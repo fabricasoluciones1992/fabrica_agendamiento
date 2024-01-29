@@ -17,7 +17,7 @@ class ReservationController extends Controller
     public function index()
     {
         $reservations = DB::select(
-            "SELECT reservations.res_id, reservations.res_date, 
+            "SELECT reservations.res_id, reservations.res_date,
             reservation_types.res_typ_name, spaces.spa_name, users.use_mail
             FROM reservations
             INNER JOIN reservation_types
@@ -26,7 +26,7 @@ class ReservationController extends Controller
             ON reservations.spa_id = spaces.spa_id
             INNER JOIN users
             ON reservations.use_id = users.use_id");
-        
+
         if ($reservations == null)
         {
             return response()->json([
@@ -60,7 +60,7 @@ class ReservationController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'res_date' => 'required',
+            'res_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])(\s)([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
             'res_typ_id' => 'required',
             'spa_id' => 'required',
             'use_id' => 'required',
@@ -76,16 +76,26 @@ class ReservationController extends Controller
             ]);
         }else{
 
+            $date= date('Y-m-d H:i');
+
             $reservations = new Reservation($request->input());
             $reservations->res_date = $request->res_date;
             $reservations->res_typ_id = $request->res_typ_id;
             $reservations->spa_id = $request->spa_id;
             $reservations->use_id = $request->use_id;
-            $reservations->save();
-            return response()->json([
-                'status' => True,
-                'message' => 'Reservation created succesfully'
-            ], 200);
+            if($request->res_date >= $date)
+            {
+                $reservations->save();
+                return response()->json([
+                    'status' => True,
+                    'message' => 'Reservation created succesfully'
+                ], 200);
+            }else{
+                return response()->json([
+                    'status' => False,
+                    'message' => 'The date of the reservation is invalid'
+                ], 200);
+            }
         }
     }
 
@@ -99,9 +109,9 @@ class ReservationController extends Controller
     {
         $reservation = DB::select(
             "SELECT reservations.res_id, reservations.res_date, reservation_types.res_typ_name, spaces.spa_name, users.use_mail
-            FROM reservations 
-            INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id 
-            INNER JOIN users ON reservations.use_id = users.use_id 
+            FROM reservations
+            INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
+            INNER JOIN users ON reservations.use_id = users.use_id
             WHERE reservations.res_id = $id");
 
         if ($reservation == null)
@@ -123,7 +133,7 @@ class ReservationController extends Controller
      */
     public function edit(Reservation $reservation)
     {
-        // 
+        //
     }
 
     /**

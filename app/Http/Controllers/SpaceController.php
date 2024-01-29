@@ -136,10 +136,14 @@ class SpaceController extends Controller
      * @param  \App\Models\Space  $space
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Space $space)
+    public function destroy($id)
     {
+        $desactivate = Space::find($id);
+        ($desactivate->spa_status == 1)?$desactivate->spa_status=0:$desactivate->spa_status=1;
+        $desactivate->save();
         return response()->json([
-            "message" => "This action is not allowed"
-        ], 400);
+            "message" => "Status changed successfully"
+        ], 200);
     }
+
 }
