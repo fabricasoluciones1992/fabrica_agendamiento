@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reservation;
+use App\Models\Space;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -77,13 +78,13 @@ class ReservationController extends Controller
         }else{
 
             $date= date('Y-m-d H:i');
-
+            $space = Space::find($request->spa_id);
             $reservations = new Reservation($request->input());
             $reservations->res_date = $request->res_date;
             $reservations->res_typ_id = $request->res_typ_id;
             $reservations->spa_id = $request->spa_id;
             $reservations->use_id = $request->use_id;
-            if($request->res_date >= $date)
+            if($request->res_date >= $date && $space->spa_status != 0)
             {
                 $reservations->save();
                 return response()->json([
@@ -93,8 +94,8 @@ class ReservationController extends Controller
             }else{
                 return response()->json([
                     'status' => False,
-                    'message' => 'The date of the reservation is invalid'
-                ], 200);
+                    'message' => $validator->errors()->all()
+                ], 400);
             }
         }
     }
