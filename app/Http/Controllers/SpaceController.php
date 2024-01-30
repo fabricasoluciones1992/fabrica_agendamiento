@@ -24,6 +24,8 @@ class SpaceController extends Controller
              'message' => 'There is no spaces availables.'
             ], 400);
         }else{
+            Controller::NewRegisterTrigger("Se realizó una busqueda de un dato en la tabla spaces ",4,1,1);
+
             return response()->json($spaces);
         }
     }
@@ -60,6 +62,8 @@ class SpaceController extends Controller
             $space = new Space($request->input());
             $space->spa_name = $request->spa_name;
             $space ->save();
+            Controller::NewRegisterTrigger("Se realizó una inserción de un dato en la tabla spaces ",3,1,1);
+
             return response()->json([
                 'status' => True,
                 'message' => 'space created successfully',
@@ -84,6 +88,8 @@ class SpaceController extends Controller
                 'message' => 'This space does not exist.'
             ], 400);
         }else{
+            Controller::NewRegisterTrigger("Se realizó una busqueda de un dato en la tabla spaces ",4,1,1);
+
             return $space;
         }
     }
@@ -123,6 +129,8 @@ class SpaceController extends Controller
             $space->spa_name = $request->spa_name;
             $space->spa_status = $request->spa_status;
             $space->save();
+            Controller::NewRegisterTrigger("Se realizó una actualización de un dato en la tabla spaces ",1,1,1);
+
             return response()->json([
                 'status' => True,
                 'message' => 'space modified successfully',
@@ -141,6 +149,7 @@ class SpaceController extends Controller
         $desactivate = Space::find($id);
         ($desactivate->spa_status == 1)?$desactivate->spa_status=0:$desactivate->spa_status=1;
         $desactivate->save();
+        Controller::NewRegisterTrigger("Se intentó destruir un dato en la tabla spaces ",2,1,1);
         return response()->json([
             "message" => "Status changed successfully"
         ], 200);
