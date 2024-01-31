@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
+
 
 class ReservationController extends Controller
 {
@@ -116,8 +118,62 @@ class ReservationController extends Controller
             $reservations->spa_id = $request->spa_id;
             $reservations->use_id = $request->use_id;
 
-            if($request->res_date <= $date && $request->res_start < $request->res_end && $request->res_start >= "07:00" && $request->res_end <= "19:00" )
+
+            foreach ($validate as $key) {
+
+
+                if ($key->res_start == $request->res_start && $key->res_end == $request->res_end) {
+                        return response()->json([
+                            'status' => False,
+                            'message' => 'aaaaa '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.'
+                        ], 400);
+                    }else{
+                    // if($validate == null){
+                        return response()->json([
+                            'status' => True,
+                            'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.'
+                        ], 200);
+                    // }
+
+                }
+            }
+
+              /*  $request->validate([
+
+                'res_start' => [
+                    'required',
+                    'date_format:H:i',
+                    'before:res_end',
+                    Rule::unique('reservations')->where(function ($query) use ($request) {
+                      return $query->where('spa_id', $request->spa_id)
+                            ->where('res_date', $request->res_date)
+                            ->where('use_id', $request->use_id)
+                            ->where(function ($query) use ($request) {
+                                $query->orwhereBetween('res_start', [$request->res_start, $request->res_end])
+                                    ->orWhereBetween('res_end', [$request->res_start, $request->res_end]);
+                            });
+                    }),
+                ],
+                'res_end' => [
+                'required',
+                'date_format:H:i',
+                Rule::unique('reservations')->where(function ($query) use ($request) {
+                  return $query->where('spa_id', $request->spa_id)
+                            ->where('res_date', $request->res_date)
+                            ->where('use_id', $request->use_id)
+                        ->where(function ($query) use ($request) {
+                            $query->orwhereBetween('res_start', [$request->res_start, $request->res_end])
+                                ->orWhereBetween('res_end', [$request->res_start, $request->res_end]);
+                        });
+                }),
+
+            ]]);
+
+
+
+             if($request->res_date >= $date && $request->res_start >= "07:00" && $request->res_end <= "19:00" )
             {
+
                 if ($space->spa_status != 0){
                     if ($request->res_end >= $hora && $request->res_end <= $hora2) {
                         Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla reservations ",3,1,1);
@@ -129,7 +185,7 @@ class ReservationController extends Controller
                     }else{
                         return response()->json([
                             'status' => False,
-                            'message' => 'Unvaible time'
+                            'message' => 'Unvalid time'
                            ], 400);
                     }
 
@@ -137,7 +193,7 @@ class ReservationController extends Controller
                 }else{
                     return response()->json([
                      'status' => False,
-                     'message' => 'Unvaible Space'
+                     'message' => 'Unvalid Space'
                     ], 400);
                 }
             }else{
@@ -146,7 +202,7 @@ class ReservationController extends Controller
                     'message' => 'Unvalid date'
                    ], 400);
             }
-
+            */
         }
 
     }
