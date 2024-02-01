@@ -28,5 +28,7 @@ Route::resource('genders', GendersController::class)->names('genders');
 // CRUD espacios salas
 Route::Resource('reservations', ReservationController::class)->names('reservations');
 Route::get('reservations/user/{id}', [ReservationController::class, "reserPerUser"])->name('reservations.reserPerUser');
+Route::get('reservations/date/{date}', [ReservationController::class, "reserPerDate"])->name('reservations.reserPerDate');
+Route::get('reservations/space/{space}', [ReservationController::class, "reserPerSpace"])->name('reservations.reserPerSpace');
 Route::Resource('spaces', SpaceController::class)->names('spaces');
 Route::Resource('reservation_types', ReservationTypeController::class)->names('reservation_types');

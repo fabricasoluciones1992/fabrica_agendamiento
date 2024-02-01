@@ -346,4 +346,49 @@ class ReservationController extends Controller
 
   }
 
+  public function reserPerDate($date){
+    $reservation = DB::select(
+        "SELECT reservations.res_id, reservations.res_date, reservation_types.res_typ_name, spaces.spa_name, users.use_mail
+        FROM reservations
+        INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
+        INNER JOIN users ON reservations.use_id = users.use_id
+        WHERE reservations.res_date = '$date'");
+
+    if ($reservation == null)
+    {
+        return response()->json([
+            'status' => False,
+            'message' => 'No reservation made.'
+        ], 400);
+    }else{
+        // Control de acciones
+        Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,1,1);
+        return $reservation;
+    }
+
+  }
+
+  
+  public function reserPerSpace($space){
+    $reservation = DB::select(
+        "SELECT reservations.res_id, reservations.res_date, reservation_types.res_typ_name, spaces.spa_name, users.use_mail
+        FROM reservations
+        INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
+        INNER JOIN users ON reservations.use_id = users.use_id
+        WHERE reservations.spa_id = $space");
+
+    if ($reservation == null)
+    {
+        return response()->json([
+            'status' => False,
+            'message' => 'No reservation made.'
+        ], 400);
+    }else{
+        // Control de acciones
+        Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,1,1);
+        return $reservation;
+    }
+
+  }
+
 }
