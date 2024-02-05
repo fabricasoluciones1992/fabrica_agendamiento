@@ -55,6 +55,8 @@ class ReservationController extends Controller
      */
     public function store(Request $request)
     {
+        // $token = Controller::auth();
+        // $prueba = Controller::genders($token['token']);
         $rules = [
             'res_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
             'res_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],

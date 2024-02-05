@@ -13,9 +13,9 @@ class AuthController extends Controller
 {
     public function login(Request $request){
         $rules = [
-            'name' => 'required|string|min:1|max:100',
-            'email' => 'required|min:1|max:100|email',
-            'password' => 'required|string|min:1|max:100',
+            // 'name' => 'required|string|min:1|max:100',
+            'use_mail' => 'required|min:1|max:100|email',
+            'use_password' => 'required|string|min:1|max:100',
         ];
 
         $validator = Validator::make($request->input(), $rules);
@@ -24,14 +24,15 @@ class AuthController extends Controller
                 'status' => False,
                 'message' => $validator->errors()->all()
             ],400);
+            return $request;
         }else{
-            if (!Auth::attempt($request->only('email', 'password'))) {
+            if (!Auth::attempt($request->only('use_mail', 'use_password'))) {
                 return response()->json([
                     'status' => False,
                     'message' => "Unauthenticated"
                 ],400);
             }else{
-            $user = DB::table('users')->where('email', '=', $request->email)->first();
+            $user = DB::table('users')->where('use_mail', '=', $request->email)->first();
             $user = User::find($user->id);
             return response()->json([
                 'status' => True,
