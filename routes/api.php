@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\EpsController;
-use App\Http\Controllers\GendersController;
+use App\Http\Controllers\AuthController;
+// use App\Http\Controllers\EpsController;
+// use App\Http\Controllers\GendersController;
 use App\Http\Controllers\SpaceController;
 use App\Http\Controllers\ReservationTypeController;
 use App\Http\Controllers\ReservationController;
@@ -18,13 +19,16 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::post('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::resource('eps', EpsController::class)->names('eps');
-Route::resource('genders', GendersController::class)->names('genders');
+// Route::resource('eps', EpsController::class)->names('eps');
+// Route::resource('genders', GendersController::class)->names('genders');
 // CRUD espacios salas
 Route::Resource('reservations', ReservationController::class)->names('reservations');
 Route::get('reservations/user/{id}', [ReservationController::class, "reserPerUser"])->name('reservations.reserPerUser');
