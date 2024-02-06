@@ -27,11 +27,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 // Route::resource('eps', EpsController::class)->names('eps');
-// Route::get('genders', controller::class, 'genders')->names('genders');
-// CRUD espacios salas
+// Route::get('genders', [controller::class, 'genders'])->names('genders');
+
 Route::Resource('reservations', ReservationController::class)->names('reservations');
+// Funciones adicionales ReservationController
 Route::get('reservations/user/{id}', [ReservationController::class, "reserPerUser"])->name('reservations.reserPerUser');
 Route::get('reservations/date/{date}', [ReservationController::class, "reserPerDate"])->name('reservations.reserPerDate');
 Route::get('reservations/space/{space}', [ReservationController::class, "reserPerSpace"])->name('reservations.reserPerSpace');
-Route::Resource('spaces', SpaceController::class)->names('spaces');
+
 Route::Resource('reservation_types', ReservationTypeController::class)->names('reservation_types');
+Route::Resource('spaces', SpaceController::class)->names('spaces');
