@@ -31,16 +31,6 @@ class SpaceController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -49,8 +39,7 @@ class SpaceController extends Controller
     public function store(Request $request)
     {
         $rules =[
-            'spa_name' => 'required|string|min:1|max:100',
-            'spa_status' => 'required|numeric'
+            'spa_name' => ['required', 'regex:/^[A-Z ]+$/'],
         ];
         $validator = Validator::make($request->input(), $rules);
         if ($validator->fails()) {
@@ -61,12 +50,12 @@ class SpaceController extends Controller
         }else{
             $space = new Space($request->input());
             $space->spa_name = $request->spa_name;
+            $space->spa_status = 1;
             $space ->save();
             Controller::NewRegisterTrigger("Se realizó una inserción de un dato en la tabla spaces ",3,1,1);
-
             return response()->json([
                 'status' => True,
-                'message' => 'space created successfully',
+                'message' => 'space '.$space->spa_name.' created successfully',
             ], 200);
         }
 
@@ -86,23 +75,15 @@ class SpaceController extends Controller
             return response()->json([
                 'status' => False,
                 'message' => 'This space does not exist.'
-            ], 400);
+            ],400);
         }else{
             Controller::NewRegisterTrigger("Se realizó una busqueda de un dato en la tabla spaces ",4,1,1);
-
-            return $space;
+            return response()->json([
+                
+               'status' => True,
+               'data' => $space
+            ],200);
         }
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Space  $space
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Space $space)
-    {
-        //
     }
 
     /**
@@ -115,8 +96,7 @@ class SpaceController extends Controller
     public function update(Request $request, $id)
     {
         $rules =[
-            'spa_name' => 'required|string|min:1|max:100',
-            'spa_status' => 'required|numeric'
+            'spa_name' => ['required', 'regex:/^[A-Z ]+$/'],
         ];
         $validator = Validator::make($request->input(), $rules);
         if ($validator->fails()) {
@@ -127,13 +107,12 @@ class SpaceController extends Controller
         }else{
             $space = Space::find($id);
             $space->spa_name = $request->spa_name;
-            $space->spa_status = $request->spa_status;
             $space->save();
-            Controller::NewRegisterTrigger("Se realizó una actualización de un dato en la tabla spaces ",1,1,1);
+            Controller::NewRegisterTrigger("Se realizó una actualización en un dato de la tabla spaces ",1,1,1);
 
             return response()->json([
                 'status' => True,
-                'message' => 'space modified successfully',
+                'message' => 'space '.$space->spa_name.' modified successfully',
             ], 200);
         }
     }
@@ -149,9 +128,9 @@ class SpaceController extends Controller
         $desactivate = Space::find($id);
         ($desactivate->spa_status == 1)?$desactivate->spa_status=0:$desactivate->spa_status=1;
         $desactivate->save();
-        Controller::NewRegisterTrigger("Se intentó destruir un dato en la tabla spaces ",2,1,1);
+        Controller::NewRegisterTrigger("Se cambio el estado de un dato en la tabla spaces ",2,1,1);
         return response()->json([
-            "message" => "Status changed successfully"
+            'message' => 'Status of '.$desactivate->spa_name.' changed successfully'
         ], 200);
     }
 

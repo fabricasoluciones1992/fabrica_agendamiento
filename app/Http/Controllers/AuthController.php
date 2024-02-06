@@ -24,7 +24,6 @@ class AuthController extends Controller
                 'status' => False,
                 'message' => $validator->errors()->all()
             ],400);
-            return $request;
         }else{
             if (!Auth::attempt($request->only('use_mail', 'use_password'))) {
                 return response()->json([

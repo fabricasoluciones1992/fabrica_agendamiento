@@ -27,7 +27,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 // Route::resource('eps', EpsController::class)->names('eps');
-// Route::get('genders', [controller::class, 'genders'])->names('genders');
+Route::get('genders', [controller::class, 'genders'])->names('genders');
 
 Route::Resource('reservations', ReservationController::class)->names('reservations');
 // Funciones adicionales ReservationController

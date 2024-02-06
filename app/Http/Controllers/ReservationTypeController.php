@@ -25,18 +25,11 @@ class ReservationTypeController extends Controller
         }else{
             // Control de acciones
             Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservation_types ",4,1,1);
-            return response()->json($reservationTypes);
+            return response()->json([
+                'status'=> True,
+                'data' => $reservationTypes
+            ],200);
         }
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -48,7 +41,7 @@ class ReservationTypeController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'res_typ_name' => 'required|string|min:1|max:60'
+            'res_typ_name' => ['required', 'regex:/^[A-Z ]+$/']
         ];
         $validator = Validator::make($request->input(), $rules);
         if($validator->fails()){
@@ -64,7 +57,7 @@ class ReservationTypeController extends Controller
             Controller::NewRegisterTrigger("Se realizó una inserción en la tabla reservation_types ",3,1,1);
             return response()->json([
                 'status' => True,
-                'message' => 'Reservation type created successfully.'
+                'message' => 'Reservation type '.$reservationTypes->res_typ_name.' created successfully.'
             ], 200);
         }
     }
@@ -87,39 +80,31 @@ class ReservationTypeController extends Controller
             ], 400);
         }else{
             Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservation_types ",4,1,1);
-            return $reservationType;
+            return response()->json([
+                'status' => True,
+                'data'=> $reservationType
+            ],200);
         }
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\ReservationType  $reservationTypes
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(ReservationType $reservationType)
-    {
-        //
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\ReservationTypes  $reservationTypes
+     * @param  \App\Models\ReservationType  $reservationTypes
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
         $rules = [
-            'res_typ_name' => 'required|string|min:1|max:60'
+            'res_typ_name' => ['required', 'regex:/^[A-Z ]+$/']
         ];
         $validator = Validator::make($request->input(), $rules);
         if($validator->fails()){
             return response()->json([
               'status' => False,
               'message' => $validator->errors()->all()
-            ]);
+            ],400);
         }else{
             $reservationTypes = ReservationType::find($id);
             $reservationTypes->res_typ_name = $request->res_typ_name;
@@ -128,8 +113,8 @@ class ReservationTypeController extends Controller
             return response()->json([
 
                 'status' => True,
-                'message' => 'Reservation type modified successfully'
-            ]);
+                'message' => 'Reservation type '.$reservationTypes->res_typ_name.' modified successfully.'
+            ],200);
         }
     }
 
@@ -144,7 +129,7 @@ class ReservationTypeController extends Controller
         Controller::NewRegisterTrigger("Se intentó destruir un dato en la tabla reservation_types ",2,1,1);
 
         return response()->json([
-            'message' => 'This function is not allowed'
-        ]);
+            'message' => 'This function is not allowed.'
+        ],400);
     }
 }
