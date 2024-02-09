@@ -27,22 +27,25 @@ class Controller extends BaseController
         if (isset($_SESSION['api_token'])) {
             $token = $_SESSION['api_token'];
             $use_id = $_SESSION['use_id'];
+            $responseData['acc_administrator']=$_SESSION['acc_administrator'];
+ 
             return [
                 "token" => $token,
-                "use_id" => $use_id
+                "use_id" => $use_id,
+                "acc_administrator" => $responseData
             ];
         } else {
             return  'Token not found in session';
         }
     }
-   
+ 
      public function genders($token) {
         if ($token == "Token not found in session") {
             return $token;
         }else{
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->get('http://127.0.0.1:8088/api/genders');
+            ])->get('http://127.0.0.1:8088/api/projects');
  
             if ($response->successful()) {
                 return response()->json([

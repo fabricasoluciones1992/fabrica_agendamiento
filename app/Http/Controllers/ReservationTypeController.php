@@ -16,6 +16,7 @@ class ReservationTypeController extends Controller
      */
     public function index()
     {
+
         $reservationTypes = ReservationType::all();
         if($reservationTypes == null){
             return response()->json([
@@ -24,7 +25,7 @@ class ReservationTypeController extends Controller
             ], 400);
         }else{
             // Control de acciones
-            Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservation_types ",4,1,1);
+            Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservation_types ",4,env('APP_ID'),1);
             return response()->json([
                 'status'=> True,
                 'data' => $reservationTypes
@@ -40,25 +41,40 @@ class ReservationTypeController extends Controller
      */
     public function store(Request $request)
     {
-        $rules = [
-            'res_typ_name' => ['required', 'regex:/^[A-Z ]+$/']
-        ];
-        $validator = Validator::make($request->input(), $rules);
-        if($validator->fails()){
-            return response()->json([
-              'status' => False,
-              'message' => $validator->errors()->all()
-            ], 400);
+        $token = Controller::auth();
+        if ($_SESSION['acc_administrator'] == 1) {
+            if($token =='Token not found in session'){
+                return response()->json([
+                   'status' => False,
+                  'message' => 'Token not found, please login and try again.'
+                ],400);
+            }
+            $token = Controller::auth();
+            $rules = [
+                'res_typ_name' => ['required', 'regex:/^[A-Z ]+$/']
+            ];
+            $validator = Validator::make($request->input(), $rules);
+            if($validator->fails()){
+                return response()->json([
+                  'status' => False,
+                  'message' => $validator->errors()->all()
+                ], 400);
+            }else{
+                $reservationTypes = new ReservationType($request->input());
+                $reservationTypes->res_typ_name = $request->res_typ_name;
+                $reservationTypes->save();
+                // Control de acciones
+                Controller::NewRegisterTrigger("Se realizó una inserción en la tabla reservation_types ",3,env('APP_ID'),$token['use_id']);
+                return response()->json([
+                    'status' => True,
+                    'message' => 'Reservation type '.$reservationTypes->res_typ_name.' created successfully.'
+                ], 200);
+            }
         }else{
-            $reservationTypes = new ReservationType($request->input());
-            $reservationTypes->res_typ_name = $request->res_typ_name;
-            $reservationTypes->save();
-            // Control de acciones
-            Controller::NewRegisterTrigger("Se realizó una inserción en la tabla reservation_types ",3,1,1);
             return response()->json([
-                'status' => True,
-                'message' => 'Reservation type '.$reservationTypes->res_typ_name.' created successfully.'
-            ], 200);
+                'status' => False,
+            'message' => 'Access denied. This action can only be performed by active administrators.'
+            ],403);
         }
     }
 
@@ -79,7 +95,7 @@ class ReservationTypeController extends Controller
                 'message' => 'This space does not exist.'
             ], 400);
         }else{
-            Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservation_types ",4,1,1);
+            Controller::NewRegisterTrigger("Se realizó una busqueda de un dato específico en la tabla reservation_types ",4,env('APP_ID'),1);
             return response()->json([
                 'status' => True,
                 'data'=> $reservationType
@@ -96,25 +112,39 @@ class ReservationTypeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $rules = [
-            'res_typ_name' => ['required', 'regex:/^[A-Z ]+$/']
-        ];
-        $validator = Validator::make($request->input(), $rules);
-        if($validator->fails()){
-            return response()->json([
-              'status' => False,
-              'message' => $validator->errors()->all()
-            ],400);
+        $token = Controller::auth();
+        if ($_SESSION['acc_administrator'] == 1) {
+            if($token =='Token not found in session'){
+                return response()->json([
+                   'status' => False,
+                  'message' => 'Token not found, please login and try again.'
+                ],400);
+            }
+            $rules = [
+                'res_typ_name' => ['required', 'regex:/^[A-Z ]+$/']
+            ];
+            $validator = Validator::make($request->input(), $rules);
+            if($validator->fails()){
+                return response()->json([
+                  'status' => False,
+                  'message' => $validator->errors()->all()
+                ],400);
+            }else{
+                $reservationTypes = ReservationType::find($id);
+                $reservationTypes->res_typ_name = $request->res_typ_name;
+                $reservationTypes->save();
+                Controller::NewRegisterTrigger("Se realizó una actualización en la tabla reservation_types ",1,env('APP_ID'),$token['use_id']);
+                return response()->json([
+    
+                    'status' => True,
+                    'message' => 'Reservation type '.$reservationTypes->res_typ_name.' modified successfully.'
+                ],200);
+            }
         }else{
-            $reservationTypes = ReservationType::find($id);
-            $reservationTypes->res_typ_name = $request->res_typ_name;
-            $reservationTypes->save();
-            Controller::NewRegisterTrigger("Se realizó una actualización en la tabla reservation_types ",1,1,1);
             return response()->json([
-
-                'status' => True,
-                'message' => 'Reservation type '.$reservationTypes->res_typ_name.' modified successfully.'
-            ],200);
+                'status' => False,
+                'message' => 'Access denied. This action can only be performed by active administrators.'
+                ],403);
         }
     }
 
@@ -126,8 +156,7 @@ class ReservationTypeController extends Controller
      */
     public function destroy(ReservationType $reservationType)
     {
-        Controller::NewRegisterTrigger("Se intentó destruir un dato en la tabla reservation_types ",2,1,1);
-
+        Controller::NewRegisterTrigger("Se intentó destruir un dato en la tabla reservation_types ",2,env('APP_ID'),1);
         return response()->json([
             'message' => 'This function is not allowed.'
         ],400);
