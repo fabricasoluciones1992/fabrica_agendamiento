@@ -31,9 +31,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::Resource('reservations'.URL, ReservationController::class)->names('reservations')->parameter('','reservations');
 // Funciones adicionales ReservationController
-Route::get('reservations/user/{id}', [ReservationController::class, "reserPerUser"])->name('reservations.reserPerUser');
-Route::get('reservations/date/{date}', [ReservationController::class, "reserPerDate"])->name('reservations.reserPerDate');
-Route::get('reservations/space/{space}', [ReservationController::class, "reserPerSpace"])->name('reservations.reserPerSpace');
+Route::get('historial/user/{id}', [ReservationController::class, "reserPerUser"])->name('reservations.reserPerUser');
+Route::get('historial/date/{date}', [ReservationController::class, "reserPerDate"])->name('reservations.reserPerDate');
+Route::get('historial/space/{space}', [ReservationController::class, "reserPerSpace"])->name('reservations.reserPerSpace');
 
-Route::Resource('reservation/types'.URL, ReservationTypeController::class)->names('reservation/types')->parameter('','reservation/types');
+Route::Resource('reservation/types'.URL, ReservationTypeController::class)->names('reservation/types')->parameter('','reservation_types');
 Route::Resource('spaces'.URL, SpaceController::class)->names('spaces')->parameter('','spaces');
