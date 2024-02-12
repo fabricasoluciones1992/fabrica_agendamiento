@@ -56,12 +56,6 @@ class ReservationController extends Controller
     {
         $token = Controller::auth();
         if ($_SESSION['acc_administrator'] == 1) {
-            if($token =='Token not found in session'){
-                return response()->json([
-                   'status' => False,
-                  'message' => 'Token not found, please login and try again.'
-                ],400);
-            }else{
                 $rules = [
                     'res_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
                     'res_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
@@ -205,7 +199,6 @@ class ReservationController extends Controller
                         ],400);
                     }
                 }
-            }
         }else{
             return response()->json([
                 'status' => False,
@@ -264,12 +257,6 @@ class ReservationController extends Controller
     {
         $token = Controller::auth();
         if ($_SESSION['acc_administrator'] == 1) {
-            if($token =='Token not found in session'){
-                return response()->json([
-                   'status' => False,
-                  'message' => 'Token not found, please login and try again.'
-                ],400);
-            }else{
                 $rules = [
                     'res_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
                     'res_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
@@ -416,15 +403,18 @@ class ReservationController extends Controller
                         ],400);
                     }
                 }
-            }
+
         }else{
             return response()->json([
-             'status' => False,
-             'message' => 'Access denied. This action can only be performed by active administrators.'
+                'status' => False,
+                'message' => 'Access denied. This action can only be performed by active administrators.'
             ],403);
+
         }
 
-    }
+
+        }
+
 
     /**
      * Remove the specified resource from storage.
@@ -435,14 +425,8 @@ class ReservationController extends Controller
     public function destroy(Reservation $reservation)
     {
         $token = Controller::auth();
-        if($token =='Token not found in session'){
-            return response()->json([
-               'status' => False,
-              'message' => 'Token not found, please login and try again.'
-            ],400);
-        }
         // Control de acciones
-        Controller::NewRegisterTrigger("Se intentó destruir un dato en la tabla reservations ",2,env('APP_ID'),$token['use_id']);
+        Controller::NewRegisterTrigger("Se intentó destruir un dato en la tabla reservations ",2,env('APP_ID'),1);
         return response()->json([
             'status' => False,
             'message'  => 'This function is not allowed'
