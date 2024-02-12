@@ -48,50 +48,42 @@ class SpaceController extends Controller
      */
     public function store(Request $request)
     {   
+        // Se llama la sesión para traer el ID del usuario.
         $token = Controller::auth();
-            if($token =='Token not found in session'){
+            if ($_SESSION['acc_administrator'] == 1) {
+            // Se establecen los parametros para ingresar datos. 
+            $rules =[
+                'spa_name' => ['required', 'regex:/^[A-Z ]+$/'],
+            ];
+            // El sistema valida que estos datos sean correctos
+            $validator = Validator::make($request->input(), $rules);
+            if ($validator->fails()) {
                 return response()->json([
-                   'status' => False,
-                  'message' => 'Token not found, please login and try again.'
+                    'status' => False,
+                    'message' => $validator->errors()->all()
                 ],400);
             }else{
-                if ($_SESSION['acc_administrator'] == 1) {
-                // Se llama la sesión para traer el ID del usuario.
-
-                // Se establecen los parametros para ingresar datos. 
-                $rules =[
-                    'spa_name' => ['required', 'regex:/^[A-Z ]+$/'],
-                ];
-
-                // El sistema valida que estos datos sean correctos
-                $validator = Validator::make($request->input(), $rules);
-                if ($validator->fails()) {
-                    return response()->json([
-                        'status' => False,
-                        'message' => $validator->errors()->all()
-                    ],400);
-                }else{
-                    // Si los datos son correctos se procede a guardar los datos en la base de datos.
-                    $space = new Space($request->input());
-                    $space->spa_name = $request->spa_name;
-                    $space->spa_status = 1;
-                    $space ->save();
-                    // Se guarda la novedad en la base de datos.
-                    Controller::NewRegisterTrigger("Se realizó una inserción de un dato en la tabla spaces ",3,env('APP_ID'),$token['use_id']);
-                    return response()->json([
-                        'status' => True,
-                        'message' => 'space '.$space->spa_name.' created successfully',
-                        'data' => $space
-                    ],200);
-                }
-            }else{
+                // Si los datos son correctos se procede a guardar los datos en la base de datos.
+                $space = new Space($request->input());
+                $space->spa_name = $request->spa_name;
+                $space->spa_status = 1;
+                $space ->save();
+                // Se guarda la novedad en la base de datos.
+                Controller::NewRegisterTrigger("Se realizó una inserción de un dato en la tabla spaces ",3,env('APP_ID'),$token['use_id']);
                 return response()->json([
-                   'status' => False,
-                   'message' => 'Access denied. This action can only be performed by active administrators.'
-                    ],403);
+                    'status' => True,
+                    'message' => 'space '.$space->spa_name.' created successfully',
+                    'data' => $space
+                ],200);
             }
+        }else{
+            return response()->json([
+               'status' => False,
+               'message' => 'Access denied. This action can only be performed by active administrators.'
+                ],403);
         }
     }
+    
 
     /**
      * Display the specified resource.
@@ -102,29 +94,23 @@ class SpaceController extends Controller
     public function show($id)
     {
         $token = Controller::auth();
-        if($token =='Token not found in session'){
-            return response()->json([
-               'status' => False,
-              'message' => 'Token not found, please login and try again.'
-            ],400);
-        }else{
             // Se busca el id que se pasa por URL en la tabla de la base de datos
             $space = Space::find($id);
-            if($space == null)
-            {
-                return response()->json([
-                    'status' => False,
-                    'message' => 'This space does not exist.'
-                ],400);
-            }else{
-                // Se guarda la novedad en la base de datos.
-                Controller::NewRegisterTrigger("Se realizó una busqueda de un dato específico en la tabla spaces.",4,env('APP_ID'),$token['use_id']);
-                return response()->json([
-                'status' => True,
-                'data' => $space
-                ],200);
-            }
+        if($space == null)
+        {
+            return response()->json([
+                'status' => False,
+                'message' => 'This space does not exist.'
+            ],400);
+        }else{
+            // Se guarda la novedad en la base de datos.
+            Controller::NewRegisterTrigger("Se realizó una busqueda de un dato específico en la tabla spaces.",4,env('APP_ID'),$token['use_id']);
+            return response()->json([
+            'status' => True,
+            'data' => $space
+            ],200);
         }
+        
     }
 
     /**
@@ -137,39 +123,30 @@ class SpaceController extends Controller
     public function update(Request $request, $id)
     {
         $token = Controller::auth();
-        if ($_SESSION['acc_administrator'] == 1) {
-            if($token =='Token not found in session'){
+        if ($_SESSION['acc_administrator'] == 1) {               
+            // Se establecen los parametros para ingresar datos. 
+            $rules =[
+                'spa_name' => ['required', 'regex:/^[A-Z ]+$/'],
+            ];
+            // El sistema valida que estos datos sean correctos
+            $validator = Validator::make($request->input(), $rules);
+            if ($validator->fails()) {
                 return response()->json([
-                   'status' => False,
-                  'message' => 'Token not found, please login and try again.'
+                    'status' => False,
+                    'message' => $validator->errors()->all()
                 ],400);
-            }else{                
-                // Se establecen los parametros para ingresar datos. 
-                $rules =[
-                    'spa_name' => ['required', 'regex:/^[A-Z ]+$/'],
-                ];
-                // El sistema valida que estos datos sean correctos
-                $validator = Validator::make($request->input(), $rules);
-                if ($validator->fails()) {
-                    return response()->json([
-                        'status' => False,
-                        'message' => $validator->errors()->all()
-                    ],400);
-                }else{
-                    // Se busca el dato en la base de datos.
-                    $space = Space::find($id);
-                    $space->spa_name = $request->spa_name;
-                    $space->save();
-
-                    // Se guarda la novedad en la base de datos.
-                    // Controller::NewRegisterTrigger("Se realizó una actualización en la información del dato ".$request->spa_name." de la tabla spaces ",1,env('APP_ID'),$token['use_id']);
-
-                    return response()->json([
-                        'status' => True,
-                        'message' => 'space '.$space->spa_name.' modified successfully',
-                        'data'=> $space
-                    ],200);
-                }    
+            }else{
+                // Se busca el dato en la base de datos.
+                $space = Space::find($id);
+                $space->spa_name = $request->spa_name;
+                $space->save();
+                // Se guarda la novedad en la base de datos.
+                Controller::NewRegisterTrigger("Se realizó una actualización en la información del dato ".$request->spa_name." de la tabla spaces ",1,env('APP_ID'),$token['use_id']);
+                return response()->json([
+                    'status' => True,
+                    'message' => 'space '.$space->spa_name.' modified successfully',
+                    'data'=> $space
+                ],200);
             }
             
         }else{

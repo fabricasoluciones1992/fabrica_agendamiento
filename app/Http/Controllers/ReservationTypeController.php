@@ -43,12 +43,6 @@ class ReservationTypeController extends Controller
     {
         $token = Controller::auth();
         if ($_SESSION['acc_administrator'] == 1) {
-            if($token =='Token not found in session'){
-                return response()->json([
-                   'status' => False,
-                  'message' => 'Token not found, please login and try again.'
-                ],400);
-            }
             $token = Controller::auth();
             $rules = [
                 'res_typ_name' => ['required', 'regex:/^[A-Z ]+$/']
@@ -87,29 +81,19 @@ class ReservationTypeController extends Controller
     public function show($id)
     {
         $token = Controller::auth();
-        if($token =='Token not found in session'){
+        $reservationType = ReservationType::find($id);
+        if($reservationType == null){
             return response()->json([
-               'status' => False,
-              'message' => 'Token not found, please login and try again.'
-            ],400);
+                'status' => False,
+                'message' => 'This space does not exist.'
+            ], 400);
         }else{
-            $reservationType = ReservationType::find($id);
-            if($reservationType == null)
-            {
-    
-                return response()->json([
-                    'status' => False,
-                    'message' => 'This space does not exist.'
-                ], 400);
-            }else{
-                // Controller::NewRegisterTrigger("Se realizó una busqueda de un dato específico en la tabla reservation_types ",4,env('APP_ID'),1);
-                return response()->json([
-                    'status' => True,
-                    'data'=> $reservationType
-                ],200);
-            }
-        }
-       
+            Controller::NewRegisterTrigger("Se realizó una busqueda de un dato específico en la tabla reservation_types ",4,env('APP_ID'),1);
+            return response()->json([
+                'status' => True,
+                'data'=> $reservationType
+            ],200);
+        }    
     }
 
     /**
@@ -123,12 +107,6 @@ class ReservationTypeController extends Controller
     {
         $token = Controller::auth();
         if ($_SESSION['acc_administrator'] == 1) {
-            if($token =='Token not found in session'){
-                return response()->json([
-                   'status' => False,
-                  'message' => 'Token not found, please login and try again.'
-                ],400);
-            }
             $rules = [
                 'res_typ_name' => ['required', 'regex:/^[A-Z ]+$/']
             ];
