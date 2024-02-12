@@ -10,6 +10,7 @@ use App\Http\Controllers\ReservationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+define("URL", "/{proj_id}/");
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -20,18 +21,19 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::post('login', [AuthController::class, 'login'])->name('login');
+Route::post('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::Resource('reservations', ReservationController::class)->names('reservations');
+Route::Resource('reservations'.URL, ReservationController::class)->names('reservations')->parameter('','reservations');
 // Funciones adicionales ReservationController
 Route::get('reservations/user/{id}', [ReservationController::class, "reserPerUser"])->name('reservations.reserPerUser');
 Route::get('reservations/date/{date}', [ReservationController::class, "reserPerDate"])->name('reservations.reserPerDate');
 Route::get('reservations/space/{space}', [ReservationController::class, "reserPerSpace"])->name('reservations.reserPerSpace');
 
-Route::Resource('reservation_types', ReservationTypeController::class)->names('reservation_types');
-Route::Resource('spaces', SpaceController::class)->names('spaces');
+Route::Resource('reservation/types'.URL, ReservationTypeController::class)->names('reservation/types')->parameter('','reservation/types');
+Route::Resource('spaces'.URL, SpaceController::class)->names('spaces')->parameter('','spaces');

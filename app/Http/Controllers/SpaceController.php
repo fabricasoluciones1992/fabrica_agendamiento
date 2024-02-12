@@ -49,15 +49,14 @@ class SpaceController extends Controller
     public function store(Request $request)
     {   
         $token = Controller::auth();
-        if ($_SESSION['acc_administrator'] == 1) {
             if($token =='Token not found in session'){
                 return response()->json([
                    'status' => False,
                   'message' => 'Token not found, please login and try again.'
                 ],400);
             }else{
+                if ($_SESSION['acc_administrator'] == 1) {
                 // Se llama la sesión para traer el ID del usuario.
-                $token = Controller::auth();
 
                 // Se establecen los parametros para ingresar datos. 
                 $rules =[
@@ -85,16 +84,13 @@ class SpaceController extends Controller
                         'data' => $space
                     ],200);
                 }
+            }else{
+                return response()->json([
+                   'status' => False,
+                   'message' => 'Access denied. This action can only be performed by active administrators.'
+                    ],403);
             }
-            
-        }else{
-            return response()->json([
-               'status' => False,
-               'message' => 'Access denied. This action can only be performed by active administrators.'
-                ],403);
         }
-        
-
     }
 
     /**
@@ -112,9 +108,6 @@ class SpaceController extends Controller
               'message' => 'Token not found, please login and try again.'
             ],400);
         }else{
-            // Se llama la sesión en una variable para traer el ID del usuario.
-            $token = Controller::auth();
-
             // Se busca el id que se pasa por URL en la tabla de la base de datos
             $space = Space::find($id);
             if($space == null)
@@ -150,10 +143,7 @@ class SpaceController extends Controller
                    'status' => False,
                   'message' => 'Token not found, please login and try again.'
                 ],400);
-            }else{
-                // Se llama la sesión en una variable para traer el ID del usuario.
-                $token = Controller::auth();
-                
+            }else{                
                 // Se establecen los parametros para ingresar datos. 
                 $rules =[
                     'spa_name' => ['required', 'regex:/^[A-Z ]+$/'],
@@ -172,7 +162,7 @@ class SpaceController extends Controller
                     $space->save();
 
                     // Se guarda la novedad en la base de datos.
-                    Controller::NewRegisterTrigger("Se realizó una actualización en la información del dato ".$request->spa_name." de la tabla spaces ",1,env('APP_ID'),$token['use_id']);
+                    // Controller::NewRegisterTrigger("Se realizó una actualización en la información del dato ".$request->spa_name." de la tabla spaces ",1,env('APP_ID'),$token['use_id']);
 
                     return response()->json([
                         'status' => True,
