@@ -10,7 +10,7 @@ use App\Http\Controllers\ReservationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-define("URL", "/{proj_id}/");
+define("URL", "/{proj_id}/{use_id}/");
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -31,9 +31,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::Resource('reservations'.URL, ReservationController::class)->names('reservations')->parameter('','reservations');
 // Funciones adicionales ReservationController
-Route::get('historial/user/{id}', [ReservationController::class, "reserPerUser"])->name('reservations.reserPerUser');
-Route::get('historial/date/{date}', [ReservationController::class, "reserPerDate"])->name('reservations.reserPerDate');
-Route::get('historial/space/{space}', [ReservationController::class, "reserPerSpace"])->name('reservations.reserPerSpace');
+Route::get('historial/user/{id}'.URL, [ReservationController::class, "reserPerUser"])->name('historial.per.user');
+Route::get('historial/date/{date}'.URL, [ReservationController::class, "reserPerDate"])->name('historial.per.date');
+Route::get('historial/space/{space}'.URL, [ReservationController::class, "reserPerSpace"])->name('historial.Per.Space');
 
-Route::Resource('reservation/types'.URL, ReservationTypeController::class)->names('reservation/types')->parameter('','reservation_types');
+Route::Resource('reservation/types'.URL, ReservationTypeController::class)->names('reservation.types')->parameter('','reservation_types');
 Route::Resource('spaces'.URL, SpaceController::class)->names('spaces')->parameter('','spaces');

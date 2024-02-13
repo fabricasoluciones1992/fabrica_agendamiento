@@ -14,9 +14,8 @@ class SpaceController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index( $proj_id, $use_id)
     {
-        
             $spaces = Space::all();
             if($spaces == null){
                 return response()->json([
@@ -24,7 +23,7 @@ class SpaceController extends Controller
                 'message' => 'There is no spaces availables.'
                 ],400);
             }else{
-                Controller::NewRegisterTrigger("Se realizó una busqueda de datos en la tabla spaces ",4,env('APP_ID'),1);
+                Controller::NewRegisterTrigger("Se realizó una busqueda de datos en la tabla spaces ",4,$proj_id,$use_id);
 
                 return response()->json([
                     'status'=>True,
@@ -38,14 +37,14 @@ class SpaceController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store($proj_id, $use_id, Request $request )
     {   
-        // Se llama la sesión para traer el ID del usuario.
         
-            if ($_SESSION['acc_administrator'] == 1) {
+
+            if ($request->acc_administrator == 1) {
             // Se establecen los parametros para ingresar datos. 
             $rules =[
-                'spa_name' => ['required', 'regex:/^[A-Z ]+$/'],
+                'spa_name' => ['required', 'regex:/^[A-ZÑ\s]+$/']
             ];
             // El sistema valida que estos datos sean correctos
             $validator = Validator::make($request->input(), $rules);
@@ -61,7 +60,7 @@ class SpaceController extends Controller
                 $space->spa_status = 1;
                 $space ->save();
                 // Se guarda la novedad en la base de datos.
-                Controller::NewRegisterTrigger("Se realizó una inserción de un dato en la tabla spaces ",3,env('APP_ID'),1);
+                Controller::NewRegisterTrigger("Se realizó una inserción de un dato en la tabla spaces ",3,$proj_id,$use_id);
                 return response()->json([
                     'status' => True,
                     'message' => 'space '.$space->spa_name.' created successfully',
@@ -83,7 +82,7 @@ class SpaceController extends Controller
      * @param  \App\Models\Space  $space
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, $proj_id, $use_id)
     {
         
             // Se busca el id que se pasa por URL en la tabla de la base de datos
@@ -96,7 +95,7 @@ class SpaceController extends Controller
             ],400);
         }else{
             // Se guarda la novedad en la base de datos.
-            Controller::NewRegisterTrigger("Se realizó una busqueda de un dato específico en la tabla spaces.",4,env('APP_ID'),1);
+            Controller::NewRegisterTrigger("Se realizó una busqueda de un dato específico en la tabla spaces.",4,$proj_id,$use_id);
             return response()->json([
             'status' => True,
             'data' => $space
@@ -112,13 +111,12 @@ class SpaceController extends Controller
      * @param  \App\Models\Space  $space
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update($proj_id, $use_id, Request $request, $id )
     {
-        
-        if ($_SESSION['acc_administrator'] == 1) {               
+        if ($request->acc_administrator == 1) {               
             // Se establecen los parametros para ingresar datos. 
             $rules =[
-                'spa_name' => ['required', 'regex:/^[A-Z ]+$/'],
+                'spa_name' => ['required', 'regex:/^[A-ZÑ\s]+$/'],
             ];
             // El sistema valida que estos datos sean correctos
             $validator = Validator::make($request->input(), $rules);
@@ -133,7 +131,7 @@ class SpaceController extends Controller
                 $space->spa_name = $request->spa_name;
                 $space->save();
                 // Se guarda la novedad en la base de datos.
-                Controller::NewRegisterTrigger("Se realizó una actualización en la información del dato ".$request->spa_name." de la tabla spaces ",1,env('APP_ID'),1);
+                Controller::NewRegisterTrigger("Se realizó una actualización en la información del dato ".$request->spa_name." de la tabla spaces ",1,$proj_id,$use_id);
                 return response()->json([
                     'status' => True,
                     'message' => 'space '.$space->spa_name.' modified successfully',
@@ -156,7 +154,7 @@ class SpaceController extends Controller
      * @param  \App\Models\Space  $space
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, $proj_id, $use_id)
     {
         // Se llama la sesión en una variable para traer el ID del usuario.
         
@@ -164,7 +162,7 @@ class SpaceController extends Controller
         $desactivate = Space::find($id);
         ($desactivate->spa_status == 1)?$desactivate->spa_status=0:$desactivate->spa_status=1;
         $desactivate->save();
-        Controller::NewRegisterTrigger("Se cambio el estado de un dato en la tabla spaces ",2,env('APP_ID'),1);
+        Controller::NewRegisterTrigger("Se cambio el estado de un dato en la tabla spaces ",2,$proj_id,$use_id);
         return response()->json([
             'message' => 'Status of '.$desactivate->spa_name.' changed successfully.',
             'data' => $desactivate

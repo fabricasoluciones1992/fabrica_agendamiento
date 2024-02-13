@@ -29,10 +29,10 @@ class AuthController extends Controller
             // Check if a token was retrieved before storing it
             if ($token !== null) {
                 // Start the session and store the token
-                session_start();
-                $_SESSION['api_token'] = $token;
-                $_SESSION['use_id'] = $user->use_id;
-                $_SESSION['acc_administrator'] = $responseData['acc_administrator'];
+                // session_start();
+                // $_SESSION['api_token'] = $token;
+                // $_SESSION['use_id'] = $user->use_id;
+                // $_SESSION['acc_administrator'] = $responseData['acc_administrator'];
    
                 return response()->json([
                     'status' => true,

@@ -22,22 +22,22 @@ class Controller extends BaseController
         DB::statement("CALL new_register('" . addslashes($new_description) . "', $new_typ_id, $proj_id, $use_id)");
     }
 
-    function auth(){
-        session_start();
-        if (isset($_SESSION['api_token'])) {
-            $token = $_SESSION['api_token'];
-            $use_id = $_SESSION['use_id'];
-            $responseData['acc_administrator']=$_SESSION['acc_administrator'];
+    // function auth(){
+    //     session_start();
+    //     if (isset($_SESSION['api_token'])) {
+    //         $token = $_SESSION['api_token'];
+    //         $use_id = $_SESSION['use_id'];
+    //         $responseData['acc_administrator']=$_SESSION['acc_administrator'];
  
-            return [
-                "token" => $token,
-                "use_id" => $use_id,
-                "acc_administrator" => $responseData
-            ];
-        } else {
-            return  'Token not found in session';
-        }
-    }
+    //         return [
+    //             "token" => $token,
+    //             "use_id" => $use_id,
+    //             "acc_administrator" => $responseData
+    //         ];
+    //     } else {
+    //         return  'Token not found in session';
+    //     }
+    // }
  
      public function genders($token) {
         if ($token == "Token not found in session") {
