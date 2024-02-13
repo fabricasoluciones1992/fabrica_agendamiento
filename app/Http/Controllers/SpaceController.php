@@ -16,14 +16,7 @@ class SpaceController extends Controller
      */
     public function index()
     {
-        $token = Controller::auth();
-
-        if($token =='Token not found in session'){
-            return response()->json([
-               'status' => False,
-              'message' => 'Token not found, please login and try again.'
-            ],400);
-        }else{
+        
             $spaces = Space::all();
             if($spaces == null){
                 return response()->json([
@@ -37,7 +30,6 @@ class SpaceController extends Controller
                     'status'=>True,
                     'data'=>$spaces],200);
             }
-        }
     }
 
     /**
@@ -49,7 +41,7 @@ class SpaceController extends Controller
     public function store(Request $request)
     {   
         // Se llama la sesión para traer el ID del usuario.
-        $token = Controller::auth();
+        
             if ($_SESSION['acc_administrator'] == 1) {
             // Se establecen los parametros para ingresar datos. 
             $rules =[
@@ -69,7 +61,7 @@ class SpaceController extends Controller
                 $space->spa_status = 1;
                 $space ->save();
                 // Se guarda la novedad en la base de datos.
-                Controller::NewRegisterTrigger("Se realizó una inserción de un dato en la tabla spaces ",3,env('APP_ID'),$token['use_id']);
+                Controller::NewRegisterTrigger("Se realizó una inserción de un dato en la tabla spaces ",3,env('APP_ID'),1);
                 return response()->json([
                     'status' => True,
                     'message' => 'space '.$space->spa_name.' created successfully',
@@ -93,7 +85,7 @@ class SpaceController extends Controller
      */
     public function show($id)
     {
-        $token = Controller::auth();
+        
             // Se busca el id que se pasa por URL en la tabla de la base de datos
             $space = Space::find($id);
         if($space == null)
@@ -104,7 +96,7 @@ class SpaceController extends Controller
             ],400);
         }else{
             // Se guarda la novedad en la base de datos.
-            Controller::NewRegisterTrigger("Se realizó una busqueda de un dato específico en la tabla spaces.",4,env('APP_ID'),$token['use_id']);
+            Controller::NewRegisterTrigger("Se realizó una busqueda de un dato específico en la tabla spaces.",4,env('APP_ID'),1);
             return response()->json([
             'status' => True,
             'data' => $space
@@ -122,7 +114,7 @@ class SpaceController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $token = Controller::auth();
+        
         if ($_SESSION['acc_administrator'] == 1) {               
             // Se establecen los parametros para ingresar datos. 
             $rules =[
@@ -141,7 +133,7 @@ class SpaceController extends Controller
                 $space->spa_name = $request->spa_name;
                 $space->save();
                 // Se guarda la novedad en la base de datos.
-                Controller::NewRegisterTrigger("Se realizó una actualización en la información del dato ".$request->spa_name." de la tabla spaces ",1,env('APP_ID'),$token['use_id']);
+                Controller::NewRegisterTrigger("Se realizó una actualización en la información del dato ".$request->spa_name." de la tabla spaces ",1,env('APP_ID'),1);
                 return response()->json([
                     'status' => True,
                     'message' => 'space '.$space->spa_name.' modified successfully',
@@ -167,12 +159,12 @@ class SpaceController extends Controller
     public function destroy($id)
     {
         // Se llama la sesión en una variable para traer el ID del usuario.
-        $token = Controller::auth();
+        
 
         $desactivate = Space::find($id);
         ($desactivate->spa_status == 1)?$desactivate->spa_status=0:$desactivate->spa_status=1;
         $desactivate->save();
-        Controller::NewRegisterTrigger("Se cambio el estado de un dato en la tabla spaces ",2,env('APP_ID'),$token['use_id']);
+        Controller::NewRegisterTrigger("Se cambio el estado de un dato en la tabla spaces ",2,env('APP_ID'),1);
         return response()->json([
             'message' => 'Status of '.$desactivate->spa_name.' changed successfully.',
             'data' => $desactivate
