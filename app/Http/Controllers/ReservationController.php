@@ -54,7 +54,7 @@ class ReservationController extends Controller
      */
     public function store($proj_id, $use_id, Request $request)
     {
-        if ($request->acc_administrator == 1) {
+
                 $rules = [
                     'res_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
                     'res_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
@@ -120,17 +120,30 @@ class ReservationController extends Controller
                             // Se comprueba que la reserva sea minimo de treinta minutos y máximo de dos horas.
                             if ($request->res_end >= $minHourFormat && $request->res_end <= $maxHourFormat && $request->res_start < $request->res_end){
 
-                                $totalReservationsDay = DB::select("SELECT COUNT(reservations.res_id) AS total_res
+                                /* $totalReservationsDay = DB::select("SELECT COUNT(reservations.res_id) AS total_res
                                                                     FROM reservations
                                                                     WHERE reservations.res_date = '$request->res_date' AND reservations.use_id = $request->use_id");
-                                $totalReservationsDayCount = $totalReservationsDay[0]->total_res;
+                                $totalReservationsDayCount = $totalReservationsDay[0]->total_res; */
+
                                 $reservationsUsers = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_id
                                                                     FROM reservations
                                                                     INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
                                                                     INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
                                                                     INNER JOIN users ON reservations.use_id = users.use_id
-                                                                    WHERE reservations.res_date = '$request->res_date' AND reservations.res_start = '$request->res_start' AND reservations.use_id = $request->use_id");
-                                if($totalReservationsDayCount < 3 ){
+                                                                    WHERE reservations.res_date = '$request->res_date' AND reservations.use_id = $request->use_id");
+                               /*  $reservationsSinceDate = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_id
+                                FROM reservations
+                                INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
+                                INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
+                                INNER JOIN users ON reservations.use_id = users.use_id
+                                WHERE reservations.res_date >= $date  AND reservations.use_id = $request->use_id"); */
+
+                                $reservationsSinceDate = DB::select("SELECT COUNT(reservations.res_id) AS total_res
+                                                        FROM reservations
+                                                        WHERE reservations.res_date >= '$date'  AND reservations.use_id = $request->use_id");
+                                $reservationsSinceDateCount = $reservationsSinceDate[0]->total_res;
+
+                                if($reservationsSinceDateCount < 3 || $request->acc_administrator == 1 ){
                                     if($reservationsUsers == null){
                                         if($request->res_date == $date && $request->res_start <= $actualHour){
                                             return response()->json([
@@ -156,7 +169,8 @@ class ReservationController extends Controller
                                                 $reservations->save();
                                                 return response()->json([
                                                     'status' => True,
-                                                    'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.'
+                                                    'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.',
+                                                    'data' => $reservations
                                                 ],200);
                                                 }
                                         }
@@ -164,18 +178,37 @@ class ReservationController extends Controller
                                         $reservations->save();
                                         return response()->json([
                                             'status' => True,
-                                            'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.'
+                                            'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.',
+                                            'data' => $reservations
                                         ],200);
                                     }else{
-                                        return response()->json([
-                                        'status' => False,
-                                        'message' => 'This user have a reservation in other room.'
-                                        ],400);
+                                        // return $reservationsUsers;
+                                        foreach ($reservationsUsers as $reservationsUsersKey){
+                                            // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon
+                                            $validatedResStart = carbon::parse($reservationsUsersKey->res_start);
+                                            $validatedResEnd = carbon::parse($reservationsUsersKey->res_end);
+
+                                            if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart)) {
+                                                // Hay superposición, la nueva reserva no es posible
+                                                return response()->json([
+                                                    'status' => False,
+                                                    'message' => 'This user have a reservation in room '.$reservationsUsers[0]->spa_name.'.'
+                                                ],400);
+                                            }else{
+                                                Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla reservations ",3,$proj_id, $use_id);
+                                                $reservations->save();
+                                                return response()->json([
+                                                    'status' => True,
+                                                    'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.',
+                                                    'data' => $reservations
+                                                    ],200);
+                                            }
+                                        }
                                     }
                                 }else{
                                     return response()->json([
                                         'status' => False,
-                                        'message' => 'This user can not made more reservations today.'
+                                        'message' => 'This user can not made more reservations.'
                                     ],400);
                                 }
                             }else{
@@ -198,12 +231,6 @@ class ReservationController extends Controller
                         ],400);
                     }
                 }
-        }else{
-            return response()->json([
-                'status' => False,
-                'message' => 'Access denied. This action can only be performed by active administrators.'
-            ],403);
-        }
 
     }
 
@@ -254,7 +281,6 @@ class ReservationController extends Controller
      */
     public function update($proj_id, $use_id, Request $request, $id)
     {
-        if ($request->acc_administrator == 1) { 
                 $rules = [
                     'res_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
                     'res_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
@@ -329,7 +355,7 @@ class ReservationController extends Controller
                                                             INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
                                                             INNER JOIN users ON reservations.use_id = users.use_id
                                                             WHERE reservations.res_date = '$request->res_date' AND reservations.res_start = '$request->res_start' AND reservations.use_id = $request->use_id");
-                                if($totalReservationsDayCount < 3 ){
+                                if($totalReservationsDayCount < 3 || $request->acc_administrator == 1){
                                     if($reservationsUsers == null){
                                         if($request->res_date == $date && $request->res_start <= $actualHour){
                                             return response()->json([
@@ -401,14 +427,6 @@ class ReservationController extends Controller
                         ],400);
                     }
                 }
-
-        }else{
-            return response()->json([
-                'status' => False,
-                'message' => 'Access denied. This action can only be performed by active administrators.'
-            ],403);
-
-        }
 
 
         }
