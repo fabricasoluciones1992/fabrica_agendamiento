@@ -18,7 +18,7 @@ class ReservationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($proj_id, $use_id)
     {
         $reservations = DB::select(
             "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end,
@@ -38,7 +38,7 @@ class ReservationController extends Controller
              'message' => 'No se encontraron reservaciones'
             ], 400);
         }else{
-        Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,env('APP_ID'),1);
+        Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
         return response()->json([
             'status'=> True,
             'data'=> $reservations
@@ -52,10 +52,9 @@ class ReservationController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store($proj_id, $use_id, Request $request)
     {
-        $token = Controller::auth();
-        if ($_SESSION['acc_administrator'] == 1) {
+        if ($request->acc_administrator == 1) {
                 $rules = [
                     'res_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
                     'res_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
@@ -153,7 +152,7 @@ class ReservationController extends Controller
                                                         'message' => 'This space is reserved'
                                                     ],400);
                                                 }else{
-                                                Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla reservations ",3,env('APP_ID'),1);
+                                                Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla reservations ",3,$proj_id, $use_id);
                                                 $reservations->save();
                                                 return response()->json([
                                                     'status' => True,
@@ -161,7 +160,7 @@ class ReservationController extends Controller
                                                 ],200);
                                                 }
                                         }
-                                        Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla reservations ",3,env('APP_ID'),1);
+                                        Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla reservations ",3,$proj_id, $use_id);
                                         $reservations->save();
                                         return response()->json([
                                             'status' => True,
@@ -214,7 +213,7 @@ class ReservationController extends Controller
      * @param  \App\Models\Reservation  $reservation
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($proj_id, $use_id, $id)
     {
        $reservation = DB::select(
             "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, reservation_types.res_typ_name, spaces.spa_name, users.use_mail
@@ -230,7 +229,7 @@ class ReservationController extends Controller
                 'message' => 'No reservation found.'
             ],400);
         }else{
-        Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,env('APP_ID'),1);
+        Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
 
             return response()->json([
                 'status' => True,
@@ -253,10 +252,9 @@ class ReservationController extends Controller
      * @param  \App\Models\Reservation  $reservation
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update($proj_id, $use_id, Request $request, $id)
     {
-        $token = Controller::auth();
-        if ($_SESSION['acc_administrator'] == 1) {
+        if ($request->acc_administrator == 1) { 
                 $rules = [
                     'res_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
                     'res_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
@@ -354,7 +352,7 @@ class ReservationController extends Controller
                                                 }
                                                 else{
                                                     // Reporte de novedad
-                                                    Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla reservations ",1,env('APP_ID'),$token['use_id']);
+                                                    Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla reservations ",1,$proj_id, $use_id);
                                                     // Se guarda la actualización
                                                     $reservations->save();
                                                     return response()->json([
@@ -365,7 +363,7 @@ class ReservationController extends Controller
                                             }
                                         }
                                         // Reporte de novedad
-                                        Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla reservations ",1,env('APP_ID'),$token['use_id']);
+                                        Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla reservations ",1,$proj_id, $use_id);
                                         // Se guarda la novedad
                                         $reservations->save();
                                         return response()->json([
@@ -422,18 +420,17 @@ class ReservationController extends Controller
      * @param  \App\Models\Reservation  $reservation
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Reservation $reservation)
+    public function destroy($proj_id, $use_id, Reservation $reservation)
     {
-        $token = Controller::auth();
         // Control de acciones
-        Controller::NewRegisterTrigger("Se intentó destruir un dato en la tabla reservations ",2,env('APP_ID'),1);
+        Controller::NewRegisterTrigger("Se intentó destruir un dato en la tabla reservations ", 2, $proj_id, $use_id);
         return response()->json([
             'status' => False,
             'message'  => 'This function is not allowed'
         ],400);
     }
 
-    public function reserPerUser($id){
+    public function reserPerUser($proj_id, $use_id, $id){
         $reservation = DB::select(
             "SELECT reservations.res_id, reservations.res_date, reservation_types.res_typ_name, spaces.spa_name, users.use_mail
             FROM reservations
@@ -449,7 +446,7 @@ class ReservationController extends Controller
             ],400);
         }else{
             // Control de acciones
-            Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,env('APP_ID'),1);
+            Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
             return response()->json([
                 'status' => True,
                 'data' => $reservation
@@ -458,7 +455,7 @@ class ReservationController extends Controller
 
     }
 
-    public function reserPerDate($date){
+    public function reserPerDate($proj_id, $use_id, $date){
         $reservation = DB::select(
             "SELECT reservations.res_id, reservations.res_date, reservation_types.res_typ_name, spaces.spa_name, users.use_mail
             FROM reservations
@@ -474,7 +471,7 @@ class ReservationController extends Controller
             ],400);
         }else{
             // Control de acciones
-            Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,env('APP_ID'),1);
+            Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
             return response()->json([
                 'status' => True,
                 'data' => $reservation
@@ -484,7 +481,7 @@ class ReservationController extends Controller
     }
 
 
-    public function reserPerSpace($space){
+    public function reserPerSpace($proj_id, $use_id, $space){
         $reservation = DB::select(
             "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, reservation_types.res_typ_name, spaces.spa_name, users.use_mail
             FROM reservations
@@ -500,7 +497,7 @@ class ReservationController extends Controller
             ], 400);
         }else{
             // Control de acciones
-            Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,env('APP_ID'),1);
+            Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
             return response()->json([
                 'status' => True,
                 'data' => $reservation

@@ -14,7 +14,7 @@ class SpaceController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index( $proj_id, $use_id)
+    public function index($proj_id, $use_id)
     {
             $spaces = Space::all();
             if($spaces == null){
@@ -82,13 +82,12 @@ class SpaceController extends Controller
      * @param  \App\Models\Space  $space
      * @return \Illuminate\Http\Response
      */
-    public function show($id, $proj_id, $use_id)
+    public function show($proj_id, $use_id, $id)
     {
         
-            // Se busca el id que se pasa por URL en la tabla de la base de datos
-            $space = Space::find($id);
-        if($space == null)
-        {
+        // Se busca el id que se pasa por URL en la tabla de la base de datos
+        $space = Space::find($id);
+        if($space == null){
             return response()->json([
                 'status' => False,
                 'message' => 'This space does not exist.'
@@ -154,19 +153,22 @@ class SpaceController extends Controller
      * @param  \App\Models\Space  $space
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id, $proj_id, $use_id)
+    public function destroy( $proj_id, $use_id, $id, Request $request)
     {
-        // Se llama la sesión en una variable para traer el ID del usuario.
-        
-
-        $desactivate = Space::find($id);
-        ($desactivate->spa_status == 1)?$desactivate->spa_status=0:$desactivate->spa_status=1;
-        $desactivate->save();
-        Controller::NewRegisterTrigger("Se cambio el estado de un dato en la tabla spaces ",2,$proj_id,$use_id);
-        return response()->json([
-            'message' => 'Status of '.$desactivate->spa_name.' changed successfully.',
-            'data' => $desactivate
-        ],200);
+        if($request->acc_administrator == 1){
+            $desactivate = Space::find($id);
+            ($desactivate->spa_status == 1)?$desactivate->spa_status=0:$desactivate->spa_status=1;
+            $desactivate->save();
+            Controller::NewRegisterTrigger("Se cambio el estado de un dato en la tabla spaces ",2,$proj_id,$use_id);
+            return response()->json([
+                'message' => 'Status of '.$desactivate->spa_name.' changed successfully.',
+                'data' => $desactivate
+            ],200);
+        }else{
+            return response()->json([
+                'status' => False,
+                'message' => 'Access denied. This action can only be performed by active administrators.'
+            ]);
+        }
     }
-
 }

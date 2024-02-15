@@ -60,8 +60,8 @@ class Controller extends BaseController
         }
     }
  
-    public function gender($id) {
-        $token = Controller::auth();
+    public function gender($id, $token) {
+        // $token = Controller::auth();
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $token,
         ])->get('http://127.0.0.1:8088/api/genders/'.$id);

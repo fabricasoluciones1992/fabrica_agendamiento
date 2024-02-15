@@ -14,7 +14,7 @@ class ReservationTypeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($proj_id, $use_id)
     {
 
         $reservationTypes = ReservationType::all();
@@ -25,7 +25,7 @@ class ReservationTypeController extends Controller
             ], 400);
         }else{
             // Control de acciones
-            Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservation_types ",4,env('APP_ID'),1);
+            Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservation_types ",4, $proj_id, $use_id);
             return response()->json([
                 'status'=> True,
                 'data' => $reservationTypes
@@ -39,13 +39,11 @@ class ReservationTypeController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store($proj_id, $use_id, Request $request)
     {
-        $token = Controller::auth();
-        if ($_SESSION['acc_administrator'] == 1) {
-            $token = Controller::auth();
+        if($request->acc_administrator == 1){
             $rules = [
-                'res_typ_name' => ['required', 'regex:/^[A-Z ]+$/']
+                'res_typ_name' => ['required', 'regex:/^[A-ZÑ\s]+$/']
             ];
             $validator = Validator::make($request->input(), $rules);
             if($validator->fails()){
@@ -58,10 +56,11 @@ class ReservationTypeController extends Controller
                 $reservationTypes->res_typ_name = $request->res_typ_name;
                 $reservationTypes->save();
                 // Control de acciones
-                Controller::NewRegisterTrigger("Se realizó una inserción en la tabla reservation_types ",3,env('APP_ID'),$token['use_id']);
+                Controller::NewRegisterTrigger("Se realizó una inserción en la tabla reservation_types ",3,$proj_id,$use_id);
                 return response()->json([
                     'status' => True,
-                    'message' => 'Reservation type '.$reservationTypes->res_typ_name.' created successfully.'
+                    'message' => 'Reservation type '.$reservationTypes->res_typ_name.' created successfully.',
+                    'data' => $reservationTypes
                 ], 200);
             }
         }else{
@@ -78,9 +77,8 @@ class ReservationTypeController extends Controller
      * @param  \App\Models\ReservationType  $reservationTypes
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($proj_id, $use_id, $id)
     {
-        $token = Controller::auth();
         $reservationType = ReservationType::find($id);
         if($reservationType == null){
             return response()->json([
@@ -88,7 +86,7 @@ class ReservationTypeController extends Controller
                 'message' => 'This space does not exist.'
             ], 400);
         }else{
-            Controller::NewRegisterTrigger("Se realizó una busqueda de un dato específico en la tabla reservation_types ",4,env('APP_ID'),1);
+            Controller::NewRegisterTrigger("Se realizó una busqueda de un dato específico en la tabla reservation_types ",4,$proj_id,$use_id);
             return response()->json([
                 'status' => True,
                 'data'=> $reservationType
@@ -103,12 +101,12 @@ class ReservationTypeController extends Controller
      * @param  \App\Models\ReservationType  $reservationTypes
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update($proj_id, $use_id, Request $request, $id)
     {
-        $token = Controller::auth();
-        if ($_SESSION['acc_administrator'] == 1) {
+        
+        if ($request->acc_administrator == 1) {
             $rules = [
-                'res_typ_name' => ['required', 'regex:/^[A-Z ]+$/']
+                'res_typ_name' => ['required', 'regex:/^[A-ZÑ\s]+$/']
             ];
             $validator = Validator::make($request->input(), $rules);
             if($validator->fails()){
@@ -120,11 +118,12 @@ class ReservationTypeController extends Controller
                 $reservationTypes = ReservationType::find($id);
                 $reservationTypes->res_typ_name = $request->res_typ_name;
                 $reservationTypes->save();
-                Controller::NewRegisterTrigger("Se realizó una actualización en la tabla reservation_types ",1,env('APP_ID'),$token['use_id']);
+                Controller::NewRegisterTrigger("Se realizó una actualización en la tabla reservation_types ",1,$proj_id, $use_id);
                 return response()->json([
     
                     'status' => True,
-                    'message' => 'Reservation type '.$reservationTypes->res_typ_name.' modified successfully.'
+                    'message' => 'Reservation type '.$reservationTypes->res_typ_name.' modified successfully.',
+                    'data'=>$reservationTypes
                 ],200);
             }
         }else{
@@ -141,9 +140,9 @@ class ReservationTypeController extends Controller
      * @param  \App\Models\ReservationType  $reservationTypes
      * @return \Illuminate\Http\Response
      */
-    public function destroy(ReservationType $reservationType)
+    public function destroy($proj_id, $use_id, ReservationType $reservationType)
     {
-        Controller::NewRegisterTrigger("Se intentó destruir un dato en la tabla reservation_types ",2,env('APP_ID'),1);
+        Controller::NewRegisterTrigger("Se intentó destruir un dato en la tabla reservation_types ",2,$proj_id, $use_id);
         return response()->json([
             'message' => 'This function is not allowed.'
         ],400);
