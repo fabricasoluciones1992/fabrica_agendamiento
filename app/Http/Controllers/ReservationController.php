@@ -202,7 +202,7 @@ class ReservationController extends Controller
                     }else{
                         return response()->json([
                             'status' => False,
-                            'message' => 'Unvalid time, '.$request->res_end.' must be higher than '.$request->res_start.' and reservation must be in the range of 30 minutes and 2 hours.'
+                            'message' => 'Unvalid time, initial reservation hour ('.$request->res_end.') must be higher than final reservation hour ('.$request->res_start.') and reservation must be in the range of 30 minutes and 2 hours.'
                         ],400);
                     }
                 }else{
@@ -214,7 +214,7 @@ class ReservationController extends Controller
             }else{
                 return response()->json([
                     'status' => False,
-                    'message' => 'Unvalid time, the space must be reserved between the 07:00 and 19:00 of '.$date.', or a posterior date.'
+                    'message' => 'Unvalid time, the space must be reserved between the 07:00 AM and 07:00 PM of '.$date.', or a posterior date.'
                 ],400);
             }
         }
