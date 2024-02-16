@@ -54,117 +54,106 @@ class ReservationController extends Controller
      */
     public function store($proj_id, $use_id, Request $request)
     {
-
-                $rules = [
-                    'res_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
-                    'res_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
-                    'res_end' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
-                    'res_typ_id' => 'required|integer',
-                    'spa_id' => 'required',
-                    'use_id' => 'required'
-
-                ];
-
-                $validator = Validator::make($request->input(), $rules);
-                if($validator->fails())
-                {
-                    return response()->json([
-                      'status' => False,
-                      'message' => $validator->errors()->all()
-                    ],400);
-                }else{
-
-                    $validateDay = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_id
-                    FROM reservations
-                    INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
-                    INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
-                    INNER JOIN users ON reservations.use_id = users.use_id
-                    WHERE reservations.res_date = '$request->res_date' AND spaces.spa_id = $request->spa_id
-                    ORDER BY reservations.res_start ASC ");
-
+        // Reglas para validar los campos que se ingresan en los input.
+        $rules = [
+            'res_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
+            'res_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
+            'res_end' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
+            'res_typ_id' => 'required|integer',
+            'spa_id' => 'required',
+            'use_id' => 'required'
+        ];
+        // Le pasamos a una función que valida los datos 'Validator::make()' el request(los datos que ingresa el usuario) y como segundo parámetro las reglas que se requieren para validar.
+        $validator = Validator::make($request->input(), $rules);
+        // La condición dicta que si el validator falla que retorne el error y una respuesta JSON.
+        if($validator->fails())
+        {
+            return response()->json([
+            'status' => False,
+            'message' => $validator->errors()->all()
+            ],400);
+        }else{
+            // La consulta devuelve las reservas que existen en la base de datos el día de la solicitud (campo $request->res_date) y la sala que se esta pidiendo ($request->spa_id).
+            $validateDay = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_id
+            FROM reservations
+            INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
+            INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
+            INNER JOIN users ON reservations.use_id = users.use_id
+            WHERE reservations.res_date = '$request->res_date' AND spaces.spa_id = $request->spa_id
+            ORDER BY reservations.res_start ASC ");
+            // Fecha actual
+            $date= date('Y-m-d');
+            $actualHour = Carbon::now('America/Bogota')->format('H:i');
+            // Trae todos los datos de usuarios y salas según el id que trae el request.
+            $user = User::find($request->use_id);
+            $space = Space::find($request->spa_id);
+            // Los datos ingresados en el request se almacenan en un nuevo modelo Reservation.
+            $reservations = new Reservation($request->input());
+            $reservations->res_date = $request->res_date;
+            $reservations->res_start = $request->res_start;
+            $reservations->res_end = $request->res_end;
+            $reservations->res_typ_id = $request->res_typ_id;
+            $reservations->spa_id = $request->spa_id;
+            $reservations->use_id = $request->use_id;
+            // Convertimos los valores de hora que nos pasa el usuario a datos tipo Carbon.
+            $newResStart = $request->res_start;
+            $newResEnd = $request->res_end;
+            $newResStart = carbon::parse($newResStart);
+            $newResEnd = carbon::parse($newResEnd);
+            // Se comprueba que solo puedan hacerse reservas del mismo día o días posteriores y la zona horaria de la reserva.
+            if($request->res_date >= $date && $request->res_start >= "07:00" && $request->res_end <= "19:00")
+            {
+                // Se comprueba que la sala este habilitada
+                if ($space->spa_status != 0){
+                    // Parseamos la hora inicial y final en dos variables 'carbon' para poder validar el rango de la reserva (30m - 2h).
                     $minHour = Carbon::create($request->res_start);
                     $minHour->add(30,"minute");
                     $maxHour = Carbon::create($request->res_start);
                     $maxHour->add(2,"hour");
-                    $maxHourFormat = $maxHour->format("H:i");
-                    $minHourFormat = $minHour->format('H:i');
-
-                    // Fecha actual
-                    $date= date('Y-m-d');
-                    $actualHour = Carbon::now('America/Bogota')->format('H:i');
-
-                    // Trae todos los datos de usuarios y salas según el id que trae el request
-                    $user = User::find($request->use_id);
-                    $space = Space::find($request->spa_id);
-
-                    // Los datos ingresados en el request se almacenan en un nuevo modelo Reservation
-                    $reservations = new Reservation($request->input());
-                    $reservations->res_date = $request->res_date;
-                    $reservations->res_start = $request->res_start;
-                    $reservations->res_end = $request->res_end;
-                    $reservations->res_typ_id = $request->res_typ_id;
-                    $reservations->spa_id = $request->spa_id;
-                    $reservations->use_id = $request->use_id;
-
-                    // Convertimos los valores de hora que nos pasa el usuario a datos tipo Carbon
-                    $newResStart = $request->res_start;
-                    $newResEnd = $request->res_end;
-                    $newResStart = carbon::parse($newResStart);
-                    $newResEnd = carbon::parse($newResEnd);
-
-                    // Se comprueba que solo puedan hacerse reservas del mismo día o días posteriores y la zona horaria de la reserva.
-                    if($request->res_date >= $date && $request->res_start >= "07:00" && $request->res_end <= "19:00")
-                    {
-                        // Se comprueba que la sala este habilitada
-                        if ($space->spa_status != 0){
-                            // Se comprueba que la reserva sea minimo de treinta minutos y máximo de dos horas.
-                            if ($request->res_end >= $minHourFormat && $request->res_end <= $maxHourFormat && $request->res_start < $request->res_end){
-
-                                /* $totalReservationsDay = DB::select("SELECT COUNT(reservations.res_id) AS total_res
-                                                                    FROM reservations
-                                                                    WHERE reservations.res_date = '$request->res_date' AND reservations.use_id = $request->use_id");
-                                $totalReservationsDayCount = $totalReservationsDay[0]->total_res; */
-
-                                $reservationsUsers = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_id
-                                                                    FROM reservations
-                                                                    INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
-                                                                    INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
-                                                                    INNER JOIN users ON reservations.use_id = users.use_id
-                                                                    WHERE reservations.res_date = '$request->res_date' AND reservations.use_id = $request->use_id");
-                               /*  $reservationsSinceDate = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_id
-                                FROM reservations
-                                INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
-                                INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
-                                INNER JOIN users ON reservations.use_id = users.use_id
-                                WHERE reservations.res_date >= $date  AND reservations.use_id = $request->use_id"); */
-
-                                $reservationsSinceDate = DB::select("SELECT COUNT(reservations.res_id) AS total_res
-                                                        FROM reservations
-                                                        WHERE reservations.res_date >= '$date'  AND reservations.use_id = $request->use_id");
-                                $reservationsSinceDateCount = $reservationsSinceDate[0]->total_res;
-
-                                if($reservationsSinceDateCount < 3 || $request->acc_administrator == 1 ){
-                                    if($reservationsUsers == null){
-                                        if($request->res_date == $date && $request->res_start <= $actualHour){
-                                            return response()->json([
-                                                'status' => False,
-                                                'message' => 'The reservation initial hour must need to be equal or higher to '.$actualHour.'.'
-                                            ],400);
-                                        }
-                                        if($validateDay!=null){
-
-                                            foreach ($validateDay as $validateDayKey)
-                                                // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon
-                                                $validatedResStart = carbon::parse($validateDayKey->res_start);
-                                                $validatedResEnd = carbon::parse($validateDayKey->res_end);
-
-                                                if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart)) {
-                                                    // Hay superposición, la nueva reserva no es posible
-                                                    return response()->json([
-                                                        'status' => False,
-                                                        'message' => 'This space is reserved'
-                                                    ],400);
-                                                }else{
+                    // Para operar este rango horario le pasamos un formato común.
+                    $maxHour->format("H:i");
+                    $minHour->format('H:i');
+                    // Se comprueba que la reserva sea minimo de treinta minutos y máximo de dos horas.
+                    if ($request->res_end >= $minHour && $request->res_end <= $maxHour && $request->res_start < $request->res_end){
+                        // Se traen las reservas por fecha y usuario.
+                        $reservationsUsers = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_id
+                                                            FROM reservations
+                                                            INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
+                                                            INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
+                                                            INNER JOIN users ON reservations.use_id = users.use_id
+                                                            WHERE reservations.res_date = '$request->res_date' AND reservations.use_id = $request->use_id");
+                        // Se comprueba cuantas reservas activas tiene el usuario.
+                        $reservationsSinceDate = DB::select("SELECT COUNT(reservations.res_id) AS total_res
+                                                                FROM reservations
+                                                                WHERE reservations.res_date >= '$date'  AND reservations.use_id = $request->use_id");
+                        // Se guarda el arreglo en una variable para poder operarla 
+                        $reservationsSinceDateCount = $reservationsSinceDate[0]->total_res;
+                        // Se valida si el usuario es administrador (acc_administrator = 1) o si tiene menos de 3 reservas.
+                        if($reservationsSinceDateCount < 3 || $request->acc_administrator == 1 ){
+                            // Se valida si el usuario no tiene reservas en el sistema.
+                            if($reservationsUsers == null){
+                                    // Si la fecha de la reserva es igual al día de hoy ($date) y la hora inicial de la reserva es menor a la hora actual NO dejará reservar.
+                                if($request->res_date == $date && $request->res_start <= $actualHour){
+                                    return response()->json([
+                                        'status' => False,
+                                        'message' => 'The reservation initial hour must need to be equal or higher to '.$actualHour.'.'
+                                    ],400);
+                                }else{
+                                    //Por el contrario se sabra que el día de la reserva es posterior a la fecha actual o que la hora inicial de la reserva es posterior a la hora actual 
+                                    // Así que entrará a la siguiente validación, si el día de la reserva no es nulo, que compare el rango horario de las reservas existentes.
+                                    if($validateDay!=null){
+                                        foreach ($validateDay as $validateDayKey)
+                                            // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon
+                                            $validatedResStart = carbon::parse($validateDayKey->res_start);
+                                            $validatedResEnd = carbon::parse($validateDayKey->res_end);
+                                            if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart)) {
+                                                // Hay superposición, la nueva reserva no es posible.
+                                                return response()->json([
+                                                    'status' => False,
+                                                    'message' => 'The space '.$request->spa_name.' is reserved .'
+                                                ],400);
+                                            }else{
+                                                // Si no hay superposición se guardará la reserva.
                                                 Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla reservations ",3,$proj_id, $use_id);
                                                 $reservations->save();
                                                 return response()->json([
@@ -172,8 +161,8 @@ class ReservationController extends Controller
                                                     'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.',
                                                     'data' => $reservations
                                                 ],200);
-                                                }
-                                        }
+                                            }
+                                    }else{
                                         Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla reservations ",3,$proj_id, $use_id);
                                         $reservations->save();
                                         return response()->json([
@@ -181,58 +170,56 @@ class ReservationController extends Controller
                                             'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.',
                                             'data' => $reservations
                                         ],200);
-                                    }else{
-                                        // return $reservationsUsers;
-                                        foreach ($reservationsUsers as $reservationsUsersKey){
-                                            // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon
-                                            $validatedResStart = carbon::parse($reservationsUsersKey->res_start);
-                                            $validatedResEnd = carbon::parse($reservationsUsersKey->res_end);
-
-                                            if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart)) {
-                                                // Hay superposición, la nueva reserva no es posible
-                                                return response()->json([
-                                                    'status' => False,
-                                                    'message' => 'This user have a reservation in room '.$reservationsUsers[0]->spa_name.'.'
-                                                ],400);
-                                            }else{
-                                                Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla reservations ",3,$proj_id, $use_id);
-                                                $reservations->save();
-                                                return response()->json([
-                                                    'status' => True,
-                                                    'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.',
-                                                    'data' => $reservations
-                                                    ],200);
-                                            }
-                                        }
                                     }
-                                }else{
-                                    return response()->json([
-                                        'status' => False,
-                                        'message' => 'This user can not made more reservations.'
-                                    ],400);
                                 }
                             }else{
-                                return response()->json([
-                                    'status' => False,
-                                    'message' => 'Unvalid time, '.$request->res_end.' must be higher than '.$request->res_start.' and reservation must be in the range of 30 minutes and 2 hours.'
-                                ],400);
+                                foreach ($reservationsUsers as $reservationsUsersKey)
+                                    // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon.
+                                    $validatedResStart = carbon::parse($reservationsUsersKey->res_start);
+                                    $validatedResEnd = carbon::parse($reservationsUsersKey->res_end);
+                                    if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart)) {
+                                        // Hay superposición, la nueva reserva no es posible.
+                                        return response()->json([
+                                            'status' => False,
+                                            'message' => 'This user has a reservation in room '.$reservationsUsers[0]->spa_name.'.'
+                                        ],400);
+                                    }else{
+                                        Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla reservations ",3,$proj_id, $use_id);
+                                        $reservations->save();
+                                        return response()->json([
+                                            'status' => True,
+                                            'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.',
+                                            'data' => $reservations
+                                        ],200);
+                                    }    
                             }
                         }else{
                             return response()->json([
                                 'status' => False,
-                                'message' => 'The space '.$space->spa_name.' is not available.'
+                                'message' => 'This user can not made more reservations, try updating reserves that are active.'
                             ],400);
                         }
-
                     }else{
                         return response()->json([
                             'status' => False,
-                            'message' => 'Unvalid time, the space must be reserved between the 07:00 and 19:00 of '.$date.', or a posterior date.'
+                            'message' => 'Unvalid time, '.$request->res_end.' must be higher than '.$request->res_start.' and reservation must be in the range of 30 minutes and 2 hours.'
                         ],400);
                     }
+                }else{
+                    return response()->json([
+                        'status' => False,
+                        'message' => 'The space '.$space->spa_name.' is not available.'
+                    ],400);
                 }
-
+            }else{
+                return response()->json([
+                    'status' => False,
+                    'message' => 'Unvalid time, the space must be reserved between the 07:00 and 19:00 of '.$date.', or a posterior date.'
+                ],400);
+            }
+        }
     }
+    
 
     /**
      * Display the specified resource.
@@ -281,91 +268,92 @@ class ReservationController extends Controller
      */
     public function update($proj_id, $use_id, Request $request, $id)
     {
-                $rules = [
-                    'res_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
-                    'res_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
-                    'res_end' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
-                    'res_typ_id' => 'required|integer',
-                    'spa_id' => 'required|integer',
-                    'use_id' => 'required|integer'
-
-                ];
-
-                $validator = Validator::make($request->input(), $rules);
-                if($validator->fails()){
-                    return response()->json([
-                        'status' => False,
-                        'message' => $validator->errors()->all()
-                    ],400);
-                }else{
-
-                    $validateDay = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_id
-                    FROM reservations
-                    INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
-                    INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
-                    INNER JOIN users ON reservations.use_id = users.use_id
-                    WHERE reservations.res_date = '$request->res_date' AND spaces.spa_id = $request->spa_id
-                    ORDER BY reservations.res_start ASC ");
-
+        // Reglas para validar los campos que se ingresan en los input.
+        $rules = [
+            'res_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
+            'res_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
+            'res_end' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
+            'res_typ_id' => 'required|integer',
+            'spa_id' => 'required|integer',
+            'use_id' => 'required|integer'
+        ];
+        // Le pasamos a una función que valida los datos 'Validator::make()' el request(los datos que ingresa el usuario) y como segundo parámetro las reglas que se requieren para validar.
+        $validator = Validator::make($request->input(), $rules);
+        // La condición dicta que si el validator falla que retorne el error y una respuesta JSON.
+        if($validator->fails()){
+            return response()->json([
+                'status' => False,
+                'message' => $validator->errors()->all()
+            ],400);
+        }else{
+            // La consulta devuelve las reservas que existen en la base de datos el día de la solicitud (campo $request->res_date) y la sala que se esta pidiendo ($request->spa_id).
+            $validateDay = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_id
+            FROM reservations
+            INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
+            INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
+            INNER JOIN users ON reservations.use_id = users.use_id
+            WHERE reservations.res_date = '$request->res_date' AND spaces.spa_id = $request->spa_id
+            ORDER BY reservations.res_start ASC ");
+            // Fecha actual
+            $date= date('Y-m-d');
+            $actualHour = Carbon::now('America/Bogota')->format('H:i');
+            // Trae todos los datos de usuarios y salas según el id que trae el request
+            $user = User::find($request->use_id);
+            $space = Space::find($request->spa_id);
+            // Busca el id de la reserva en la base de datos
+            $reservations = Reservation::find($id);
+            $reservations->res_date = $request->res_date;
+            $reservations->res_start = $request->res_start;
+            $reservations->res_end = $request->res_end;
+            $reservations->res_typ_id = $request->res_typ_id;
+            $reservations->spa_id = $request->spa_id;
+            $reservations->use_id = $request->use_id;
+            // Convertimos los valores de hora que nos pasa el usuario a datos tipo Carbon
+            $newResStart = $request->res_start;
+            $newResEnd = $request->res_end;
+            $newResStart = carbon::parse($newResStart);
+            $newResEnd = carbon::parse($newResEnd);
+            // Se comprueba que solo puedan hacerse reservas del mismo día o días posteriores y la zona horaria de la reserva.
+            if($request->res_date >= $date && $request->res_start >= "07:00" && $request->res_end <= "19:00"){
+                // Se comprueba que la sala este habilitada
+                if ($space->spa_status != 0){
+                    // Parseamos la hora inicial y final en dos variables 'carbon' para poder validar el rango de la reserva (30m - 2h).
                     $minHour = Carbon::create($request->res_start);
                     $minHour->add(30,"minute");
                     $maxHour = Carbon::create($request->res_start);
                     $maxHour->add(2,"hour");
+                     // Para operar este rango horario le pasamos un formato común.
                     $maxHourFormat = $maxHour->format("H:i");
                     $minHourFormat = $minHour->format('H:i');
+                    // Se comprueba que la reserva sea minimo de treinta minutos y máximo de dos horas.
+                    if ($request->res_end >= $minHourFormat && $request->res_end <= $maxHourFormat && $request->res_start < $request->res_end){
 
-                    // Fecha actual
-                    $date= date('Y-m-d');
-                    $actualHour = Carbon::now('America/Bogota')->format('H:i');
-
-                    // Trae todos los datos de usuarios y salas según el id que trae el request
-
-                    $user = User::find($request->use_id);
-                    $space = Space::find($request->spa_id);
-
-                    // Busca el id de la reserva en la base de datos
-                    $reservations = Reservation::find($id);
-                    $reservations->res_date = $request->res_date;
-                    $reservations->res_start = $request->res_start;
-                    $reservations->res_end = $request->res_end;
-                    $reservations->res_typ_id = $request->res_typ_id;
-                    $reservations->spa_id = $request->spa_id;
-                    $reservations->use_id = $request->use_id;
-
-                    // Convertimos los valores de hora que nos pasa el usuario a datos tipo Carbon
-                    $newResStart = $request->res_start;
-                    $newResEnd = $request->res_end;
-                    $newResStart = carbon::parse($newResStart);
-                    $newResEnd = carbon::parse($newResEnd);
-
-                    // Se comprueba que solo puedan hacerse reservas del mismo día o días posteriores y la zona horaria de la reserva.
-                    if($request->res_date >= $date && $request->res_start >= "07:00" && $request->res_end <= "19:00"){
-                        // Se comprueba que la sala este habilitada
-                        if ($space->spa_status != 0){
-                            // Se comprueba que la reserva sea minimo de treinta minutos y máximo de dos horas.
-                            if ($request->res_end >= $minHourFormat && $request->res_end <= $maxHourFormat && $request->res_start < $request->res_end){
-
-                                $totalReservationsDay = DB::select("SELECT COUNT(reservations.res_id) AS total_res
-                                                                        FROM reservations
-                                                                        WHERE reservations.res_date = '$request->res_date' AND reservations.use_id = $request->use_id");
-                                $totalReservationsDayCount = $totalReservationsDay[0]->total_res;
-                                $reservationsUsers = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_id
-                                                            FROM reservations
-                                                            INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
-                                                            INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
-                                                            INNER JOIN users ON reservations.use_id = users.use_id
-                                                            WHERE reservations.res_date = '$request->res_date' AND reservations.res_start = '$request->res_start' AND reservations.use_id = $request->use_id");
-                                if($totalReservationsDayCount < 3 || $request->acc_administrator == 1){
-                                    if($reservationsUsers == null){
-                                        if($request->res_date == $date && $request->res_start <= $actualHour){
-                                            return response()->json([
-                                                'status' => False,
-                                                'message' => 'The reservation initial hour must need to be equal or higher to '.$actualHour.'.'
-                                                ],400);
-                                            }
+                        $totalReservationsDay = DB::select("SELECT COUNT(reservations.res_id) AS total_res
+                                                                FROM reservations
+                                                                WHERE reservations.res_date = '$request->res_date' AND reservations.use_id = $request->use_id");
+                        $totalReservationsDayCount = $totalReservationsDay[0]->total_res;
+                        // Se traen las reservas por fecha y usuario.
+                        $reservationsUsers = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_id
+                                                    FROM reservations
+                                                    INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
+                                                    INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
+                                                    INNER JOIN users ON reservations.use_id = users.use_id
+                                                    WHERE reservations.res_date = '$request->res_date' AND reservations.res_start = '$request->res_start' AND reservations.use_id = $request->use_id");
+                        // Se valida si el usuario es administrador (acc_administrator = 1) o si tiene menos de 3 reservas.
+                        if($totalReservationsDayCount < 3 || $request->acc_administrator == 1){
+                            // Se valida si el usuario no tiene reservas en el sistema.
+                            if($reservationsUsers == null){
+                                // Si la fecha de la reserva es igual al día de hoy ($date) y la hora inicial de la reserva es menor a la hora actual NO dejará reservar.
+                                if($request->res_date == $date && $request->res_start <= $actualHour){
+                                    return response()->json([
+                                        'status' => False,
+                                        'message' => 'The reservation initial hour must need to be equal or higher to '.$actualHour.'.'
+                                        ],400);
+                                    }else{
+                                         //Por el contrario se sabra que el día de la reserva es posterior a la fecha actual o que la hora inicial de la reserva es posterior a la hora actual 
+                                        // Así que entrará a la siguiente validación, si el día de la reserva no es nulo, que compare el rango horario de las reservas existentes. 
                                         if($validateDay!=null){
-
-                                            foreach ($validateDay as $validateDayKey){
+                                            foreach ($validateDay as $validateDayKey)
                                                 // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon
                                                 $validatedResStart = carbon::parse($validateDayKey->res_start);
                                                 $validatedResEnd = carbon::parse($validateDayKey->res_end);
@@ -375,61 +363,78 @@ class ReservationController extends Controller
                                                         'status' => False,
                                                         'message' => 'This space is reserved'
                                                     ],400);
-                                                }
-                                                else{
+                                                }else{
                                                     // Reporte de novedad
                                                     Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla reservations ",1,$proj_id, $use_id);
                                                     // Se guarda la actualización
                                                     $reservations->save();
                                                     return response()->json([
                                                         'status' => True,
-                                                        'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.'
+                                                        'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.',
+                                                        'data' => $reservations
                                                     ],200);
                                                 }
-                                            }
+                                        }else{
+                                            // Reporte de novedad
+                                            Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla reservations ",1,$proj_id, $use_id);
+                                            // Se guarda la novedad
+                                            $reservations->save();
+                                            return response()->json([
+                                                'status' => True,
+                                                'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.'
+                                            ],200);
                                         }
-                                        // Reporte de novedad
-                                        Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla reservations ",1,$proj_id, $use_id);
-                                        // Se guarda la novedad
+                                    }
+                                }else{
+                                    // return $reservationsUsers;
+                                    foreach ($reservationsUsers as $reservationsUsersKey)
+                                    // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon.
+                                    $validatedResStart = carbon::parse($reservationsUsersKey->res_start);
+                                    $validatedResEnd = carbon::parse($reservationsUsersKey->res_end);
+                                    if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart)) {
+                                        // Hay superposición, la nueva reserva no es posible.
+                                        return response()->json([
+                                            'status' => False,
+                                            'message' => 'This user has a reservation in room '.$reservationsUsers[0]->spa_name.'.'
+                                        ],400);
+                                    }else{
+                                        Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla reservations ",3,$proj_id, $use_id);
                                         $reservations->save();
                                         return response()->json([
                                             'status' => True,
-                                            'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.'
+                                            'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.',
+                                            'data' => $reservations
                                         ],200);
-                                    }else{
-                                        return response()->json([
-                                            'status' => False,
-                                            'message' => 'This user have a reservation in other room.'
-                                        ],400);
                                     }
-                                }else{
-                                    return response()->json([
-                                        'status' => False,
-                                        'message' => 'This user can not made more reservations today.'
-                                    ],400);
                                 }
                             }else{
                                 return response()->json([
                                     'status' => False,
-                                    'message' => 'Unvalid time, '.$request->res_end.' must be higher than '.$request->res_start.' and reservation must be in the range of 30 minutes and 2 hours.'
+                                    'message' => 'This user can not made more reservations today.'
                                 ],400);
                             }
-                        }else{
-                            return response()->json([
-                                'status' => False,
-                                'message' => 'The space '.$space->spa_name.' is not available.'
-                            ],400);
-                        }
                     }else{
                         return response()->json([
                             'status' => False,
-                            'message' => 'Unvalid time, the space must be reserved between the 07:00 and 19:00 of '.$date.', or a posterior date.'
+                            'message' => 'Unvalid time, '.$request->res_end.' must be higher than '.$request->res_start.' and reservation must be in the range of 30 minutes and 2 hours.'
                         ],400);
                     }
+                }else{
+                    return response()->json([
+                        'status' => False,
+                        'message' => 'The space '.$space->spa_name.' is not available.'
+                    ],400);
                 }
-
-
+            }else{
+                return response()->json([
+                    'status' => False,
+                    'message' => 'Unvalid time, the space must be reserved between the 07:00 and 19:00 of '.$date.', or a posterior date.'
+                ],400);
+            }
+        // Se cierra el else del validator
         }
+    // Se cierra la función
+    }
 
 
     /**
@@ -444,7 +449,7 @@ class ReservationController extends Controller
         Controller::NewRegisterTrigger("Se intentó destruir un dato en la tabla reservations ", 2, $proj_id, $use_id);
         return response()->json([
             'status' => False,
-            'message'  => 'This function is not allowed'
+            'message'  => 'This function is not allowed.'
         ],400);
     }
 
