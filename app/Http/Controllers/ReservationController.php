@@ -111,10 +111,10 @@ class ReservationController extends Controller
                     $maxHour = Carbon::create($request->res_start);
                     $maxHour->add(2,"hour");
                     // Para operar este rango horario le pasamos un formato común.
-                    $maxHour->format("H:i");
-                    $minHour->format('H:i');
+                    $minHourFormat = $minHour->format('H:i');
+                    $maxHourFormat = $maxHour->format("H:i");
                     // Se comprueba que la reserva sea minimo de treinta minutos y máximo de dos horas.
-                    if ($request->res_end >= $minHour && $request->res_end <= $maxHour && $request->res_start < $request->res_end){
+                    if ($request->res_end >= $minHourFormat && $request->res_end <= $maxHourFormat && $request->res_start < $request->res_end){
                         // Se traen las reservas por fecha y usuario.
                         $reservationsUsers = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_id
                                                             FROM reservations
@@ -126,7 +126,7 @@ class ReservationController extends Controller
                         $reservationsSinceDate = DB::select("SELECT COUNT(reservations.res_id) AS total_res
                                                                 FROM reservations
                                                                 WHERE reservations.res_date >= '$date'  AND reservations.use_id = $request->use_id");
-                        // Se guarda el arreglo en una variable para poder operarla 
+                        // Se guarda el arreglo en una variable para poder operarla
                         $reservationsSinceDateCount = $reservationsSinceDate[0]->total_res;
                         // Se valida si el usuario es administrador (acc_administrator = 1) o si tiene menos de 3 reservas.
                         if($reservationsSinceDateCount < 3 || $request->acc_administrator == 1 ){
@@ -139,7 +139,7 @@ class ReservationController extends Controller
                                         'message' => 'The reservation initial hour must need to be equal or higher to '.$actualHour.'.'
                                     ],400);
                                 }else{
-                                    //Por el contrario se sabra que el día de la reserva es posterior a la fecha actual o que la hora inicial de la reserva es posterior a la hora actual 
+                                    //Por el contrario se sabra que el día de la reserva es posterior a la fecha actual o que la hora inicial de la reserva es posterior a la hora actual
                                     // Así que entrará a la siguiente validación, si el día de la reserva no es nulo, que compare el rango horario de las reservas existentes.
                                     if($validateDay!=null){
                                         foreach ($validateDay as $validateDayKey)
@@ -191,7 +191,7 @@ class ReservationController extends Controller
                                             'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.',
                                             'data' => $reservations
                                         ],200);
-                                    }    
+                                    }
                             }
                         }else{
                             return response()->json([
@@ -219,7 +219,7 @@ class ReservationController extends Controller
             }
         }
     }
-    
+
 
     /**
      * Display the specified resource.
@@ -347,8 +347,8 @@ class ReservationController extends Controller
                                     'message' => 'The reservation initial hour must need to be equal or higher to '.$actualHour.'.'
                                     ],400);
                                 }else{
-                                     //Por el contrario se sabra que el día de la reserva es posterior a la fecha actual o que la hora inicial de la reserva es posterior a la hora actual 
-                                    // Así que entrará a la siguiente validación, si el día de la reserva no es nulo, que compare el rango horario de las reservas existentes. 
+                                     //Por el contrario se sabra que el día de la reserva es posterior a la fecha actual o que la hora inicial de la reserva es posterior a la hora actual
+                                    // Así que entrará a la siguiente validación, si el día de la reserva no es nulo, que compare el rango horario de las reservas existentes.
                                     if($validateDay!=null){
                                         foreach ($validateDay as $validateDayKey)
                                             // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon
