@@ -41,20 +41,20 @@ class AuthController extends Controller
                         "use_id" => $user->use_id,
                         "acc_administrator" => $responseData['acc_administrator']
                     ]
-                ]);
+                ],200);
             } else {
                 // Handle the case where 'token' is not present in the response
                 return response()->json([
                     'status' => false,
                     'message' => $response->json()
-                ]);
+                ],400);
             }
         } else {
             // Handle the case where the HTTP request was not successful
             return response()->json([
                 'status' => false,
                 'message' => $response->json()
-            ]);
+            ],400);
         }
     }
 

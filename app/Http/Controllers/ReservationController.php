@@ -455,7 +455,7 @@ class ReservationController extends Controller
 
     public function reserPerUser($proj_id, $use_id, $id){
         $reservation = DB::select(
-            "SELECT reservations.res_id, reservations.res_date, reservation_types.res_typ_name, spaces.spa_name, users.use_mail
+            "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, reservation_types.res_typ_name, spaces.spa_name, users.use_mail
             FROM reservations
             INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
             INNER JOIN users ON reservations.use_id = users.use_id
@@ -480,7 +480,7 @@ class ReservationController extends Controller
 
     public function reserPerDate($proj_id, $use_id, $date){
         $reservation = DB::select(
-            "SELECT reservations.res_id, reservations.res_date, reservation_types.res_typ_name, spaces.spa_name, users.use_mail
+            "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, reservation_types.res_typ_name, spaces.spa_name, users.use_mail
             FROM reservations
             INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
             INNER JOIN users ON reservations.use_id = users.use_id
