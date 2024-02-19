@@ -60,7 +60,6 @@ class ReservationTypeController extends Controller
                 return response()->json([
                     'status' => True,
                     'message' => 'Reservation type '.$reservationTypes->res_typ_name.' created successfully.',
-                    'data' => $reservationTypes
                 ], 200);
             }
         }else{
