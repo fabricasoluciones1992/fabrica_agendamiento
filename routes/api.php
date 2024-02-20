@@ -31,8 +31,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::Resource('reservations'.URL, ReservationController::class)->names('reservations')->parameter('','reservations');
 // Funciones adicionales ReservationController
+// Route::get('historial/date/{date}'.URL, [ReservationController::class, "reserPerDate"])->name('historial.per.date');
+Route::get('active/reserv'.URL, [ReservationController::class, "AdminActiveReserv"])->name('admin.active.reserv');
 Route::get('historial/user/{id}'.URL, [ReservationController::class, "reserPerUser"])->name('historial.per.user');
-Route::get('historial/date/{date}'.URL, [ReservationController::class, "reserPerDate"])->name('historial.per.date');
+Route::get('active/reserv/user/{id}'.URL, [ReservationController::class, "activeReservUser"])->name('active.reserv.user');
 Route::get('historial/space/{space}'.URL, [ReservationController::class, "reserPerSpace"])->name('historial.Per.Space');
 
 Route::Resource('reservation/types'.URL, ReservationTypeController::class)->names('reservation.types')->parameter('','reservation_types');
