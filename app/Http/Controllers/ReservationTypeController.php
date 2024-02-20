@@ -43,7 +43,7 @@ class ReservationTypeController extends Controller
     {
         if($request->acc_administrator == 1){
             $rules = [
-                'res_typ_name' => ['required', 'regex:/^[A-ZÁÉÍÓÚÜÑ\s]+$/']
+                'res_typ_name' => ['required','unique:reservation_types', 'regex:/^[A-ZÁÉÍÓÚÜÑ\s]+$/']
             ];
             $validator = Validator::make($request->input(), $rules);
             if($validator->fails()){
@@ -105,7 +105,7 @@ class ReservationTypeController extends Controller
         
         if ($request->acc_administrator == 1) {
             $rules = [
-                'res_typ_name' => ['required', 'regex:/^[A-ZÁÉÍÓÚÜÑ\s]+$/']
+                'res_typ_name' => ['required', 'unique:reservation_types', 'regex:/^[A-ZÁÉÍÓÚÜÑ\s]+$/']
             ];
             $validator = Validator::make($request->input(), $rules);
             if($validator->fails()){
