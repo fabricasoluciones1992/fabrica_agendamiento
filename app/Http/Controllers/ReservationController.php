@@ -352,7 +352,7 @@ class ReservationController extends Controller
                                                                         FROM reservations
                                                                         WHERE reservations.res_date = '$request->res_date' AND reservations.use_id = $request->use_id");
                                 $totalReservationsDayCount = $totalReservationsDay[0]->total_res;
-                                $reservationsUsers = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_id
+                                $reservationsUsers = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, spaces.spa_id, users.use_id
                                                             FROM reservations
                                                             INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
                                                             INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
@@ -367,7 +367,6 @@ class ReservationController extends Controller
                                                 ],400);
                                             }
                                         if($validateDay!=null){
-
                                             foreach ($validateDay as $validateDayKey){
                                                 // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon
                                                 $validatedResStart = carbon::parse($validateDayKey->res_start);
@@ -398,10 +397,27 @@ class ReservationController extends Controller
                                             'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.'
                                         ],200);
                                     }else{
-                                        return response()->json([
-                                            'status' => False,
-                                            'message' => 'This user have a reservation in other room.'
-                                        ],400);
+                                        // return $reservationsUsers;
+                                        foreach ($reservationsUsers as $reservationsUsersKey){
+                                            // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon
+                                            $validatedResStart = carbon::parse($reservationsUsersKey->res_start);
+                                            $validatedResEnd = carbon::parse($reservationsUsersKey->res_end);
+
+                                            if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart) && $request->spa_id == $reservationsUsersKey->spa_id) {
+                                                // Hay superposición, la nueva reserva no es posible
+                                                return response()->json([
+                                                    'status' => False,
+                                                    'message' => 'This user have a reservation in room '.$reservationsUsers[0]->spa_name.'.'
+                                                ],400);
+                                            }
+                                        }
+                                        Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla reservations ",3,$proj_id, $use_id);
+                                                $reservations->save();
+                                                return response()->json([
+                                                    'status' => True,
+                                                    'message' => 'Reservation of the space '.$space->spa_name.' updated succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.',
+
+                                                    ],200);
                                     }
                                 }else{
                                     return response()->json([
@@ -574,6 +590,29 @@ class ReservationController extends Controller
             ],200);
         }
 
+    }
+
+    public function users(Request $request){
+       if ($request->acc_administrator == 1){
+        $users  = DB::select("SELECT users.use_id, users.use_mail FROM users
+        WHERE users.use_status = 1");
+        if($users != null){
+            return response()->json([
+                'status' => True,
+                'data' => $users
+                ],200);
+            }else{
+                return response()->json([
+                    'status' => False,
+                    'message' => 'No users registered.'
+                ],400);
+            }
+       }else{
+            return response()->json([
+                'status' => False,
+                'message' => 'Access denied.'
+            ],400);
+       }
     }
 
 }

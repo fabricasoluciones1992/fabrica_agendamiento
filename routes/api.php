@@ -36,6 +36,7 @@ Route::get('active/reserv'.URL, [ReservationController::class, "AdminActiveReser
 Route::get('historial/user/{id}'.URL, [ReservationController::class, "reserPerUser"])->name('historial.per.user');
 Route::get('active/reserv/user/{id}'.URL, [ReservationController::class, "activeReservUser"])->name('active.reserv.user');
 Route::get('historial/space/{space}'.URL, [ReservationController::class, "reserPerSpace"])->name('historial.Per.Space');
+Route::get('users'.URL, [ReservationController::class, "users"])->name('users');
 
 Route::Resource('reservation/types'.URL, ReservationTypeController::class)->names('reservation.types')->parameter('','reservation_types');
 Route::Resource('spaces'.URL, SpaceController::class)->names('spaces')->parameter('','spaces');
