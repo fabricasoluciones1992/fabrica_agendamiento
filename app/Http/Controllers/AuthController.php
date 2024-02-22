@@ -20,7 +20,7 @@ class AuthController extends Controller
         $user=DB::table('users')->where("use_mail",'=',$request->use_mail)->first();
         $user = User::find($user->use_id);
         Auth::login($user);
-       
+
         // Check if the HTTP request was successful
         if ($response->successful()) {
             // Get the token from the JSON response if present
@@ -33,7 +33,7 @@ class AuthController extends Controller
                 // $_SESSION['api_token'] = $token;
                 // $_SESSION['use_id'] = $user->use_id;
                 // $_SESSION['acc_administrator'] = $responseData['acc_administrator'];
-   
+
                 return response()->json([
                     'status' => true,
                     'data' => [
