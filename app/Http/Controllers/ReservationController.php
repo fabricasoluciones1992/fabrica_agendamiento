@@ -88,7 +88,7 @@ class ReservationController extends Controller
                     $maxHour->add(2,"hour");
                     $maxHourFormat = $maxHour->format("H:i");
                     $minHourFormat = $minHour->format('H:i');
-
+                    $count=0;
                     // Fecha actual
                     $date= date('Y-m-d');
                     $actualHour = Carbon::now('America/Bogota')->format('H:i');
@@ -122,23 +122,12 @@ class ReservationController extends Controller
                             // Se comprueba que la reserva sea minimo de treinta minutos y máximo de dos horas.
                             if ($request->res_end >= $minHourFormat && $request->res_end <= $maxHourFormat && $request->res_start < $request->res_end){
 
-                                /* $totalReservationsDay = DB::select("SELECT COUNT(reservations.res_id) AS total_res
-                                                                    FROM reservations
-                                                                    WHERE reservations.res_date = '$request->res_date' AND reservations.use_id = $request->use_id");
-                                $totalReservationsDayCount = $totalReservationsDay[0]->total_res; */
-
                                 $reservationsUsers = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_id
                                                                     FROM reservations
                                                                     INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
                                                                     INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
                                                                     INNER JOIN users ON reservations.use_id = users.use_id
                                                                     WHERE reservations.res_date = '$request->res_date' AND reservations.use_id = $request->use_id");
-                               /*  $reservationsSinceDate = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_id
-                                FROM reservations
-                                INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
-                                INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
-                                INNER JOIN users ON reservations.use_id = users.use_id
-                                WHERE reservations.res_date >= $date  AND reservations.use_id = $request->use_id"); */
 
                                 $reservationsSinceDate = DB::select("SELECT COUNT(reservations.res_id) AS total_res
                                                         FROM reservations
@@ -147,6 +136,7 @@ class ReservationController extends Controller
 
                                 if($reservationsSinceDateCount < 3 || $request->acc_administrator == 1 ){
                                     if($reservationsUsers == null){
+
                                         if($request->res_date == $date && $request->res_start <= $actualHour){
                                             return response()->json([
                                                 'status' => False,
@@ -154,14 +144,14 @@ class ReservationController extends Controller
                                             ],400);
                                         }
                                         if($validateDay!=null){
-
+                                            // return $validateDay;
                                             foreach ($validateDay as $validateDayKey){
                                                  // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon
                                                  $validatedResStart = carbon::parse($validateDayKey->res_start);
                                                  $validatedResEnd = carbon::parse($validateDayKey->res_end);
 
-                                                 if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart)) {
-                                                     // Hay superposición, la nueva reserva no es posible
+                                                 if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart)){
+                                                    // Hay superposición, la nueva reserva no es posible
                                                      return response()->json([
                                                          'status' => False,
                                                          'message' => 'This space is reserved'
@@ -174,7 +164,9 @@ class ReservationController extends Controller
                                                     'status' => True,
                                                     'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.',
 
-                                                ],200);
+                                                   ],200);
+                                            }
+
 
                                         }else{
                                             Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla reservations ",3,$proj_id, $use_id);
@@ -191,22 +183,23 @@ class ReservationController extends Controller
                                             // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon
                                             $validatedResStart = carbon::parse($reservationsUsersKey->res_start);
                                             $validatedResEnd = carbon::parse($reservationsUsersKey->res_end);
-
-                                            if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart)    ) {
+                                            if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart) ) {
                                                 // Hay superposición, la nueva reserva no es posible
                                                 return response()->json([
                                                     'status' => False,
-                                                    'message' => 'This user have a reservation in room '.$reservationsUsers[0]->spa_name.'.'
+                                                    'message' => 'This user has a reservation in room '.$reservationsUsersKey->spa_name.'.'
                                                 ],400);
                                             }
                                         }
                                         Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla reservations ",3,$proj_id, $use_id);
-                                                $reservations->save();
-                                                return response()->json([
-                                                    'status' => True,
-                                                    'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.',
+                                            $reservations->save();
+                                            return response()->json([
+                                                'status' => True,
+                                                'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.',
 
-                                                    ],200);
+                                            ],200);
+
+                                        }
                                     }
                                 }else{
                                     return response()->json([
@@ -407,7 +400,7 @@ class ReservationController extends Controller
                                                 // Hay superposición, la nueva reserva no es posible
                                                 return response()->json([
                                                     'status' => False,
-                                                    'message' => 'This user have a reservation in room '.$reservationsUsers[0]->spa_name.'.'
+                                                    'message' => 'This user has a reservation in room '.$reservationsUsers[0]->spa_name.'.'
                                                 ],400);
                                             }
                                         }
@@ -594,9 +587,8 @@ class ReservationController extends Controller
 
     public function users(Request $request){
        if ($request->acc_administrator == 1){
-        $users  = DB::select("SELECT acc.acc_id, if(acc.acc_administrator = 1, 1,0) acceso_usuario, us.use_id, us.use_mail
-        FROM access acc
-        Right JOIN users us on us.use_id = acc.use_id");
+        $users  = DB::select("SELECT users.use_id, users.use_mail FROM users
+        WHERE users.use_status = 1");
         if($users != null){
             return response()->json([
                 'status' => True,
