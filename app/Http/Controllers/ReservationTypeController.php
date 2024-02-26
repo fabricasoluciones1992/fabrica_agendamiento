@@ -50,7 +50,7 @@ class ReservationTypeController extends Controller
                 return response()->json([
                   'status' => False,
                   'message' => $validator->errors()->all()
-                ], 400);
+                ]);
             }else{
                 $reservationTypes = new ReservationType($request->input());
                 $reservationTypes->res_typ_name = $request->res_typ_name;
