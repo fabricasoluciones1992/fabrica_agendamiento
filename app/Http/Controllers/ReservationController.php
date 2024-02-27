@@ -22,7 +22,7 @@ class ReservationController extends Controller
     {
         $reservations = DB::select(
             "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end,
-            reservation_types.res_typ_name, spaces.spa_name, users.use_mail
+            reservation_types.res_typ_name, spaces.spa_name, users.use_mail, users.use_id
             FROM reservations
             INNER JOIN reservation_types
             ON reservations.res_typ_id = reservation_types.res_typ_id
@@ -612,8 +612,9 @@ class ReservationController extends Controller
 
     public function users(Request $request){
        if ($request->acc_administrator == 1){
-        $users  = DB::select("SELECT users.use_id, users.use_mail FROM users
-        WHERE users.use_status = 1");
+        $users  = DB::select("SELECT acc.acc_id, if(acc.acc_administrator = 1, 1,0) acceso_usuario, us.use_id, us.use_mail
+        FROM access acc
+        Right JOIN users us on us.use_id = acc.use_id");
         if($users != null){
             return response()->json([
                 'status' => True,
