@@ -35,7 +35,7 @@ class ReservationController extends Controller
         {
             return response()->json([
              'status' => False,
-             'message' => 'No se encontraron reservaciones'
+             'message' => 'No reservations found'
             ], 400);
         }else{
         Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
