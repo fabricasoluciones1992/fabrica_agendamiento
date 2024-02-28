@@ -508,30 +508,30 @@ class ReservationController extends Controller
 
     }
 
-    // public function reserPerDate($proj_id, $use_id, $date){
-    //     $reservation = DB::select(
-    //         "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, reservation_types.res_typ_name, spaces.spa_name, users.use_mail
-    //         FROM reservations
-    //         INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
-    //         INNER JOIN users ON reservations.use_id = users.use_id
-    //         WHERE reservations.res_date = '$date'");
+    public function reserPerDate($proj_id, $use_id, $date){
+        $reservation = DB::select(
+            "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, reservation_types.res_typ_name, spaces.spa_name, users.use_mail
+            FROM reservations
+            INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
+            INNER JOIN users ON reservations.use_id = users.use_id
+            WHERE reservations.res_date = '$date'");
 
-    //     if ($reservation == null)
-    //     {
-    //         return response()->json([
-    //             'status' => False,
-    //             'message' => 'No reservation made.'
-    //         ],400);
-    //     }else{
-    //         // Control de acciones
-    //         Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
-    //         return response()->json([
-    //             'status' => True,
-    //             'data' => $reservation
-    //         ],200);
-    //     }
+        if ($reservation == null)
+        {
+            return response()->json([
+                'status' => False,
+                'message' => 'No reservation made.'
+            ],400);
+        }else{
+            // Control de acciones
+            Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
+            return response()->json([
+                'status' => True,
+                'data' => $reservation
+            ],200);
+        }
 
-    // }
+    }
 
     public function AdminActiveReserv($proj_id, $use_id){
         $date = date('Y-m-d');
@@ -612,7 +612,7 @@ class ReservationController extends Controller
 
     public function users(Request $request){
        if ($request->acc_administrator == 1){
-        $users  = DB::select("SELECT acc.acc_id, if(acc.acc_administrator = 1, 1,0) acceso_usuario, us.use_id, us.use_mail
+        $users  = DB::select("SELECT acc.acc_id, us.use_id, us.use_mail
         FROM access acc
         Right JOIN users us on us.use_id = acc.use_id");
         if($users != null){
