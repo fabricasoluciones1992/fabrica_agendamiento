@@ -612,9 +612,10 @@ class ReservationController extends Controller
 
     public function users(Request $request){
        if ($request->acc_administrator == 1){
-        $users  = DB::select("SELECT DISTINCT us.use_id, us.use_mail
-        FROM access acc
-        Right JOIN users us on us.use_id = acc.use_id");
+        $users  = DB::select("SELECT us.use_id, MAX(us.use_mail) AS use_mail, MAX(acc.acc_id) AS acc_id
+        FROM users us
+        LEFT JOIN access acc ON us.use_id = acc.use_id
+        GROUP BY us.use_id");
         if($users != null){
             return response()->json([
                 'status' => True,
