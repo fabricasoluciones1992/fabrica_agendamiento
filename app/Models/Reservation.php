@@ -15,6 +15,7 @@ class Reservation extends Model
       'res_date',
       'res_start',
       'res_end',
+      'res_status',
       'res_typ_id',
       'spa_id',
       'use_id'

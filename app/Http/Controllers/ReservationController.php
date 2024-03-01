@@ -22,7 +22,7 @@ class ReservationController extends Controller
     {
         $reservations = DB::select(
             "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end,
-            reservation_types.res_typ_name, spaces.spa_name, users.use_mail, users.use_id
+            reservation_types.res_typ_name,reservations.res_status, spaces.spa_name, users.use_mail, users.use_id
             FROM reservations
             INNER JOIN reservation_types
             ON reservations.res_typ_id = reservation_types.res_typ_id
@@ -473,14 +473,24 @@ class ReservationController extends Controller
      * @param  \App\Models\Reservation  $reservation
      * @return \Illuminate\Http\Response
      */
-    public function destroy($proj_id, $use_id, Reservation $reservation)
+    public function destroy($proj_id, $use_id, Request $request, $id)
     {
         // Control de acciones
-        Controller::NewRegisterTrigger("Se intentó destruir un dato en la tabla reservations ", 2, $proj_id, $use_id);
-        return response()->json([
-            'status' => False,
-            'message'  => 'This function is not allowed'
-        ],400);
+        if($request->acc_administrator == 1){
+             $desactivate = Reservation::find($id);
+            ($desactivate->res_status == 1)?$desactivate->res_status=0:$desactivate->res_status=1;
+            $desactivate->save();
+            Controller::NewRegisterTrigger("Se cambio el estado de una reserva en la tabla reservations ",2,$proj_id,$use_id);
+            return response()->json([
+                'message' => 'Status of '.$desactivate->res_status.' changed successfully.',
+                'data' => $desactivate
+            ],200);
+        }else{
+            return response()->json([
+                'status' => False,
+                'message' => 'Access denied. This action can only be performed by active administrators.'
+            ]);
+        }
     }
 
     public function reserPerUser($proj_id, $use_id, $id){
