@@ -612,7 +612,7 @@ class ReservationController extends Controller
 
     public function users(Request $request){
        if ($request->acc_administrator == 1){
-        $users  = DB::select("SELECT acc.acc_id, us.use_id, us.use_mail
+        $users  = DB::select("SELECT DISTINCT us.use_id, us.use_mail
         FROM access acc
         Right JOIN users us on us.use_id = acc.use_id");
         if($users != null){
