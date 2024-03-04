@@ -550,7 +550,7 @@ class ReservationController extends Controller
             FROM reservations
             INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
             INNER JOIN users ON reservations.use_id = users.use_id
-            WHERE reservations.res_date >= '$date'");
+            WHERE reservations.res_date >= '$date' AND reservations.res_status = 1");
 
         if ($reservation == null)
         {
