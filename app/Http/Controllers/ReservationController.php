@@ -29,7 +29,9 @@ class ReservationController extends Controller
             INNER JOIN spaces
             ON reservations.spa_id = spaces.spa_id
             INNER JOIN users
-            ON reservations.use_id = users.use_id");
+            ON reservations.use_id = users.use_id
+            ORDER BY reservations.res_date DESC
+            LIMIT 100");
 
         if ($reservations == null)
         {
