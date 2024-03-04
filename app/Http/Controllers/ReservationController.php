@@ -495,7 +495,7 @@ class ReservationController extends Controller
 
     public function reserPerUser($proj_id, $use_id, $id){
         $reservation = DB::select(
-            "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, reservation_types.res_typ_name, spaces.spa_name, users.use_mail, reservations.res_status
+            "SELECT reservations.res_id AS 'No. Reserva', reservations.res_date AS 'Fecha', reservations.res_start AS 'Hora inicio', reservations.res_end AS 'Hora fin', reservation_types.res_typ_name AS 'Tipo Reserva', spaces.spa_name AS 'Espacio', users.use_mail AS 'Correo', reservations.res_status AS 'Estado'
             FROM reservations
             INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
             INNER JOIN users ON reservations.use_id = users.use_id
@@ -520,7 +520,7 @@ class ReservationController extends Controller
 
     public function reserPerDate($proj_id, $use_id, $date){
         $reservation = DB::select(
-            "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, reservation_types.res_typ_name, spaces.spa_name, users.use_mail, reservations.res_status
+            "SELECT reservations.res_id AS 'No. Reserva', reservations.res_date AS 'Fecha', reservations.res_start AS 'Hora inicio', reservations.res_end AS 'Hora fin', reservation_types.res_typ_name AS 'Tipo Reserva', spaces.spa_name AS 'Espacio', users.use_mail AS 'Correo', reservations.res_status AS 'Estado'
             FROM reservations
             INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
             INNER JOIN users ON reservations.use_id = users.use_id
@@ -572,7 +572,7 @@ class ReservationController extends Controller
 
     public function reserPerSpace($proj_id, $use_id, $space){
         $reservation = DB::select(
-            "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, reservation_types.res_typ_name, spaces.spa_name, users.use_mail, reservations.res_status
+            "SELECT reservations.res_id AS 'No. Reserva', reservations.res_date AS 'Fecha', reservations.res_start AS 'Hora inicio', reservations.res_end AS 'Hora fin', reservation_types.res_typ_name AS 'Tipo Reserva', spaces.spa_name AS 'Espacio', users.use_mail AS 'Correo', reservations.res_status AS 'Estado'
             FROM reservations
             INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
             INNER JOIN users ON reservations.use_id = users.use_id
@@ -602,7 +602,7 @@ class ReservationController extends Controller
             FROM reservations
             INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
             INNER JOIN users ON reservations.use_id = users.use_id
-            WHERE reservations.use_id = $id AND reservations.res_date >= '$date'");
+            WHERE reservations.use_id = $id AND reservations.res_date >= '$date' AND reservations.res_status = 1");
         if ($reservation == null)
         {
             return response()->json([

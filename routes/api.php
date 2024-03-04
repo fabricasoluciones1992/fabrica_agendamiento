@@ -40,3 +40,4 @@ Route::get('users'.URL, [ReservationController::class, "users"])->name('users');
 
 Route::Resource('reservation/types'.URL, ReservationTypeController::class)->names('reservation.types')->parameter('','reservation_types');
 Route::Resource('spaces'.URL, SpaceController::class)->names('spaces')->parameter('','spaces');
+// 
