@@ -74,7 +74,7 @@ class ReservationController extends Controller
                     ],400);
                 }else{
 
-                    $validateDay = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, spaces.spa_id, users.use_id
+                    $validateDay = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, spaces.spa_id, users.use_id, reservations.res_status
                     FROM reservations
                     INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
                     INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
@@ -127,7 +127,7 @@ class ReservationController extends Controller
                                                                     WHERE reservations.res_date = '$request->res_date' AND reservations.use_id = $request->use_id");
                                 $totalReservationsDayCount = $totalReservationsDay[0]->total_res; */
 
-                                $reservationsUsers = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, spaces.spa_id, users.use_id
+                                $reservationsUsers = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, spaces.spa_id, users.use_id, reservations.res_status
                                                                     FROM reservations
                                                                     INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
                                                                     INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
@@ -161,7 +161,7 @@ class ReservationController extends Controller
                                                  $validatedResStart = carbon::parse($validateDayKey->res_start);
                                                  $validatedResEnd = carbon::parse($validateDayKey->res_end);
 
-                                                 if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart)){
+                                                 if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart) && $validateDayKey->res_status == 1){
                                                     // Hay superposición, la nueva reserva no es posible
                                                      return response()->json([
                                                          'status' => False,
@@ -192,7 +192,7 @@ class ReservationController extends Controller
                                             // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon
                                             $validatedResStart = carbon::parse($reservationsUsersKey->res_start);
                                             $validatedResEnd = carbon::parse($reservationsUsersKey->res_end);
-                                            if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart) ) {
+                                            if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart) && $reservationsUsersKey->res_status == 1) {
                                                 // Hay superposición, la nueva reserva no es posible
                                                 return response()->json([
                                                     'status' => False,
@@ -302,7 +302,7 @@ class ReservationController extends Controller
                     ],400);
                 }else{
 
-                    $validateDay = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_id
+                    $validateDay = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_id, reservations.res_status
                     FROM reservations
                     INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
                     INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
@@ -352,7 +352,7 @@ class ReservationController extends Controller
                                                                         FROM reservations
                                                                         WHERE reservations.res_date = '$request->res_date' AND reservations.use_id = $request->use_id");
                                 $totalReservationsDayCount = $totalReservationsDay[0]->total_res;
-                                $reservationsUsers = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, spaces.spa_id, users.use_id
+                                $reservationsUsers = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, spaces.spa_id, users.use_id, reservations.res_status
                                                             FROM reservations
                                                             INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
                                                             INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
@@ -382,7 +382,7 @@ class ReservationController extends Controller
                                                         'status' => True,
                                                         'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.'
                                                     ],200);
-                                                }elseif ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart)) {
+                                                }elseif ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart) && $validateDayKey->res_status == 1) {
                                                     // Hay superposición, la nueva reserva no es posible
                                                     return response()->json([
                                                         'status' => False,
@@ -422,7 +422,7 @@ class ReservationController extends Controller
                                                   'status' => True,
                                                   'message' => 'Reservation of the space '.$space->spa_name.' updated succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.'
                                                 ],200);
-                                            }elseif($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart) && $request->spa_id == $reservationsUsersKey->spa_id){
+                                            }elseif($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart) && $request->spa_id == $reservationsUsersKey->spa_id && $reservationsUsersKey->res_status == 1){
                                                 return response()->json([
                                                     'status' => False,
                                                     'message' => 'This user have a reservation in room '.$reservationsUsers[0]->spa_name.'.'
@@ -495,7 +495,7 @@ class ReservationController extends Controller
 
     public function reserPerUser($proj_id, $use_id, $id){
         $reservation = DB::select(
-            "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, reservation_types.res_typ_name, spaces.spa_name, users.use_mail
+            "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, reservation_types.res_typ_name, spaces.spa_name, users.use_mail, reservations.res_status
             FROM reservations
             INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
             INNER JOIN users ON reservations.use_id = users.use_id
@@ -520,7 +520,7 @@ class ReservationController extends Controller
 
     public function reserPerDate($proj_id, $use_id, $date){
         $reservation = DB::select(
-            "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, reservation_types.res_typ_name, spaces.spa_name, users.use_mail
+            "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, reservation_types.res_typ_name, spaces.spa_name, users.use_mail, reservations.res_status
             FROM reservations
             INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
             INNER JOIN users ON reservations.use_id = users.use_id
@@ -546,7 +546,7 @@ class ReservationController extends Controller
     public function AdminActiveReserv($proj_id, $use_id){
         $date = date('Y-m-d');
         $reservation = DB::select(
-            "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, reservation_types.res_typ_name, spaces.spa_name, users.use_mail
+            "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, reservation_types.res_typ_name, spaces.spa_name, users.use_mail, reservations.res_status
             FROM reservations
             INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
             INNER JOIN users ON reservations.use_id = users.use_id
@@ -572,7 +572,7 @@ class ReservationController extends Controller
 
     public function reserPerSpace($proj_id, $use_id, $space){
         $reservation = DB::select(
-            "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, reservation_types.res_typ_name, spaces.spa_name, users.use_mail
+            "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, reservation_types.res_typ_name, spaces.spa_name, users.use_mail, reservations.res_status
             FROM reservations
             INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
             INNER JOIN users ON reservations.use_id = users.use_id
@@ -598,7 +598,7 @@ class ReservationController extends Controller
     public function ActiveReservUser($proj_id, $use_id, $id){
         $date= date('Y-m-d');
         $reservation = DB::select(
-            "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, reservation_types.res_typ_name, spaces.spa_name, users.use_mail
+            "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, reservation_types.res_typ_name, spaces.spa_name, users.use_mail, reservations.res_status
             FROM reservations
             INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
             INNER JOIN users ON reservations.use_id = users.use_id
