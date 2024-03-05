@@ -117,6 +117,7 @@ class ReservationController extends Controller
                     $reservations->res_start = $request->res_start;
                     $reservations->res_end = $request->res_end;
                     $reservations->res_typ_id = $request->res_typ_id;
+                    $reservations->res_status = 1;
                     $reservations->spa_id = $request->spa_id;
                     $reservations->use_id = $request->use_id;
 
