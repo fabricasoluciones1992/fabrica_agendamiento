@@ -575,7 +575,7 @@ class ReservationController extends Controller
     public function AdminActiveReserv($proj_id, $use_id){
         $date = date('Y-m-d');
         $reservation = DB::select(
-            "SELECT reservations.res_id AS 'No. Reserva', reservations.res_date AS 'Fecha', reservations.res_start AS 'Hora inicio', reservations.res_end AS 'Hora fin', reservation_types.res_typ_name AS 'Tipo Reserva', spaces.spa_name AS 'Espacio', users.use_mail AS 'Correo', reservations.res_status AS 'Estado'
+            "SELECT reservations.res_id AS 'No. Reserva', reservations.res_date AS 'Fecha', reservations.res_start AS 'Hora inicio', reservations.res_end AS 'Hora fin', reservation_types.res_typ_name AS 'Tipo Reserva', users.use_id, spaces.spa_name AS 'Espacio', users.use_mail AS 'Correo', reservations.res_status AS 'Estado'
             FROM reservations
             INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
             INNER JOIN users ON reservations.use_id = users.use_id
@@ -640,6 +640,9 @@ class ReservationController extends Controller
             ],400);
         }else{
             // Control de acciones
+
+
+
             Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
             return response()->json([
                 'status' => True,
