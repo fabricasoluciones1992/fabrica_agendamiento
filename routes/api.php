@@ -25,11 +25,8 @@ Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-Route::Resource('reservations'.URL, ReservationController::class)->names('reservations')->parameter('','reservations');
+Route::middleware(['auth:sanctum'])->group(function() {
+    Route::Resource('reservations'.URL, ReservationController::class)->names('reservations')->parameter('','reservations');
 // Funciones adicionales ReservationController
 Route::get('historial/date/{date}'.URL, [ReservationController::class, "reserPerDate"])->name('historial.per.date');
 Route::get('active/reserv'.URL, [ReservationController::class, "AdminActiveReserv"])->name('admin.active.reserv');
@@ -40,4 +37,7 @@ Route::get('users'.URL, [ReservationController::class, "users"])->name('users');
 
 Route::Resource('reservation/types'.URL, ReservationTypeController::class)->names('reservation.types')->parameter('','reservation_types');
 Route::Resource('spaces'.URL, SpaceController::class)->names('spaces')->parameter('','spaces');
+});
+
+
 // 
