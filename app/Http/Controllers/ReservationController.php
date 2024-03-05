@@ -37,7 +37,7 @@ class ReservationController extends Controller
         {
             return response()->json([
              'status' => False,
-             'message' => 'No reservations found'
+             'message' => 'No se encontraron reservas'
             ], 400);
         }else{
         Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
@@ -66,8 +66,20 @@ class ReservationController extends Controller
                     'use_id' => 'required'
 
                 ];
+                $messages = [
+                    'res_date.required' => 'La fecha de la reserva es requerida.',
+                    'res_date.regex' => 'El formato de la fecha de la reserva no es valido.',
+                    'res_start.required' => 'La hora inicial de la reserva es requerida.',
+                    'res_start.regex' => 'El formato de la hora inicial de la reserva no es valido.',
+                    'res_end.required' => 'La hora final de la reserva es requerida.',
+                    'res_end.regex' => 'El formato de la hora final de la reserva no es valido.',
+                    'res_typ_id.required' => 'El tipo de reserva es requerido.',
+                    'res_typ_id.integer' => 'El tipo de reserva no es valido.',
+                    'spa_id.required' => 'El espacio a reservar es requerido.',
+                    'use_id.required' => 'El usuario que realiza la reserva es requerido.'
+                ];
 
-                $validator = Validator::make($request->input(), $rules);
+                $validator = Validator::make($request->input(), $rules, $messages);
                 if($validator->fails())
                 {
                     return response()->json([
@@ -153,7 +165,7 @@ class ReservationController extends Controller
                                         if($request->res_date == $date && $request->res_start <= $actualHour){
                                             return response()->json([
                                                 'status' => False,
-                                                'message' => 'The reservation initial hour must need to be equal or higher to '.$actualHour.'.'
+                                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a:'.$actualHour.'.'
                                             ],400);
                                         }
                                         if($validateDay!=null){
@@ -167,7 +179,7 @@ class ReservationController extends Controller
                                                     // Hay superposición, la nueva reserva no es posible
                                                      return response()->json([
                                                          'status' => False,
-                                                         'message' => 'This space is reserved'
+                                                         'message' => 'Este espacio está reservado'
                                                      ],400);
                                                  }
                                             }
@@ -175,7 +187,7 @@ class ReservationController extends Controller
                                                 $reservations->save();
                                                 return response()->json([
                                                     'status' => True,
-                                                    'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.',
+                                                    'message' => 'La reserva en el espacio '.$space->spa_name.' se creo exitosamente el dia '.$reservations->res_date.' por el usuario: '.$user->use_mail.'.',
 
                                                 ],200);
 
@@ -184,7 +196,7 @@ class ReservationController extends Controller
                                             $reservations->save();
                                             return response()->json([
                                                 'status' => True,
-                                                'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.',
+                                                'message' => 'La reserva en el espacio  '.$space->spa_name.' se creó exitosamente el dia '.$reservations->res_date.' por el usuario: '.$user->use_mail.'.',
 
                                             ],200);
                                         }
@@ -198,7 +210,7 @@ class ReservationController extends Controller
                                                 // Hay superposición, la nueva reserva no es posible
                                                 return response()->json([
                                                     'status' => False,
-                                                    'message' => 'This user has a reservation in room '.$reservationsUsersKey->spa_name.'.'
+                                                    'message' => 'Este usuario ya tiene una reservacion en la sala: '.$reservationsUsersKey->spa_name.'.'
                                                 ],400);
                                             }
                                         }
@@ -206,33 +218,33 @@ class ReservationController extends Controller
                                                 $reservations->save();
                                                 return response()->json([
                                                     'status' => True,
-                                                    'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.',
+                                                    'message' => 'La reserva en el espacio '.$space->spa_name.' se creo exitosamente el dia '.$reservations->res_date.' por el usuario: '.$user->use_mail.'.',
 
                                                     ],200);
                                     }
                                 }else{
                                     return response()->json([
                                         'status' => False,
-                                        'message' => 'This user can not made more reservations.'
+                                        'message' => 'Este usuario no puede hacer mas reservaciones.'
                                     ],400);
                                 }
                             }else{
                                 return response()->json([
                                     'status' => False,
-                                    'message' => 'Unvalid time, '.$request->res_end.' must be higher than '.$request->res_start.' and reservation must be in the range of 30 minutes and 2 hours.'
+                                    'message' => 'Hora invalida, '.$request->res_end.' debe ser mayor a '.$request->res_start.' y el rango de la reserva debe ser mínimo de 30 minutos y máximo 2 horas.'
                                 ],400);
                             }
                         }else{
                             return response()->json([
                                 'status' => False,
-                                'message' => 'The space '.$space->spa_name.' is not available.'
+                                'message' => 'El espacio '.$space->spa_name.' no está disponible.'
                             ],400);
                         }
 
                     }else{
                         return response()->json([
                             'status' => False,
-                            'message' => 'Unvalid time, the space must be reserved between the 07:00 and 19:00 of '.$date.', or a posterior date.'
+                            'message' => 'Hora invalida, el espacio debe ser reservado entre las 7:00AM y las 7:00PM del '.$date.', o una fecha posterior.'
                         ],400);
                     }
                 }
@@ -258,7 +270,7 @@ class ReservationController extends Controller
         {
             return response()->json([
                 'status' => False,
-                'message' => 'No reservation found.'
+                'message' => 'No se han hecho reservaciones'
             ],400);
         }else{
         Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
@@ -296,7 +308,20 @@ class ReservationController extends Controller
 
                 ];
 
-                $validator = Validator::make($request->input(), $rules);
+                $messages = [
+                    'res_date.required' => 'La fecha de la reserva es requerida.',
+                    'res_date.regex' => 'El formato de la fecha de la reserva no es valido.',
+                    'res_start.required' => 'La hora inicial de la reserva es requerida.',
+                    'res_start.regex' => 'El formato de la hora inicial de la reserva no es valido.',
+                    'res_end.required' => 'La hora final de la reserva es requerida.',
+                    'res_end.regex' => 'El formato de la hora final de la reserva no es valido.',
+                    'res_typ_id.required' => 'El tipo de reserva es requerido.',
+                    'res_typ_id.integer' => 'El tipo de reserva no es valido.',
+                    'spa_id.required' => 'El espacio a reservar es requerido.',
+                    'use_id.required' => 'El usuario que realiza la reserva es requerido.'
+                ];
+
+                $validator = Validator::make($request->input(), $rules, $messages);
                 if($validator->fails()){
                     return response()->json([
                         'status' => False,
@@ -365,7 +390,7 @@ class ReservationController extends Controller
                                         if($request->res_date == $date && $request->res_start <= $actualHour){
                                             return response()->json([
                                                 'status' => False,
-                                                'message' => 'The reservation initial hour must need to be equal or higher to '.$actualHour.'.'
+                                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a:'.$actualHour.'.'
                                                 ],400);
                                             }
 
@@ -382,13 +407,13 @@ class ReservationController extends Controller
                                                     $reservations->save();
                                                     return response()->json([
                                                         'status' => True,
-                                                        'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.'
+                                                        'message' => 'La reserva en el espacio '.$space->spa_name.' se actualizó exitosamente el dia '.$reservations->res_date.' por el usuario: '.$user->use_mail.'.'
                                                     ],200);
                                                 }elseif ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart) && $validateDayKey->res_status == 1) {
                                                     // Hay superposición, la nueva reserva no es posible
                                                     return response()->json([
                                                         'status' => False,
-                                                        'message' => 'This space is reserved'
+                                                        'message' => 'Este espacio está reservado'
                                                     ],400);
                                                 }
                                             }
@@ -398,7 +423,7 @@ class ReservationController extends Controller
                                             $reservations->save();
                                             return response()->json([
                                                 'status' => True,
-                                                'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.'
+                                                'message' => 'La reserva en el espacio  '.$space->spa_name.' se actualizó exitosamente el dia '.$reservations->res_date.' por el usuario: '.$user->use_mail.'.'
                                             ],200);
                                         }
                                         // Reporte de novedad
@@ -407,7 +432,7 @@ class ReservationController extends Controller
                                         $reservations->save();
                                         return response()->json([
                                             'status' => True,
-                                            'message' => 'Reservation of the space '.$space->spa_name.' created succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.'
+                                            'message' => 'La reserva en el espacio '.$space->spa_name.' se actualizó exitosamente el dia'.$reservations->res_date.' por el usuario: '.$user->use_mail.'.'
                                         ],200);
                                     }else{
                                         // return $reservationsUsers;
@@ -422,12 +447,12 @@ class ReservationController extends Controller
                                                 $reservations->save();
                                                 return response()->json([
                                                   'status' => True,
-                                                  'message' => 'Reservation of the space '.$space->spa_name.' updated succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.'
+                                                  'message' => 'La reserva en el espacio '.$space->spa_name.' se actualizó exitosamente el dia'.$reservations->res_date.' por el usuario: '.$user->use_mail.'.'
                                                 ],200);
                                             }elseif($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart) && $request->spa_id == $reservationsUsersKey->spa_id && $reservationsUsersKey->res_status == 1){
                                                 return response()->json([
                                                     'status' => False,
-                                                    'message' => 'This user have a reservation in room '.$reservationsUsers[0]->spa_name.'.'
+                                                    'message' => 'Este usuario ya tiene una reservacion en la sala: '.$reservationsUsers[0]->spa_name.'.'
                                                 ],400);
                                             }
                                         }
@@ -435,32 +460,32 @@ class ReservationController extends Controller
                                                 $reservations->save();
                                                 return response()->json([
                                                     'status' => True,
-                                                    'message' => 'Reservation of the space '.$space->spa_name.' updated succesfully in '.$reservations->res_date.' by user: '.$user->use_mail.'.',
+                                                    'message' => 'La reserva en el espacio '.$space->spa_name.' se actualizó exitosamente el dia'.$reservations->res_date.' por el usuario: '.$user->use_mail.'.',
 
                                                     ],200);
                                     }
                                 }else{
                                     return response()->json([
                                         'status' => False,
-                                        'message' => 'This user can not made more reservations today.'
+                                        'message' => 'Este usuario no puede hacer mas reservaciones.'
                                     ],400);
                                 }
                             }else{
                                 return response()->json([
                                     'status' => False,
-                                    'message' => 'Unvalid time, '.$request->res_end.' must be higher than '.$request->res_start.' and reservation must be in the range of 30 minutes and 2 hours.'
+                                    'message' => 'Hora invalida, '.$request->res_end.' debe ser mayor a '.$request->res_start.' y el rango de la reserva debe ser mínimo de 30 minutos y máximo 2 horas.'
                                 ],400);
                             }
                         }else{
                             return response()->json([
                                 'status' => False,
-                                'message' => 'The space '.$space->spa_name.' is not available.'
+                                'message' => 'El espacio '.$space->spa_name.' no está disponible.'
                             ],400);
                         }
                     }else{
                         return response()->json([
                             'status' => False,
-                            'message' => 'Unvalid time, the space must be reserved between the 07:00 and 19:00 of '.$date.', or a posterior date.'
+                            'message' => 'Hora invalida, el espacio debe ser reservado entre las 7:00AM y las 7:00PM del '.$date.', o una fecha posterior.'
                         ],400);
                     }
                 }
@@ -484,13 +509,13 @@ class ReservationController extends Controller
             $desactivate->save();
             Controller::NewRegisterTrigger("Se cambio el estado de una reserva en la tabla reservations ",2,$proj_id,$use_id);
             return response()->json([
-                'message' => 'Status of '.$desactivate->res_status.' changed successfully.',
+                'message' => 'El estado ha sido cambiado a '.$desactivate->res_status.' exitosamente.',
                 'data' => $desactivate
             ],200);
         }else{
             return response()->json([
                 'status' => False,
-                'message' => 'Access denied. This action can only be performed by active administrators.'
+                'message' => 'Acceso denegado, el usuario no es administrador'
             ]);
         }
     }
@@ -507,7 +532,7 @@ class ReservationController extends Controller
         {
             return response()->json([
                 'status' => False,
-                'message' => 'No reservation made.'
+                'message' => 'No se han hecho reservaciones'
             ],400);
         }else{
             // Control de acciones
@@ -532,7 +557,7 @@ class ReservationController extends Controller
         {
             return response()->json([
                 'status' => False,
-                'message' => 'No reservation made.'
+                'message' => 'No se han hecho reservaciones'
             ],400);
         }else{
             // Control de acciones
@@ -558,7 +583,7 @@ class ReservationController extends Controller
         {
             return response()->json([
                 'status' => False,
-                'message' => 'No reservation made.'
+                'message' => 'No se han hecho reservaciones'
             ],400);
         }else{
             // Control de acciones
@@ -584,7 +609,7 @@ class ReservationController extends Controller
         {
             return response()->json([
                 'status' => False,
-                'message' => 'No reservation made.'
+                'message' => 'No se han hecho reservaciones'
             ], 400);
         }else{
             // Control de acciones
@@ -609,7 +634,7 @@ class ReservationController extends Controller
         {
             return response()->json([
                 'status' => False,
-                'message' => 'No reservation made.'
+                'message' => 'No se han hecho reservaciones'
             ],400);
         }else{
             // Control de acciones
@@ -636,13 +661,13 @@ class ReservationController extends Controller
             }else{
                 return response()->json([
                     'status' => False,
-                    'message' => 'No users registered.'
+                    'message' => 'No se han registrado usuarios'
                 ],400);
             }
        }else{
             return response()->json([
                 'status' => False,
-                'message' => 'Access denied.'
+                'message' => 'Acceso denegado'
             ],400);
        }
     }
