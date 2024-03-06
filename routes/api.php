@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SpaceController;
 use App\Http\Controllers\ReservationTypeController;
 use App\Http\Controllers\ReservationController;
+use App\Models\Reservation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,7 +26,7 @@ Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::middleware(['auth:sanctum'])->group(function() {
+// Route::middleware(['auth:sanctum'])->group(function() {
     Route::Resource('reservations'.URL, ReservationController::class)->names('reservations')->parameter('','reservations');
 // Funciones adicionales ReservationController
 Route::get('historial/date/{date}'.URL, [ReservationController::class, "reserPerDate"])->name('historial.per.date');
@@ -33,11 +34,11 @@ Route::get('active/reserv'.URL, [ReservationController::class, "AdminActiveReser
 Route::get('historial/user/{id}'.URL, [ReservationController::class, "reserPerUser"])->name('historial.per.user');
 Route::get('active/reserv/user/{id}'.URL, [ReservationController::class, "activeReservUser"])->name('active.reserv.user');
 Route::get('historial/space/{space}'.URL, [ReservationController::class, "reserPerSpace"])->name('historial.Per.Space');
-Route::get('users'.URL, [ReservationController::class, "users"])->name('users');
+Route::get('users'.URL, [Reservation::class, "users"])->name('users');
 
 Route::Resource('reservation/types'.URL, ReservationTypeController::class)->names('reservation.types')->parameter('','reservation_types');
 Route::Resource('spaces'.URL, SpaceController::class)->names('spaces')->parameter('','spaces');
-});
+// });
 
 
 //
