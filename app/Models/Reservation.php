@@ -29,7 +29,7 @@ class Reservation extends Model
     ];
 
     public $timestamps = false;
-// FUNCIONES NOOOOOOOOOOOO VIDA HPTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
     public static function Select(){
         $reservations = DB::select(
             "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end,
@@ -148,10 +148,10 @@ class Reservation extends Model
 
                         $reservationsSinceDate = DB::select("SELECT COUNT(reservations.res_id) AS total_res
                                                 FROM reservations
-                                                WHERE reservations.res_date >= '$date'  AND reservations.use_id = $request->use_id");
+                                                WHERE reservations.res_date >= '$date'  AND reservations.use_id = $request->use_id AND reservations.res_status = 1");
                         $reservationsSinceDateCount = $reservationsSinceDate[0]->total_res;
 
-                        if($reservationsSinceDateCount < 3 || $request->acc_administrator == 1 ){
+                        if($reservationsSinceDateCount < 3 || $request->acc_administrator == 1){
 
                             if($reservationsUsers == null){
                                 if($request->res_date == $date && $request->res_start <= $actualHour){
@@ -330,7 +330,7 @@ class Reservation extends Model
 
                         $totalReservationsDay = DB::select("SELECT COUNT(reservations.res_id) AS total_res
                                                                 FROM reservations
-                                                                WHERE reservations.res_date = '$request->res_date' AND reservations.use_id = $request->use_id");
+                                                                WHERE reservations.res_date = '$request->res_date' AND reservations.use_id = $request->use_id  AND reservations.res_status = 1");
                         $totalReservationsDayCount = $totalReservationsDay[0]->total_res;
                         $reservationsUsers = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, spaces.spa_id, users.use_id, reservations.res_status
                                                     FROM reservations
