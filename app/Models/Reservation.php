@@ -443,67 +443,28 @@ class Reservation extends Model
             }
         }
     }
-    public static function ReserPerUser($id){
-        $reservation = DB::select(
-            "SELECT reservations.res_id AS 'No. Reserva', reservations.res_date AS 'Fecha', reservations.res_start AS 'Hora inicio', reservations.res_end AS 'Hora fin', reservation_types.res_typ_name AS 'Tipo Reserva', spaces.spa_name AS 'Espacio', users.use_mail AS 'Correo', reservations.res_status AS 'Estado'
-            FROM reservations
-            INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
-            INNER JOIN users ON reservations.use_id = users.use_id
-            WHERE reservations.use_id = $id");
 
-            return $reservation;
-    }
 
-    public static function reserPerDate( $date){
-        $reservation = DB::select(
-            "SELECT reservations.res_id AS 'No. Reserva', reservations.res_date AS 'Fecha', reservations.res_start AS 'Hora inicio', reservations.res_end AS 'Hora fin', reservation_types.res_typ_name AS 'Tipo Reserva', spaces.spa_name AS 'Espacio', users.use_mail AS 'Correo', reservations.res_status AS 'Estado'
-            FROM reservations
-            INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
-            INNER JOIN users ON reservations.use_id = users.use_id
-            WHERE reservations.res_date = '$date'");
+    public static function ReserFilters( $column, $data){
+        $reservation=0;
+         if($column == "spa_id"){$reservation = DB::table('reservations')->where($column,'like', '%'.$data.'%')->OrderBy($column, 'DESC')->get();}
+         if($column == "res_date"){$reservation = DB::table('reservations')->where($column,'like', '%'.$data.'%')->OrderBy($column, 'DESC')->get();}
+         if($column == "use_id"){$reservation = DB::table('reservations')->where($column,'like', '%'.$data.'%')->OrderBy($column, 'DESC')->get();}
 
             return $reservation;
         }
 
-    public static function AdminActiveReserv(){
-        $date = date('Y-m-d');
-        $reservation = DB::select(
-            "SELECT reservations.res_id AS 'No. Reserva', reservations.res_date AS 'Fecha', reservations.res_start AS 'Hora inicio', reservations.res_end AS 'Hora fin', reservation_types.res_typ_name AS 'Tipo Reserva', users.use_id, spaces.spa_name AS 'Espacio', users.use_mail AS 'Correo', reservations.res_status AS 'Estado'
-            FROM reservations
-            INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
-            INNER JOIN users ON reservations.use_id = users.use_id
-            WHERE reservations.res_date >= '$date' AND reservations.res_status = 1");
-
-        return $reservation;
-        }
-    public static function ReserPerSpace($space){
-        $reservation = DB::select(
-            "SELECT reservations.res_id AS 'No. Reserva', reservations.res_date AS 'Fecha', reservations.res_start AS 'Hora inicio', reservations.res_end AS 'Hora fin', reservation_types.res_typ_name AS 'Tipo Reserva', spaces.spa_name AS 'Espacio', users.use_mail AS 'Correo', reservations.res_status AS 'Estado'
-            FROM reservations
-            INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
-            INNER JOIN users ON reservations.use_id = users.use_id
-            WHERE reservations.spa_id = $space");
-        return $reservation;
-    }
-
-    public static function ActiveReservUser($id){
+    public static function ActiveReservUser($column, $use_id, $request){
         $date= date('Y-m-d');
-        $reservation = DB::select(
-            "SELECT reservations.res_id AS 'No. Reserva', reservations.res_date AS 'Fecha', reservations.res_start AS 'Hora inicio', reservations.res_end AS 'Hora fin', reservation_types.res_typ_name AS 'Tipo Reserva', spaces.spa_name AS 'Espacio', users.use_mail AS 'Correo', reservations.res_status AS 'Estado'
-            FROM reservations
-            INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
-            INNER JOIN users ON reservations.use_id = users.use_id
-            WHERE reservations.use_id = $id AND reservations.res_date >= '$date' AND reservations.res_status = 1");
+        $reservation = ($request->acc_administrator == 1) ?  DB::table('reservations')->where("res_date", ">=" ,$date)->OrderBy($column, 'DESC')->get() : DB::table('reservations')->OrderBy($column, 'DESC')->where("use_id", '=', $use_id)->get() ;
         return $reservation;
     }
 
     public static function users(){
 
         $users  = DB::select(
-            "SELECT us.use_id, MAX(us.use_mail) AS use_mail, MAX(acc.acc_id) AS acc_id
-            FROM users us
-            LEFT JOIN access acc ON us.use_id = acc.use_id
-            GROUP BY us.use_id");
+            "SELECT us.use_id, MAX(us.use_mail) AS use_mail, MAX(acc.acc_id) AS acc_id FROM users us
+            LEFT JOIN access acc ON us.use_id = acc.use_id GROUP BY us.use_id");
         return $users;
     }
 

@@ -71,25 +71,9 @@ class ReservationController extends Controller
                 'data' => $desactivate
             ],200);
     }
-    public function reserPerUser($proj_id, $use_id, $id){
-        $reservation = Reservation::ReserPerUser($id);
-        if ($reservation == null){
-            return response()->json([
-                'status' => False,
-                'message' => 'No se han hecho reservaciones'
-            ],400);
-        }else{
-            // Control de acciones
-            Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
-            return response()->json([
-                'status' => True,
-                'data' => $reservation
-            ],200);
-        }
-
-    }
-    public function reserPerDate($proj_id, $use_id, $date){
-        $reservation = Reservation::ReserPerDate($date);
+    public function reserFilters($proj_id, $use_id, $data, $column){
+        // return $column;
+        $reservation = Reservation::ReserFilters($column, $data);
         if ($reservation == null){
             return response()->json([
                 'status' => False,
@@ -104,43 +88,9 @@ class ReservationController extends Controller
             ],200);
         }
     }
-    public function AdminActiveReserv($proj_id, $use_id){
-       $reservation = Reservation::AdminActiveReserv();
-        if ($reservation == null)
-        {
-            return response()->json([
-                'status' => False,
-                'message' => 'No se han hecho reservaciones'
-            ],400);
-        }else{
-            // Control de acciones
-            Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
-            return response()->json([
-                'status' => True,
-                'data' => $reservation
-            ],200);
-        }
 
-    }
-    public function reserPerSpace($proj_id, $use_id, $space){
-        $reservation = Reservation::ReserPerSpace($space);
-        if ($reservation == null){
-            return response()->json([
-                'status' => False,
-                'message' => 'No se han hecho reservaciones'
-            ], 400);
-        }else{
-            // Control de acciones
-            Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
-            return response()->json([
-                'status' => True,
-                'data' => $reservation
-            ],200);
-        }
-
-    }
-    public function activeReservUser($proj_id, $use_id, $id){
-        $reservation = Reservation::ActiveReservUser($id);
+    public function activeReservUser($column, $proj_id, $use_id, Request $request){
+        $reservation = Reservation::ActiveReservUser($column, $use_id, $request);
         if ($reservation == null){
             return response()->json([
                 'status' => False,
