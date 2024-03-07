@@ -447,22 +447,22 @@ class Reservation extends Model
 
     public static function ReserFilters( $column, $data){
         $reservation = DB::table('reservations')->where($column,'like', '%'.$data.'%')->OrderBy($column, 'DESC')->get();
-        return $reservation; 
+        return $reservation;
         }
 
-    public static function ActiveReservUser($column, $use_id, $request){
+    public static function ActiveReservUser($use_id, $request){
         $date= date('Y-m-d');
-        $reservation = ($request->acc_administrator == 1) ?  DB::table('reservations')->where("res_date", ">=" ,$date)->OrderBy($column, 'DESC')->get() : DB::table('reservations')->OrderBy($column, 'DESC')->where("use_id", '=', $use_id)->where("res_status", "=", 1)->get() ;
+        $reservation = ($request->acc_administrator == 1) ?  DB::table('reservations')->where("res_date", ">=" ,$date)->OrderBy("use_id", 'DESC')->get() : DB::table('reservations')->OrderBy("use_id", 'DESC')->where("use_id", '=', $use_id)->where("res_status", "=", 1)->get() ;
         return $reservation;
     }
     public static function Calendar(){
         $date= date('Y-m-d');
-        $reservation = DB::select("SELECT reservations.res_id, reservations.res_date, 
+        $reservation = DB::select("SELECT reservations.res_id, reservations.res_date,
         reservations.res_start, reservations.res_end, spaces.spa_name, spaces.spa_id, users.use_id, reservations.res_status, reservation_types.res_typ_name FROM reservations INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
         INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
         INNER JOIN users ON reservations.use_id = users.use_id
         WHERE reservations.res_date >= '$date' AND reservations.res_status = 1");
-        return $reservation; 
+        return $reservation;
     }
 
     public static function users(){

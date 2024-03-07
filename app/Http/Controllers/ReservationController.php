@@ -89,8 +89,8 @@ class ReservationController extends Controller
         }
     }
 
-    public function activeReservUser($column, $proj_id, $use_id, Request $request){
-        $reservation = Reservation::ActiveReservUser($column, $use_id, $request);
+    public function activeReservUser($proj_id, $use_id, Request $request){
+        $reservation = Reservation::ActiveReservUser($use_id, $request);
         if ($reservation == null){
             return response()->json([
                 'status' => False,

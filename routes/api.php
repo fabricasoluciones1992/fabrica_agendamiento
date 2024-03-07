@@ -30,9 +30,10 @@ Route::middleware(['auth:sanctum'])->group(function() {
     Route::Resource('reservations'.URL, ReservationController::class)->names('reservations')->parameter('','reservations');
 // Funciones adicionales ReservationController
 Route::get('historial'.URL.'{column}/{data}', [ReservationController::class, "reserFilters"])->name('historial.filters');
-Route::get('active/reserv/user'.URL.'{column}', [ReservationController::class, "activeReservUser"])->name('active.reserv.user');
+Route::get('active/reserv/user'.URL, [ReservationController::class, "activeReservUser"])->name('active.reserv.user');
 Route::get('users'.URL, [ReservationController::class, "users"])->name('users');
 Route::get('calendar'.URL, [ReservationController::class, "calendar"])->name('calendar');
+
 Route::Resource('reservation/types'.URL, ReservationTypeController::class)->names('reservation.types')->parameter('','reservation_types');
 Route::Resource('spaces'.URL, SpaceController::class)->names('spaces')->parameter('','spaces');
 });
