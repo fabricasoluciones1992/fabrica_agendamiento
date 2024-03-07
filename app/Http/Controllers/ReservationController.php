@@ -105,6 +105,22 @@ class ReservationController extends Controller
             ],200);
         }
     }
+    public function calendar($proj_id, $use_id){
+        $reservation = Reservation::Calendar();
+        if ($reservation == null){
+            return response()->json([
+                'status' => False,
+                'message' => 'No se han hecho reservaciones'
+            ],400);
+        }else{
+            // Control de acciones
+            Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
+            return response()->json([
+                'status' => True,
+                'data' => $reservation
+            ],200);
+        }
+    }
     public function users(Request $request){
         if ($request->acc_administrator == 1){
             $users  = Reservation::Users();
