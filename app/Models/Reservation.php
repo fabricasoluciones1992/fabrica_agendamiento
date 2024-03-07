@@ -452,7 +452,17 @@ class Reservation extends Model
 
     public static function ActiveReservUser($use_id, $request){
         $date= date('Y-m-d');
-        $reservation = ($request->acc_administrator == 1) ?  DB::table('reservations')->where("res_date", ">=" ,$date)->OrderBy("use_id", 'DESC')->get() : DB::table('reservations')->OrderBy("use_id", 'DESC')->where("use_id", '=', $use_id)->where("res_status", "=", 1)->get() ;
+        $reservation = ($request->acc_administrator == 1) ?  DB::table('reservations')->select('reservations.res_id AS No. Reserva', 'reservations.res_date AS Fecha',
+        'reservations.res_start AS Hora inicio', 'reservations.res_end AS Hora fin',
+        'reservation_types.res_typ_name AS Tipo Reserva', 'spaces.spa_name AS Espacio',
+        'users.use_mail AS Correo', 'reservations.res_status AS Estado')->join('reservation_types', 'reservations.res_typ_id', '=', 'reservation_types.res_typ_id')
+        ->join('spaces', 'reservations.spa_id', '=', 'spaces.spa_id')
+        ->join('users', 'reservations.use_id', '=', 'users.use_id')->where("res_date", ">=" ,$date)->where("res_status","=", 1)->OrderBy("reservations.use_id", 'DESC')->get() : DB::table('reservations')->select('reservations.res_id AS No. Reserva', 'reservations.res_date AS Fecha',
+        'reservations.res_start AS Hora inicio', 'reservations.res_end AS Hora fin',
+        'reservation_types.res_typ_name AS Tipo Reserva', 'spaces.spa_name AS Espacio',
+        'users.use_mail AS Correo', 'reservations.res_status AS Estado')->join('reservation_types', 'reservations.res_typ_id', '=', 'reservation_types.res_typ_id')
+        ->join('spaces', 'reservations.spa_id', '=', 'spaces.spa_id')
+        ->join('users', 'reservations.use_id', '=', 'users.use_id')->OrderBy("reservations.use_id", 'DESC')->where("reservations.use_id", '=', $use_id)->where("res_status", "=", 1)->get() ;
         return $reservation;
     }
     public static function Calendar(){
