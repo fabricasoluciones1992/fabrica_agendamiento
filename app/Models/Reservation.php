@@ -446,12 +446,10 @@ class Reservation extends Model
 
 
     public static function ReserFilters( $column, $data){
-        $reservation=0;
-         if($column == "spa_id"){$reservation = DB::table('reservations')->where($column,'like', '%'.$data.'%')->OrderBy($column, 'DESC')->get();}
-         if($column == "res_date"){$reservation = DB::table('reservations')->where($column,'like', '%'.$data.'%')->OrderBy($column, 'DESC')->get();}
-         if($column == "use_id"){$reservation = DB::table('reservations')->where($column,'like', '%'.$data.'%')->OrderBy($column, 'DESC')->get();}
-
-            return $reservation;
+        // $reservation=0;
+        // return $column;
+        $reservation = DB::table('reservations')->where($column,'like', '%'.$data.'%')->OrderBy($column, 'DESC')->get();
+        return $reservation; 
         }
 
     public static function ActiveReservUser($column, $use_id, $request){

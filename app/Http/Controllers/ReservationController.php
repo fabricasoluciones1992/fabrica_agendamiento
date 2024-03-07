@@ -71,7 +71,7 @@ class ReservationController extends Controller
                 'data' => $desactivate
             ],200);
     }
-    public function reserFilters($proj_id, $use_id, $data, $column){
+    public function reserFilters($proj_id, $use_id, $column, $data){
         // return $column;
         $reservation = Reservation::ReserFilters($column, $data);
         if ($reservation == null){
