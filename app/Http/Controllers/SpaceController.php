@@ -9,11 +9,7 @@ use Illuminate\Http\Request;
 
 class SpaceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index($proj_id, $use_id)
     {
             $spaces = Space::all();
@@ -31,18 +27,13 @@ class SpaceController extends Controller
             }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function store($proj_id, $use_id, Request $request )
-    {   
-        
+    {
+
 
             if ($request->acc_administrator == 1) {
-            // Se establecen los parametros para ingresar datos. 
+            // Se establecen los parametros para ingresar datos.
             $rules =[
                 'spa_name' => ['required','unique:spaces', 'regex:/^[A-ZÁÉÍÓÚÜÑ\s]+$/']
             ];
@@ -74,17 +65,12 @@ class SpaceController extends Controller
                 ],403);
         }
     }
-    
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Space  $space
-     * @return \Illuminate\Http\Response
-     */
+
+
     public function show($proj_id, $use_id, $id)
     {
-        
+
         // Se busca el id que se pasa por URL en la tabla de la base de datos
         $space = Space::find($id);
         if($space == null){
@@ -100,20 +86,14 @@ class SpaceController extends Controller
             'data' => $space
             ],200);
         }
-        
+
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Space  $space
-     * @return \Illuminate\Http\Response
-     */
+
     public function update($proj_id, $use_id, Request $request, $id )
     {
-        if ($request->acc_administrator == 1) {               
-            // Se establecen los parametros para ingresar datos. 
+        if ($request->acc_administrator == 1) {
+            // Se establecen los parametros para ingresar datos.
             $rules =[
                 'spa_name' => ['required', 'unique:spaces', 'regex:/^[A-ZÁÉÍÓÚÜÑ\s]+$/'],
             ];
@@ -137,22 +117,17 @@ class SpaceController extends Controller
                     'data'=> $space
                 ],200);
             }
-            
+
         }else{
             return response()->json([
               'status' => False,
               'message' => 'Access denied. This action can only be performed by active administrators.'
                 ],403);
         }
-        
+
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Space  $space
-     * @return \Illuminate\Http\Response
-     */
+    
     public function destroy( $proj_id, $use_id, $id, Request $request)
     {
         if($request->acc_administrator == 1){

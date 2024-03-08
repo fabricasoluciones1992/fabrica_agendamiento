@@ -9,11 +9,7 @@ use Illuminate\Http\Request;
 
 class ReservationTypeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index($proj_id, $use_id)
     {
 
@@ -33,12 +29,7 @@ class ReservationTypeController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function store($proj_id, $use_id, Request $request)
     {
         if($request->acc_administrator == 1){
@@ -70,12 +61,7 @@ class ReservationTypeController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\ReservationType  $reservationTypes
-     * @return \Illuminate\Http\Response
-     */
+
     public function show($proj_id, $use_id, $id)
     {
         $reservationType = ReservationType::find($id);
@@ -90,19 +76,13 @@ class ReservationTypeController extends Controller
                 'status' => True,
                 'data'=> $reservationType
             ],200);
-        }    
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\ReservationType  $reservationTypes
-     * @return \Illuminate\Http\Response
-     */
+
     public function update($proj_id, $use_id, Request $request, $id)
     {
-        
+
         if ($request->acc_administrator == 1) {
             $rules = [
                 'res_typ_name' => ['required', 'unique:reservation_types', 'regex:/^[A-ZÁÉÍÓÚÜÑ\s]+$/']
@@ -119,7 +99,7 @@ class ReservationTypeController extends Controller
                 $reservationTypes->save();
                 Controller::NewRegisterTrigger("Se realizó una actualización en la tabla reservation_types ",1,$proj_id, $use_id);
                 return response()->json([
-    
+
                     'status' => True,
                     'message' => 'Reservation type '.$reservationTypes->res_typ_name.' modified successfully.',
                     'data'=>$reservationTypes
@@ -133,12 +113,7 @@ class ReservationTypeController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\ReservationType  $reservationTypes
-     * @return \Illuminate\Http\Response
-     */
+
     public function destroy($proj_id, $use_id, ReservationType $reservationType)
     {
         Controller::NewRegisterTrigger("Se intentó destruir un dato en la tabla reservation_types ",2,$proj_id, $use_id);

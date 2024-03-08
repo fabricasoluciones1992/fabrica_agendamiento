@@ -32,12 +32,6 @@ class ReservationController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store($proj_id, $use_id, Request $request)
     {
         return Reservation::Store($proj_id, $use_id, $request);

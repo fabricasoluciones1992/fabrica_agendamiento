@@ -446,7 +446,12 @@ class Reservation extends Model
 
 
     public static function ReserFilters( $column, $data){
-        $reservation = DB::table('reservations')->where($column,'like', '%'.$data.'%')->OrderBy($column, 'DESC')->get();
+        $reservation = DB::table('reservations')->select('reservations.res_id AS No. Reserva', 'reservations.res_date AS Fecha',
+        'reservations.res_start AS Hora inicio', 'reservations.res_end AS Hora fin',
+        'reservation_types.res_typ_name AS Tipo Reserva', 'spaces.spa_name AS Espacio',
+        'users.use_mail AS Correo', 'reservations.res_status AS Estado')->join('reservation_types', 'reservations.res_typ_id', '=', 'reservation_types.res_typ_id')
+        ->join('spaces', 'reservations.spa_id', '=', 'spaces.spa_id')
+        ->join('users', 'reservations.use_id', '=', 'users.use_id')->where("reservations.".$column,'like', '%'.$data.'%')->OrderBy("reservations.".$column, 'DESC')->get();
         return $reservation;
         }
 
