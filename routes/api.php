@@ -4,10 +4,14 @@
 // use App\Http\Controllers\GendersController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfesionalsController;
 use App\Http\Controllers\SpaceController;
 use App\Http\Controllers\ReservationTypeController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\ServicesController;
+use App\Http\Controllers\ServiceTypesController;
 use App\Models\Reservation;
+use App\Models\ServiceTypes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +40,19 @@ Route::get('calendar'.URL, [ReservationController::class, "calendar"])->name('ca
 
 Route::Resource('reservation/types'.URL, ReservationTypeController::class)->names('reservation.types')->parameter('','reservation_types');
 Route::Resource('spaces'.URL, SpaceController::class)->names('spaces')->parameter('','spaces');
+
+Route::Resource('services'.URL, ServicesController::class)->names('services')->parameter('','services');
+// Funciones adicionales ServiceController
+Route::Resource('profesionals'.URL, ProfesionalsController::class)->names('profesionals')->parameter('','profesionals');
+Route::Resource('service/types'.URL, ServiceTypesController::class)->names('service.types')->parameter('','service_types');
+
+
+Route::get('historialService'.URL.'{column}/{data}', [ServicesController::class, "reserFilters"])->name('historial.filters');
+Route::get('active/service/user'.URL, [ServicesController::class, "activeReservUser"])->name('active.reserv.user');
+Route::get('calendarService'.URL, [ServicesController::class, "calendar"])->name('calendar');
+
+
+
 // });
 
 //
