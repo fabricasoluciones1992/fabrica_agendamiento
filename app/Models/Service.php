@@ -451,7 +451,7 @@ class Service extends Model
     public static function ReserFilters( $column, $data){
         $reservation = DB::table('services')->select('services.ser_id AS No. Reserva', 'services.ser_date AS Fecha',
         'services.ser_start AS Hora inicio', 'services.ser_end AS Hora fin',
-        'service_types.ser_typ_name AS Tipo Reserva', 'profesionals.prof_name AS Espacio',
+        'service_types.ser_typ_name AS Tipo Reserva', 'profesionals.prof_name AS Profesional',
         'users.use_mail AS Correo', 'services.ser_status AS Estado')->join('service_types', 'services.ser_typ_id', '=', 'service_types.ser_typ_id')
         ->join('profesionals', 'services.prof_id', '=', 'profesionals.prof_id')
         ->join('users', 'services.use_id', '=', 'users.use_id')->where("services.".$column,'like', '%'.$data.'%')->OrderBy("services.".$column, 'DESC')->get();
@@ -462,12 +462,12 @@ class Service extends Model
         $date= date('Y-m-d');
         $reservation = ($request->acc_administrator == 1) ?  DB::table('services')->select('services.ser_id AS No. Reserva', 'services.ser_date AS Fecha',
         'services.ser_start AS Hora inicio', 'services.ser_end AS Hora fin',
-        'service_types.ser_typ_name AS Tipo Reserva', 'profesionals.prof_name AS Espacio',
+        'service_types.ser_typ_name AS Tipo Reserva', 'profesionals.prof_name AS Profesional',
         'users.use_mail AS Correo', 'services.ser_status AS Estado')->join('service_types', 'services.ser_typ_id', '=', 'service_types.ser_typ_id')
         ->join('profesionals', 'services.prof_id', '=', 'profesionals.prof_id')
         ->join('users', 'services.use_id', '=', 'users.use_id')->where("ser_date", ">=" ,$date)->where("ser_status","=", 1)->OrderBy("services.use_id", 'DESC')->get() : DB::table('services')->select('services.ser_id AS No. Reserva', 'services.ser_date AS Fecha',
         'services.ser_start AS Hora inicio', 'services.ser_end AS Hora fin',
-        'service_types.ser_typ_name AS Tipo Reserva', 'profesionals.prof_name AS Espacio',
+        'service_types.ser_typ_name AS Tipo Reserva', 'profesionals.prof_name AS Profesional',
         'users.use_mail AS Correo', 'services.ser_status AS Estado')->join('service_types', 'services.ser_typ_id', '=', 'service_types.ser_typ_id')
         ->join('profesionals', 'services.prof_id', '=', 'profesionals.prof_id')
         ->join('users', 'services.use_id', '=', 'users.use_id')->OrderBy("services.use_id", 'DESC')->where("services.use_id", '=', $use_id)->where("ser_status", "=", 1)->get() ;
@@ -477,7 +477,7 @@ class Service extends Model
         $date= date('Y-m-d');
         $reservation = DB::select("SELECT services.ser_id AS 'No. Reserva', services.ser_date AS 'Fecha',
         services.ser_start AS 'Hora inicio', services.ser_end AS 'Hora fin',
-        service_types.ser_typ_name AS 'Tipo Reserva', profesionals.prof_name AS 'Espacio',
+        service_types.ser_typ_name AS 'Tipo Reserva', profesionals.prof_name AS 'Profesional',
         users.use_mail AS 'Correo', services.ser_status AS 'Estado' FROM services INNER JOIN service_types ON services.ser_typ_id = service_types.ser_typ_id
         INNER JOIN profesionals ON services.prof_id = profesionals.prof_id
         INNER JOIN users ON services.use_id = users.use_id
