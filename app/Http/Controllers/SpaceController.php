@@ -127,7 +127,7 @@ class SpaceController extends Controller
 
     }
 
-    
+
     public function destroy( $proj_id, $use_id, $id, Request $request)
     {
         if($request->acc_administrator == 1){

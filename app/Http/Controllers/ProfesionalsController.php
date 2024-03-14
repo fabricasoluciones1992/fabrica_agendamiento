@@ -51,7 +51,7 @@ class ProfesionalsController extends Controller
                 Controller::NewRegisterTrigger("Se realizó una inserción de un dato en la tabla profesionals ",3,$proj_id,$use_id);
                 return response()->json([
                     'status' => True,
-                    'message' => 'Profe '.$profesional->prof_name.' created successfully',
+                    'message' => 'Profesional '.$profesional->prof_name.' created successfully',
                     'data' => $profesional
                 ],200);
             }
@@ -136,6 +136,23 @@ class ProfesionalsController extends Controller
                 'status' => False,
                 'message' => 'Access denied. This action can only be performed by active administrators.'
             ]);
+        }
+    }
+
+    public function Profs($proj_id,$use_id){
+        $profesionals = Profesional::Profs();
+        if($profesionals == null){
+            return response()->json([
+                'status' => False,
+                'message' => 'This profesional does not exist.'
+            ],400);
+        }else{
+            // Se guarda la novedad en la base de datos.
+            Controller::NewRegisterTrigger("Se realizó una busqueda de un dato específico en la tabla profesionals.",4,$proj_id,$use_id);
+            return response()->json([
+            'status' => True,
+            'data' => $profesionals
+            ],200);
         }
     }
 }

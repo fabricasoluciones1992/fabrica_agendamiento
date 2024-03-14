@@ -16,10 +16,10 @@ class ServicesController extends Controller
         {
             return response()->json([
              'status' => False,
-             'message' => 'No se encontraron reservas'
+             'message' => 'No se encontraron servicios'
             ], 400);
         }else{
-        Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
+        Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla services ",4,$proj_id, $use_id);
         return response()->json([
             'status'=> True,
             'data'=> $services
@@ -48,10 +48,10 @@ class ServicesController extends Controller
         {
             return response()->json([
              'status' => False,
-             'message' => 'No se encontraron reservas'
+             'message' => 'No se encontraron servicios'
             ], 400);
         }else{
-        Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
+        Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla services ",4,$proj_id, $use_id);
         return response()->json([
             'status'=> True,
             'data'=> $services
@@ -73,7 +73,7 @@ class ServicesController extends Controller
        ($desactivate->ser_status == 1)?$desactivate->ser_status=0:$desactivate->ser_status=1;
        $desactivate->save();
        $message = ($desactivate->ser_status == 1)?'Desactivado':'Activado';
-       Controller::NewRegisterTrigger("Se cambio el estado de una reserva en la tabla reservations ",2,$proj_id,$use_id);
+       Controller::NewRegisterTrigger("Se cambio el estado de un servicio en la tabla services ",2,$proj_id,$use_id);
        return response()->json([
            'message' => ''.$message.' exitosamente.',
            'data' => $desactivate
@@ -85,11 +85,11 @@ public function reserFilters($proj_id, $use_id, $column, $data){
    if ($reservation == null){
        return response()->json([
            'status' => False,
-           'message' => 'No se han hecho reservaciones'
+           'message' => 'No se han hecho reservaciones de servicios'
        ],400);
    }else{
        // Control de acciones
-       Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
+       Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla services ",4,$proj_id, $use_id);
        return response()->json([
            'status' => True,
            'data' => $reservation
@@ -102,11 +102,11 @@ public function activeReservUser($proj_id, $use_id, Request $request){
    if ($reservation == null){
        return response()->json([
            'status' => False,
-           'message' => 'No se han hecho reservaciones'
+           'message' => 'No se han hecho reservaciones de servicios'
        ],400);
    }else{
        // Control de acciones
-       Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
+       Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla services ",4,$proj_id, $use_id);
        return response()->json([
            'status' => True,
            'data' => $reservation
@@ -118,11 +118,11 @@ public function calendar($proj_id, $use_id){
    if ($reservation == null){
        return response()->json([
            'status' => False,
-           'message' => 'No se han hecho reservaciones'
+           'message' => 'No se han hecho reservaciones de servicios'
        ],400);
    }else{
        // Control de acciones
-       Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
+       Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla services ",4,$proj_id, $use_id);
        return response()->json([
            'status' => True,
            'data' => $reservation

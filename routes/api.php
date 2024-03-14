@@ -50,6 +50,7 @@ Route::Resource('service/types'.URL, ServiceTypesController::class)->names('serv
 Route::get('historialService'.URL.'{column}/{data}', [ServicesController::class, "reserFilters"])->name('historial.filters');
 Route::get('active/service/user'.URL, [ServicesController::class, "activeReservUser"])->name('active.reserv.user');
 Route::get('calendarService'.URL, [ServicesController::class, "calendar"])->name('calendar');
+Route::get('profes'.URL, [ProfesionalsController::class, "Profs"])->name('Profs');
 
 
 

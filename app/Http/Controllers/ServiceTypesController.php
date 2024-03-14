@@ -15,11 +15,11 @@ class ServiceTypesController extends Controller
         if($serviceTypes == null){
             return response()->json([
                 'status' => False,
-                'message' => 'System does not have reservations.'
+                'message' => 'No se encontraron servicios'
             ], 400);
         }else{
             // Control de acciones
-            Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservation_types ",4, $proj_id, $use_id);
+            Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla service_types ",4, $proj_id, $use_id);
             return response()->json([
                 'status'=> True,
                 'data' => $serviceTypes
@@ -47,7 +47,7 @@ class ServiceTypesController extends Controller
                 $serviceTypes->ser_typ_name = $request->ser_typ_name;
                 $serviceTypes->save();
                 // Control de acciones
-                Controller::NewRegisterTrigger("Se realizó una inserción en la tabla reservation_types ",3,$proj_id,$use_id);
+                Controller::NewRegisterTrigger("Se realizó una inserción en la tabla service_types ",3,$proj_id,$use_id);
                 return response()->json([
                     'status' => True,
                     'message' => 'Reservation type '.$serviceTypes->ser_typ_name.' created successfully.',
@@ -70,7 +70,7 @@ class ServiceTypesController extends Controller
                 'message' => 'This space does not exist.'
             ], 400);
         }else{
-            Controller::NewRegisterTrigger("Se realizó una busqueda de un dato específico en la tabla reservation_types ",4,$proj_id,$use_id);
+            Controller::NewRegisterTrigger("Se realizó una busqueda de un dato específico en la tabla service_types ",4,$proj_id,$use_id);
             return response()->json([
                 'status' => True,
                 'data'=> $serviceTypes
@@ -97,11 +97,11 @@ class ServiceTypesController extends Controller
                 $serviceTypes = ServiceTypes::find($id);
                 $serviceTypes->ser_typ_name = $request->ser_typ_name;
                 $serviceTypes->save();
-                Controller::NewRegisterTrigger("Se realizó una actualización en la tabla reservation_types ",1,$proj_id, $use_id);
+                Controller::NewRegisterTrigger("Se realizó una actualización en la tabla service_types ",1,$proj_id, $use_id);
                 return response()->json([
 
                     'status' => True,
-                    'message' => 'Reservation type '.$serviceTypes->ser_typ_name.' modified successfully.',
+                    'message' => 'El tipo de servicio: '.$serviceTypes->ser_typ_name.', se modificó exi.',
                     'data'=>$serviceTypes
                 ],200);
             }
@@ -116,7 +116,7 @@ class ServiceTypesController extends Controller
 
     public function destroy($proj_id, $use_id)
     {
-        Controller::NewRegisterTrigger("Se intentó destruir un dato en la tabla reservation_types ",2,$proj_id, $use_id);
+        Controller::NewRegisterTrigger("Se intentó destruir un dato en la tabla service_types ",2,$proj_id, $use_id);
         return response()->json([
             'message' => 'This function is not allowed.'
         ],400);
