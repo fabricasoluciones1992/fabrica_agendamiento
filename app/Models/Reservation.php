@@ -457,7 +457,7 @@ Z                                                    INNER JOIN spaces ON reserv
         $date= date('Y-m-d');
         $reservation = DB::select("SELECT reservations.res_id AS 'No. Reserva', reservations.res_date AS 'Fecha',
         reservations.res_start AS 'Hora inicio', reservations.res_end AS 'Hora fin', spaces.spa_name AS 'Espacio',
-        users.use_mail AS 'Correo', reservations.res_status AS 'Estado' FROM reservations
+        users.use_mail AS 'Correo', reservations.use_id AS 'Identificacion', reservations.res_status AS 'Estado' FROM reservations
         INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
         INNER JOIN users ON reservations.use_id = users.use_id
         WHERE reservations.res_date >= '$date' AND reservations.res_status = 1");
