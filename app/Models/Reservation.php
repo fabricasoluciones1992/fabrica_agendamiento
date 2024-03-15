@@ -23,7 +23,6 @@ class Reservation extends Model
       'res_start',
       'res_end',
       'res_status',
-      'res_typ_id',
       'spa_id',
       'use_id'
     ];
@@ -33,10 +32,8 @@ class Reservation extends Model
     public static function Select(){
         $reservations = DB::select(
             "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end,
-            reservation_types.res_typ_name,reservations.res_status, spaces.spa_name, users.use_mail, users.use_id
+            reservations.res_status, spaces.spa_name, users.use_mail, users.use_id
             FROM reservations
-            INNER JOIN reservation_types
-            ON reservations.res_typ_id = reservation_types.res_typ_id
             INNER JOIN spaces
             ON reservations.spa_id = spaces.spa_id
             INNER JOIN users
@@ -52,7 +49,6 @@ class Reservation extends Model
             'res_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
             'res_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
             'res_end' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
-            'res_typ_id' => 'required|integer',
             'spa_id' => 'required',
             'use_id' => 'required'
 
@@ -64,8 +60,6 @@ class Reservation extends Model
             'res_start.regex' => 'El formato de la hora inicial de la reserva no es valido.',
             'res_end.required' => 'La hora final de la reserva es requerida.',
             'res_end.regex' => 'El formato de la hora final de la reserva no es valido.',
-            'res_typ_id.required' => 'El tipo de reserva es requerido.',
-            'res_typ_id.integer' => 'El tipo de reserva no es valido.',
             'spa_id.required' => 'El espacio a reservar es requerido.',
             'use_id.required' => 'El usuario que realiza la reserva es requerido.'
         ];
@@ -81,7 +75,6 @@ class Reservation extends Model
 
             $validateDay = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, spaces.spa_id, users.use_id, reservations.res_status
             FROM reservations
-            INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
             INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
             INNER JOIN users ON reservations.use_id = users.use_id
             WHERE reservations.res_date = '$request->res_date' AND spaces.spa_id = $request->spa_id
@@ -107,7 +100,6 @@ class Reservation extends Model
             $reservations->res_date = $request->res_date;
             $reservations->res_start = $request->res_start;
             $reservations->res_end = $request->res_end;
-            $reservations->res_typ_id = $request->res_typ_id;
             $reservations->res_status = 1;
             $reservations->spa_id = $request->spa_id;
             $reservations->use_id = $request->use_id;
@@ -135,7 +127,6 @@ class Reservation extends Model
 
                         $reservationsUsers = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, spaces.spa_id, users.use_id, reservations.res_status
                                                             FROM reservations
-                                                            INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
                                                             INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
                                                             INNER JOIN users ON reservations.use_id = users.use_id
                                                             WHERE reservations.res_date = '$request->res_date' AND reservations.use_id = $request->use_id");
@@ -243,9 +234,9 @@ class Reservation extends Model
     }
     public static function Show($id){
         $reservation =  DB::select(
-            "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, reservation_types.res_typ_name, spaces.spa_name, users.use_mail
+            "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_mail
             FROM reservations
-            INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
+            INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
             INNER JOIN users ON reservations.use_id = users.use_id
             WHERE reservations.res_id = $id");
             return $reservation;
@@ -255,7 +246,6 @@ class Reservation extends Model
             'res_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
             'res_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
             'res_end' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
-            'res_typ_id' => 'required|integer',
             'spa_id' => 'required|integer',
             'use_id' => 'required|integer'
 
@@ -268,8 +258,6 @@ class Reservation extends Model
             'res_start.regex' => 'El formato de la hora inicial de la reserva no es valido.',
             'res_end.required' => 'La hora final de la reserva es requerida.',
             'res_end.regex' => 'El formato de la hora final de la reserva no es valido.',
-            'res_typ_id.required' => 'El tipo de reserva es requerido.',
-            'res_typ_id.integer' => 'El tipo de reserva no es valido.',
             'spa_id.required' => 'El espacio a reservar es requerido.',
             'use_id.required' => 'El usuario que realiza la reserva es requerido.'
         ];
@@ -284,7 +272,6 @@ class Reservation extends Model
 
             $validateDay = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_id, reservations.res_status
             FROM reservations
-            INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
             INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
             INNER JOIN users ON reservations.use_id = users.use_id
             WHERE reservations.res_date = '$request->res_date' AND spaces.spa_id = $request->spa_id
@@ -311,7 +298,6 @@ class Reservation extends Model
             $reservations->res_date = $request->res_date;
             $reservations->res_start = $request->res_start;
             $reservations->res_end = $request->res_end;
-            $reservations->res_typ_id = $request->res_typ_id;
             $reservations->spa_id = $request->spa_id;
             $reservations->use_id = $request->use_id;
 
@@ -334,8 +320,7 @@ class Reservation extends Model
                         $totalReservationsDayCount = $totalReservationsDay[0]->total_res;
                         $reservationsUsers = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, spaces.spa_id, users.use_id, reservations.res_status
                                                     FROM reservations
-                                                    INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
-                                                    INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
+Z                                                    INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
                                                     INNER JOIN users ON reservations.use_id = users.use_id
                                                     WHERE reservations.res_date = '$request->res_date' AND reservations.res_start = '$request->res_start' AND reservations.use_id = $request->use_id");
                         if($totalReservationsDayCount < 3 || $request->acc_administrator == 1){
@@ -447,9 +432,8 @@ class Reservation extends Model
 
     public static function ReserFilters( $column, $data){
         $reservation = DB::table('reservations')->select('reservations.res_id AS No. Reserva', 'reservations.res_date AS Fecha',
-        'reservations.res_start AS Hora inicio', 'reservations.res_end AS Hora fin',
-        'reservation_types.res_typ_name AS Tipo Reserva', 'spaces.spa_name AS Espacio',
-        'users.use_mail AS Correo', 'reservations.res_status AS Estado')->join('reservation_types', 'reservations.res_typ_id', '=', 'reservation_types.res_typ_id')
+        'reservations.res_start AS Hora inicio', 'reservations.res_end AS Hora fin', 'spaces.spa_name AS Espacio',
+        'users.use_mail AS Correo', 'reservations.res_status AS Estado')
         ->join('spaces', 'reservations.spa_id', '=', 'spaces.spa_id')
         ->join('users', 'reservations.use_id', '=', 'users.use_id')->where("reservations.".$column,'like', '%'.$data.'%')->OrderBy("reservations.".$column, 'DESC')->get();
         return $reservation;
@@ -458,14 +442,13 @@ class Reservation extends Model
     public static function ActiveReservUser($use_id, $request){
         $date= date('Y-m-d');
         $reservation = ($request->acc_administrator == 1) ?  DB::table('reservations')->select('reservations.res_id AS No. Reserva', 'reservations.res_date AS Fecha',
-        'reservations.res_start AS Hora inicio', 'reservations.res_end AS Hora fin',
-        'reservation_types.res_typ_name AS Tipo Reserva', 'spaces.spa_name AS Espacio',
-        'users.use_mail AS Correo', 'reservations.res_status AS Estado')->join('reservation_types', 'reservations.res_typ_id', '=', 'reservation_types.res_typ_id')
+        'reservations.res_start AS Hora inicio', 'reservations.res_end AS Hora fin', 'spaces.spa_name AS Espacio',
+        'users.use_mail AS Correo', 'reservations.res_status AS Estado')
         ->join('spaces', 'reservations.spa_id', '=', 'spaces.spa_id')
         ->join('users', 'reservations.use_id', '=', 'users.use_id')->where("res_date", ">=" ,$date)->where("res_status","=", 1)->OrderBy("reservations.use_id", 'DESC')->get() : DB::table('reservations')->select('reservations.res_id AS No. Reserva', 'reservations.res_date AS Fecha',
         'reservations.res_start AS Hora inicio', 'reservations.res_end AS Hora fin',
-        'reservation_types.res_typ_name AS Tipo Reserva', 'spaces.spa_name AS Espacio',
-        'users.use_mail AS Correo', 'reservations.res_status AS Estado')->join('reservation_types', 'reservations.res_typ_id', '=', 'reservation_types.res_typ_id')
+        'spaces.spa_name AS Espacio',
+        'users.use_mail AS Correo', 'reservations.res_status AS Estado')
         ->join('spaces', 'reservations.spa_id', '=', 'spaces.spa_id')
         ->join('users', 'reservations.use_id', '=', 'users.use_id')->OrderBy("reservations.use_id", 'DESC')->where("reservations.use_id", '=', $use_id)->where("res_status", "=", 1)->get() ;
         return $reservation;
@@ -473,9 +456,8 @@ class Reservation extends Model
     public static function Calendar(){
         $date= date('Y-m-d');
         $reservation = DB::select("SELECT reservations.res_id AS 'No. Reserva', reservations.res_date AS 'Fecha',
-        reservations.res_start AS 'Hora inicio', reservations.res_end AS 'Hora fin',
-        reservation_types.res_typ_name AS 'Tipo Reserva', spaces.spa_name AS 'Espacio',
-        users.use_mail AS 'Correo', reservations.res_status AS 'Estado' FROM reservations INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
+        reservations.res_start AS 'Hora inicio', reservations.res_end AS 'Hora fin', spaces.spa_name AS 'Espacio',
+        users.use_mail AS 'Correo', reservations.res_status AS 'Estado' FROM reservations
         INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
         INNER JOIN users ON reservations.use_id = users.use_id
         WHERE reservations.res_date >= '$date' AND reservations.res_status = 1");

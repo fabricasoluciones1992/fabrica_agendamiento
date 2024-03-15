@@ -6,13 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfesionalsController;
 use App\Http\Controllers\SpaceController;
-use App\Http\Controllers\ReservationTypeController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\ServiceTypesController;
-use App\Models\Reservation;
-use App\Models\ServiceTypes;
-use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\Route;
 
 define("URL", "/{proj_id}/{use_id}/");
@@ -38,7 +35,6 @@ Route::get('active/reserv/user'.URL, [ReservationController::class, "activeReser
 Route::get('users'.URL, [ReservationController::class, "users"])->name('users');
 Route::get('calendar'.URL, [ReservationController::class, "calendar"])->name('calendar');
 
-Route::Resource('reservation/types'.URL, ReservationTypeController::class)->names('reservation.types')->parameter('','reservation_types');
 Route::Resource('spaces'.URL, SpaceController::class)->names('spaces')->parameter('','spaces');
 
 Route::Resource('services'.URL, ServicesController::class)->names('services')->parameter('','services');
