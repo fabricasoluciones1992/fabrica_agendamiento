@@ -49,9 +49,9 @@ class ReservationController extends Controller
             return response()->json(['status' => True, 'data' => $reservation],200);
         }
     }
-    public function update($proj_id, $use_id, Request $request, $id)
+    public function update(Request $request, $proj_id, $use_id,  $id)
     {
-        $reservations = Reservation::Amend($proj_id, $use_id, $request, $id);
+        $reservations = Reservation::Amend($request, $proj_id, $use_id,  $id);
         return $reservations;
     }
     public function destroy($proj_id, $use_id, $id){

@@ -241,7 +241,7 @@ class Reservation extends Model
             WHERE reservations.res_id = $id");
             return $reservation;
     }
-    public static function Amend($proj_id, $use_id, $request, $id){
+    public static function Amend(Request $request, $proj_id, $use_id,  $id){
         $rules = [
             'res_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
             'res_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
@@ -307,6 +307,7 @@ class Reservation extends Model
             $newResStart = carbon::parse($newResStart);
             $newResEnd = carbon::parse($newResEnd);
 
+
             // Se comprueba que solo puedan hacerse reservas del mismo día o días posteriores y la zona horaria de la reserva.
             if($request->res_date >= $date && $request->res_start >= "07:00" && $request->res_end <= "19:00"){
                 // Se comprueba que la sala este habilitada
@@ -314,15 +315,13 @@ class Reservation extends Model
                     // Se comprueba que la reserva sea minimo de treinta minutos y máximo de dos horas.
                     if ($request->res_end >= $minHourFormat && $request->res_end <= $maxHourFormat && $request->res_start < $request->res_end){
 
-                        $totalReservationsDay = DB::select("SELECT COUNT(reservations.res_id) AS total_res
+                        $totalReservationsDay = DB::select("SELECT COUNT(res_id) AS total_res
                                                                 FROM reservations
-                                                                WHERE reservations.res_date = '$request->res_date' AND reservations.use_id = $request->use_id  AND reservations.res_status = 1");
+                                                                WHERE res_date = '$request->res_date' AND reservations.use_id = $request->use_id  AND reservations.res_status = 1");
                         $totalReservationsDayCount = $totalReservationsDay[0]->total_res;
-                        $reservationsUsers = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, spaces.spa_id, users.use_id, reservations.res_status
-                                                    FROM reservations
-Z                                                    INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
-                                                    INNER JOIN users ON reservations.use_id = users.use_id
-                                                    WHERE reservations.res_date = '$request->res_date' AND reservations.res_start = '$request->res_start' AND reservations.use_id = $request->use_id");
+
+                        $reservationsUsers = DB::table("reservations")->select('reservations.res_id','reservations.res_date','reservations.res_start', 'reservations.res_end', 'users.use_id','reservations.spa_id','spaces.spa_name', 'reservations.res_status')->join("spaces","reservations.spa_id", "=","spaces.spa_id")->join("users","reservations.use_id","=","users.use_id")->get();
+
                         if($totalReservationsDayCount < 3 || $request->acc_administrator == 1){
                             if($reservationsUsers == null){
                                 if($request->res_date == $date && $request->res_start <= $actualHour){
