@@ -72,7 +72,7 @@ class ServicesController extends Controller
         $desactivate = Service::find($id);
        ($desactivate->ser_status == 1)?$desactivate->ser_status=0:$desactivate->ser_status=1;
        $desactivate->save();
-       $message = ($desactivate->ser_status == 1)?'Desactivado':'Activado';
+       $message = ($desactivate->ser_status == 1)?'Activado':'Desactivado';
        Controller::NewRegisterTrigger("Se cambio el estado de un servicio en la tabla services ",2,$proj_id,$use_id);
        return response()->json([
            'message' => ''.$message.' exitosamente.',

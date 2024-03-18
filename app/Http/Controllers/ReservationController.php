@@ -58,7 +58,7 @@ class ReservationController extends Controller
              $desactivate = Reservation::find($id);
             ($desactivate->res_status == 1)?$desactivate->res_status=0:$desactivate->res_status=1;
             $desactivate->save();
-            $message = ($desactivate->res_status == 1)?'Desactivado':'Activado';
+            $message = ($desactivate->res_status == 1)?'Activado':'Desactivado';
             Controller::NewRegisterTrigger("Se cambio el estado de una reserva en la tabla reservations ",2,$proj_id,$use_id);
             return response()->json([
                 'message' => ''.$message.' exitosamente.',
