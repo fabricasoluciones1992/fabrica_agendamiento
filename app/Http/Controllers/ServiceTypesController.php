@@ -45,6 +45,7 @@ class ServiceTypesController extends Controller
             }else{
                 $serviceTypes = new ServiceTypes($request->input());
                 $serviceTypes->ser_typ_name = $request->ser_typ_name;
+                $serviceTypes->ser_typ_status = 1;
                 $serviceTypes->save();
                 // Control de acciones
                 Controller::NewRegisterTrigger("Se realizó una inserción en la tabla service_types ",3,$proj_id,$use_id);
@@ -114,11 +115,22 @@ class ServiceTypesController extends Controller
     }
 
 
-    public function destroy($proj_id, $use_id)
+    public function destroy( $proj_id, $use_id, $id, Request $request)
     {
-        Controller::NewRegisterTrigger("Se intentó destruir un dato en la tabla service_types ",2,$proj_id, $use_id);
-        return response()->json([
-            'message' => 'This function is not allowed.'
-        ],400);
+        if($request->acc_administrator == 1){
+            $desactivate = ServiceTypes::find($id);
+            ($desactivate->ser_typ_status == 1)?$desactivate->ser_typ_status=0:$desactivate->ser_typ_status=1;
+            $desactivate->save();
+            Controller::NewRegisterTrigger("Se cambio el estado de un dato en la tabla spaces ",2,$proj_id,$use_id);
+            return response()->json([
+                'message' => 'Status of '.$desactivate->ser_typ_name.' changed successfully.',
+                'data' => $desactivate
+            ],200);
+        }else{
+            return response()->json([
+                'status' => False,
+                'message' => 'Access denied. This action can only be performed by active administrators.'
+            ]);
+        }
     }
 }

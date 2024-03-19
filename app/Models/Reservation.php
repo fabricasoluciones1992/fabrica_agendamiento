@@ -193,7 +193,8 @@ class Reservation extends Model
                                         // Hay superposición, la nueva reserva no es posible
                                         return response()->json([
                                             'status' => False,
-                                            'message' => 'Este usuario ya tiene una reservacion en la sala: '.$reservationsUsersKey->spa_name.'.'
+                                            'message' => 'Este usuario ya tiene una reservacion.'
+
                                         ],400);
                                     }
                                 }

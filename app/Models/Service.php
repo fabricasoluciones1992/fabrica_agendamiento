@@ -114,7 +114,13 @@ class Service extends Model
             $newSerEnd = $request->ser_end;
             $newSerStart = carbon::parse($newSerStart);
             $newSerEnd = carbon::parse($newSerEnd);
-
+            $serType = ServiceTypes::find($request->ser_typ_id);
+            if($serType->ser_typ_status == 0){
+                return response()->json([
+                    'status' => False,
+                    'message' => 'El tipo de reserva '.$serType->ser_typ_name .' está fuera de servicio'
+                ],400);
+            }
 
             // Se comprueba que solo puedan hacerse reservas del mismo día o días posteriores y la zona horaria de la reserva.
             if($request->ser_date >= $date && $request->ser_start >= "07:00" && $request->ser_end <= "19:00")
@@ -168,7 +174,7 @@ class Service extends Model
                                             // Hay superposición, la nueva reserva no es posible
                                              return response()->json([
                                                  'status' => False,
-                                                 'message' => 'Este espacio está reservado'
+                                                 'message' => 'Este profesional está reservado'
                                              ],400);
                                          }
                                     }
@@ -176,7 +182,7 @@ class Service extends Model
                                         $services->save();
                                         return response()->json([
                                             'status' => True,
-                                            'message' => 'La reserva en el espacio '.$profesional->prof_name.' se creo exitosamente el dia '.$services->ser_date.' por el usuario: '.$user->use_mail.'.',
+                                            'message' => 'La reserva en el profesional '.$profesional->prof_name.' se creo exitosamente el dia '.$services->ser_date.' por el usuario: '.$user->use_mail.'.',
 
                                         ],200);
 
@@ -185,7 +191,7 @@ class Service extends Model
                                     $services->save();
                                     return response()->json([
                                         'status' => True,
-                                        'message' => 'La reserva en el espacio  '.$profesional->prof_name.' se creó exitosamente el dia '.$services->ser_date.' por el usuario: '.$user->use_mail.'.',
+                                        'message' => 'La reserva en el profesional  '.$profesional->prof_name.' se creó exitosamente el dia '.$services->ser_date.' por el usuario: '.$user->use_mail.'.',
 
                                     ],200);
                                 }
@@ -199,7 +205,7 @@ class Service extends Model
                                         // Hay superposición, la nueva reserva no es posible
                                         return response()->json([
                                             'status' => False,
-                                            'message' => 'Este usuario ya tiene una reservacion en la sala: '.$servicesUsersKey->prof_name.'.'
+                                            'message' => 'Este usuario ya tiene una reservacion en la profesional: '.$servicesUsersKey->prof_name.'.'
                                         ],400);
                                     }
                                 }
@@ -207,7 +213,7 @@ class Service extends Model
                                         $services->save();
                                         return response()->json([
                                             'status' => True,
-                                            'message' => 'La reserva en el espacio '.$profesional->prof_name.' se creo exitosamente el dia '.$services->ser_date.' por el usuario: '.$user->use_mail.'.',
+                                            'message' => 'La reserva en el profesional '.$profesional->prof_name.' se creo exitosamente el dia '.$services->ser_date.' por el usuario: '.$user->use_mail.'.',
 
                                             ],200);
                             }
@@ -226,14 +232,14 @@ class Service extends Model
                 }else{
                     return response()->json([
                         'status' => False,
-                        'message' => 'El espacio '.$profesional->prof_name.' no está disponible.'
+                        'message' => 'El profesional '.$profesional->prof_name.' no está disponible.'
                     ],400);
                 }
 
             }else{
                 return response()->json([
                     'status' => False,
-                    'message' => 'Hora invalida, el espacio debe ser reservado entre las 7:00AM y las 7:00PM del '.$date.', o una fecha posterior.'
+                    'message' => 'Hora invalida, el profesional debe ser reservado entre las 7:00AM y las 7:00PM del '.$date.', o una fecha posterior.'
                 ],400);
             }
         }
@@ -274,7 +280,7 @@ class Service extends Model
             'ser_end.regex' => 'El formato de la hora final de la reserva no es valido.',
             'ser_typ_id.required' => 'El tipo de reserva es requerido.',
             'ser_typ_id.integer' => 'El tipo de reserva no es valido.',
-            'prof_id.required' => 'El espacio a reservar es requerido.',
+            'prof_id.required' => 'El profesional a reservar es requerido.',
             'use_id.required' => 'El usuario que realiza la reserva es requerido.'
         ];
 
@@ -364,13 +370,13 @@ class Service extends Model
                                             $services->save();
                                             return response()->json([
                                                 'status' => True,
-                                                'message' => 'La reserva en el espacio '.$profesional->prof_name.' se actualizó exitosamente el dia '.$services->ser_date.' por el usuario: '.$user->use_mail.'.'
+                                                'message' => 'La reserva en el profesional '.$profesional->prof_name.' se actualizó exitosamente el dia '.$services->ser_date.' por el usuario: '.$user->use_mail.'.'
                                             ],200);
                                         }elseif ($newSerStart->lt($validatedResEnd) && $newSer->gt($validatedResStart) && $validateDayKey->ser_status == 1) {
                                             // Hay superposición, la nueva reserva no es posible
                                             return response()->json([
                                                 'status' => False,
-                                                'message' => 'Este espacio está reservado'
+                                                'message' => 'Este profesional está reservado'
                                             ],400);
                                         }
                                     }
@@ -380,7 +386,7 @@ class Service extends Model
                                     $services->save();
                                     return response()->json([
                                         'status' => True,
-                                        'message' => 'La reserva en el espacio  '.$profesional->prof_name.' se actualizó exitosamente el dia '.$services->ser_date.' por el usuario: '.$user->use_mail.'.'
+                                        'message' => 'La reserva en el profesional  '.$profesional->prof_name.' se actualizó exitosamente el dia '.$services->ser_date.' por el usuario: '.$user->use_mail.'.'
                                     ],200);
                                 }
                                 // Reporte de novedad
@@ -389,7 +395,7 @@ class Service extends Model
                                 $services->save();
                                 return response()->json([
                                     'status' => True,
-                                    'message' => 'La reserva en el espacio '.$profesional->prof_name.' se actualizó exitosamente el dia'.$services->ser_date.' por el usuario: '.$user->use_mail.'.'
+                                    'message' => 'La reserva en el profesional '.$profesional->prof_name.' se actualizó exitosamente el dia'.$services->ser_date.' por el usuario: '.$user->use_mail.'.'
                                 ],200);
                             }else{
                                 // return $servicesUsers;
@@ -404,12 +410,12 @@ class Service extends Model
                                         $services->save();
                                         return response()->json([
                                           'status' => True,
-                                          'message' => 'La reserva en el espacio '.$profesional->prof_name.' se actualizó exitosamente el dia'.$services->ser_date.' por el usuario: '.$user->use_mail.'.'
+                                          'message' => 'La reserva en el profesional '.$profesional->prof_name.' se actualizó exitosamente el dia'.$services->ser_date.' por el usuario: '.$user->use_mail.'.'
                                         ],200);
                                     }elseif($newSerStart->lt($validatedResEnd) && $newSer->gt($validatedResStart) && $request->prof_id == $servicesUsersKey->prof_id && $servicesUsersKey->ser_status == 1){
                                         return response()->json([
                                             'status' => False,
-                                            'message' => 'Este usuario ya tiene una reservacion en la sala: '.$servicesUsers[0]->prof_name.'.'
+                                            'message' => 'Este usuario ya tiene una reservacion en la profesional: '.$servicesUsers[0]->prof_name.'.'
                                         ],400);
                                     }
                                 }
@@ -417,7 +423,7 @@ class Service extends Model
                                         $services->save();
                                         return response()->json([
                                             'status' => True,
-                                            'message' => 'La reserva en el espacio '.$profesional->prof_name.' se actualizó exitosamente el dia'.$services->ser_date.' por el usuario: '.$user->use_mail.'.',
+                                            'message' => 'La reserva en el profesional '.$profesional->prof_name.' se actualizó exitosamente el dia'.$services->ser_date.' por el usuario: '.$user->use_mail.'.',
 
                                             ],200);
                             }
@@ -436,13 +442,13 @@ class Service extends Model
                 }else{
                     return response()->json([
                         'status' => False,
-                        'message' => 'El espacio '.$profesional->prof_name.' no está disponible.'
+                        'message' => 'El profesional '.$profesional->prof_name.' no está disponible.'
                     ],400);
                 }
             }else{
                 return response()->json([
                     'status' => False,
-                    'message' => 'Hora invalida, el espacio debe ser reservado entre las 7:00AM y las 7:00PM del '.$date.', o una fecha posterior.'
+                    'message' => 'Hora invalida, el profesional debe ser reservado entre las 7:00AM y las 7:00PM del '.$date.', o una fecha posterior.'
                 ],400);
             }
         }

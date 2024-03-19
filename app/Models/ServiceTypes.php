@@ -12,7 +12,8 @@ class ServiceTypes extends Model
     protected $primaryKey ='ser_typ_id';
 
     protected $fillable = [
-      'ser_typ_name'
+      'ser_typ_name',
+      'ser_typ_status'
     ];
 
     public $timestamps = false;
