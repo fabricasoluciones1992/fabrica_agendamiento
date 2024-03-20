@@ -30,55 +30,23 @@ class Reservation extends Model
     public $timestamps = false;
 
     public static function Select(){
-        $reservations = DB::select(
-            "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end,
-            reservations.res_status, spaces.spa_name, users.use_mail, users.use_id
-            FROM reservations
-            INNER JOIN spaces
-            ON reservations.spa_id = spaces.spa_id
-            INNER JOIN users
-            ON reservations.use_id = users.use_id
-            ORDER BY reservations.res_date DESC
-            LIMIT 100");
+        $reservations = DB::table('reservations AS res')
+            ->join('spaces AS sp', 'sp.spa_id', '=', 'res.spa_id')
+            ->join('users AS u', 'u.use_id', '=', 'res.use_id')
+            ->select('res.res_id','res.res_date', 'res.res_start', 'res.res_end', 'res.res_status', 'sp.spa_name', 'u.use_mail', 'u.use_id')
+            ->orderBy('res.res_date', 'DESC')->limit(100)->get();
             return $reservations;
     }
 
     public static function Store($proj_id, $use_id, $request){
 
-        $rules = [
-            'res_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
-            'res_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
-            'res_end' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
-            'spa_id' => 'required',
-            'use_id' => 'required'
-
-        ];
-        $messages = [
-            'res_date.required' => 'La fecha de la reserva es requerida.',
-            'res_date.regex' => 'El formato de la fecha de la reserva no es valido.',
-            'res_start.required' => 'La hora inicial de la reserva es requerida.',
-            'res_start.regex' => 'El formato de la hora inicial de la reserva no es valido.',
-            'res_end.required' => 'La hora final de la reserva es requerida.',
-            'res_end.regex' => 'El formato de la hora final de la reserva no es valido.',
-            'spa_id.required' => 'El espacio a reservar es requerido.',
-            'use_id.required' => 'El usuario que realiza la reserva es requerido.'
-        ];
-
-        $validator = Validator::make($request->input(), $rules, $messages);
-        if($validator->fails())
-        {
-            return response()->json([
-              'status' => False,
-              'message' => $validator->errors()->all()
-            ],400);
-        }else{
-
-            $validateDay = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, spaces.spa_id, users.use_id, reservations.res_status
-            FROM reservations
-            INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
-            INNER JOIN users ON reservations.use_id = users.use_id
-            WHERE reservations.res_date = '$request->res_date' AND spaces.spa_id = $request->spa_id
-            ORDER BY reservations.res_start ASC ");
+            $validateDay = DB::table('reservations AS res')
+            ->join('spaces AS sp', 'sp.spa_id', '=', 'res.spa_id')
+            ->join('users AS u', 'u.use_id', '=', 'res.use_id')
+            ->select('res.res_id','res.res_date', 'res.res_start', 'res.res_end', 'res.res_status', 'sp.spa_name', 'sp.spa_id', 'u.use_id')
+            ->where('res.res_date', '=', $request->res_date)
+            ->where('sp.spa_id', '=', $request->spa_id)
+            ->orderBy('res.res_date', 'DESC')->get();
 
             $minHour = Carbon::create($request->res_start);
             $minHour->add(30,"minute");
@@ -94,15 +62,6 @@ class Reservation extends Model
             // Trae todos los datos de usuarios y salas según el id que trae el request
             $user = User::find($request->use_id);
             $space = Space::find($request->spa_id);
-
-            // Los datos ingresados en el request se almacenan en un nuevo modelo Reservation
-            $reservations = new Reservation($request->input());
-            $reservations->res_date = $request->res_date;
-            $reservations->res_start = $request->res_start;
-            $reservations->res_end = $request->res_end;
-            $reservations->res_status = 1;
-            $reservations->spa_id = $request->spa_id;
-            $reservations->use_id = $request->use_id;
 
             // Convertimos los valores de hora que nos pasa el usuario a datos tipo Carbon
             $newResStart = $request->res_start;
@@ -126,20 +85,15 @@ class Reservation extends Model
                         $totalReservationsDayCount = $totalReservationsDay[0]->total_res; */
 
                         $reservationsUsers = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, spaces.spa_id, users.use_id, reservations.res_status
-                                                            FROM reservations
-                                                            INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
-                                                            INNER JOIN users ON reservations.use_id = users.use_id
-                                                            WHERE reservations.res_date = '$request->res_date' AND reservations.use_id = $request->use_id");
-                       /*  $reservationsSinceDate = DB::select("SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_id
-                        FROM reservations
-                        INNER JOIN reservation_types ON reservations.res_typ_id = reservation_types.res_typ_id
-                        INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
-                        INNER JOIN users ON reservations.use_id = users.use_id
-                        WHERE reservations.res_date >= $date  AND reservations.use_id = $request->use_id"); */
+                            FROM reservations
+                            INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
+                            INNER JOIN users ON reservations.use_id = users.use_id
+                            WHERE reservations.res_date = '$request->res_date' AND reservations.use_id = $request->use_id");
 
                         $reservationsSinceDate = DB::select("SELECT COUNT(reservations.res_id) AS total_res
-                                                FROM reservations
-                                                WHERE reservations.res_date >= '$date'  AND reservations.use_id = $request->use_id AND reservations.res_status = 1");
+                            FROM reservations
+                            WHERE reservations.res_date >= '$date'  AND reservations.use_id = $request->use_id AND reservations.res_status = 1");
+                            
                         $reservationsSinceDateCount = $reservationsSinceDate[0]->total_res;
 
                         if($reservationsSinceDateCount < 3 || $request->acc_administrator == 1){
@@ -166,8 +120,11 @@ class Reservation extends Model
                                              ],400);
                                          }
                                     }
-                                    Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla reservations ",3,$proj_id, $use_id);
+                                     // Los datos ingresados en el request se almacenan en un nuevo modelo Reservation
+                                        $reservations = new Reservation($request->input());
+                                        $reservations->res_status = 1;
                                         $reservations->save();
+                                        Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla reservations ",3,$proj_id, $use_id);
                                         return response()->json([
                                             'status' => True,
                                             'message' => 'La reserva en el espacio '.$space->spa_name.' se creo exitosamente el dia '.$reservations->res_date.' por el usuario: '.$user->use_mail.'.',
@@ -175,8 +132,11 @@ class Reservation extends Model
                                         ],200);
 
                                 }else{
-                                    Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla reservations ",3,$proj_id, $use_id);
+                                    // Los datos ingresados en el request se almacenan en un nuevo modelo Reservation
+                                    $reservations = new Reservation($request->input());
+                                    $reservations->res_status = 1;
                                     $reservations->save();
+                                    Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla reservations ",3,$proj_id, $use_id);
                                     return response()->json([
                                         'status' => True,
                                         'message' => 'La reserva en el espacio  '.$space->spa_name.' se creó exitosamente el dia '.$reservations->res_date.' por el usuario: '.$user->use_mail.'.',
@@ -193,18 +153,20 @@ class Reservation extends Model
                                         // Hay superposición, la nueva reserva no es posible
                                         return response()->json([
                                             'status' => False,
-                                            'message' => 'Este usuario ya tiene una reservacion.'
-
+                                            'message' => 'Este usuario ya tiene una reservación.'
                                         ],400);
                                     }
                                 }
+                                
+                                // Los datos ingresados en el request se almacenan en un nuevo modelo Reservation
+                                $reservations = new Reservation($request->input());
+                                $reservations->res_status = 1;
+                                $reservations->save();
                                 Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla reservations ",3,$proj_id, $use_id);
-                                        $reservations->save();
-                                        return response()->json([
-                                            'status' => True,
-                                            'message' => 'La reserva en el espacio '.$space->spa_name.' se creo exitosamente el dia '.$reservations->res_date.' por el usuario: '.$user->use_mail.'.',
-
-                                            ],200);
+                                return response()->json([
+                                    'status' => True,
+                                    'message' => 'La reserva en el espacio '.$space->spa_name.' se creo exitosamente el dia '.$reservations->res_date.' por el usuario: '.$user->use_mail.'.',
+                                    ],200);
                             }
                         }else{
                             return response()->json([
@@ -231,9 +193,8 @@ class Reservation extends Model
                     'message' => 'Hora invalida, el espacio debe ser reservado entre las 7:00AM y las 7:00PM del '.$date.', o una fecha posterior.'
                 ],400);
             }
-        }
     }
-    public static function Show($id){
+    public static function FindOne($id){
         $reservation =  DB::select(
             "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_mail
             FROM reservations
