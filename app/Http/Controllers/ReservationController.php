@@ -31,18 +31,14 @@ class ReservationController extends Controller
             ],200);
         }
     }
-    // public function store($proj_id, $use_id, Request $request)
-    // {
-    //     return Reservation::Store($proj_id, $use_id, $request);
-    // }
     public function store($proj_id, $use_id, Request $request)
     {
         $rules = [
             'res_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
             'res_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
             'res_end' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
-            'spa_id' => 'required',
-            'use_id' => 'required'
+            'spa_id' => 'required|integer',
+            'use_id' => 'required|integer'
 
         ];
         $messages = [
@@ -81,8 +77,34 @@ class ReservationController extends Controller
     }
     public function update(Request $request, $proj_id, $use_id,  $id)
     {
-        $reservations = Reservation::Amend($request, $proj_id, $use_id,  $id);
-        return $reservations;
+        $rules = [
+            'res_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
+            'res_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
+            'res_end' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
+            'spa_id' => 'required|integer',
+            'use_id' => 'required|integer'
+
+        ];
+        $messages = [
+            'res_date.required' => 'La fecha de la reserva es requerida.',
+            'res_date.regex' => 'El formato de la fecha de la reserva no es valido.',
+            'res_start.required' => 'La hora inicial de la reserva es requerida.',
+            'res_start.regex' => 'El formato de la hora inicial de la reserva no es valido.',
+            'res_end.required' => 'La hora final de la reserva es requerida.',
+            'res_end.regex' => 'El formato de la hora final de la reserva no es valido.',
+            'spa_id.required' => 'El espacio a reservar es requerido.',
+            'use_id.required' => 'El usuario que realiza la reserva es requerido.'
+        ];
+
+        $validator = Validator::make($request->input(), $rules, $messages);
+        if($validator->fails()){
+            return response()->json([
+                'status' => False,
+                'message' => $validator->errors()->all()
+            ],400);
+        }else{
+            return Reservation::Amend($request, $proj_id, $use_id,  $id);
+        }
     }
     public function destroy($proj_id, $use_id, $id){
              $desactivate = Reservation::find($id);
