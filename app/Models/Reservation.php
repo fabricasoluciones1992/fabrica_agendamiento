@@ -93,7 +93,7 @@ class Reservation extends Model
                         $reservationsSinceDate = DB::select("SELECT COUNT(reservations.res_id) AS total_res
                             FROM reservations
                             WHERE reservations.res_date >= '$date'  AND reservations.use_id = $request->use_id AND reservations.res_status = 1");
-                            
+
                         $reservationsSinceDateCount = $reservationsSinceDate[0]->total_res;
 
                         if($reservationsSinceDateCount < 3 || $request->acc_administrator == 1){
@@ -157,7 +157,7 @@ class Reservation extends Model
                                         ],400);
                                     }
                                 }
-                                
+
                                 // Los datos ingresados en el request se almacenan en un nuevo modelo Reservation
                                 $reservations = new Reservation($request->input());
                                 $reservations->res_status = 1;
@@ -312,7 +312,7 @@ class Reservation extends Model
                                             // Hay superposición, la nueva reserva no es posible
                                             return response()->json([
                                                 'status' => False,
-                                                'message' => 'Este espacio está reservado'
+                                                'message' => 'Ya existe una reservación en este momento.'
                                             ],400);
                                         }
                                     }
@@ -351,7 +351,7 @@ class Reservation extends Model
                                     }elseif($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart) && $request->spa_id == $reservationsUsersKey->spa_id && $reservationsUsersKey->res_status == 1){
                                         return response()->json([
                                             'status' => False,
-                                            'message' => 'Este usuario ya tiene una reservacion en la sala: '.$reservationsUsers[0]->spa_name.'.'
+                                            'message' => 'Ya existe una reservación en este momento.'
                                         ],400);
                                     }
                                 }

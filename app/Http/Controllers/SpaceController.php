@@ -35,7 +35,7 @@ class SpaceController extends Controller
             if ($request->acc_administrator == 1) {
             // Se establecen los parametros para ingresar datos.
             $rules =[
-                'spa_name' => ['required','unique:spaces', 'regex:/^[A-ZÁÉÍÓÚÜÑ\s]+$/']
+                'spa_name' => ['required','unique:spaces', 'regex:/^[A-ZÁÉÍÓÚÜÀÈÌÒÙÑ\s]+$/']
             ];
             // El sistema valida que estos datos sean correctos
             $validator = Validator::make($request->input(), $rules);
@@ -95,7 +95,7 @@ class SpaceController extends Controller
         if ($request->acc_administrator == 1) {
             // Se establecen los parametros para ingresar datos.
             $rules =[
-                'spa_name' => ['required', 'unique:spaces', 'regex:/^[A-ZÁÉÍÓÚÜÑ\s]+$/'],
+                'spa_name' => ['required', 'unique:spaces', 'regex:/^[A-ZÁÉÍÓÚÜÀÈÌÒÙÑ\s]+$/'],
             ];
             // El sistema valida que estos datos sean correctos
             $validator = Validator::make($request->input(), $rules);
