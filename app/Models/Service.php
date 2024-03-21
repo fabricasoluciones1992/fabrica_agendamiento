@@ -498,4 +498,16 @@ class Service extends Model
             LEFT JOIN access acc ON us.use_id = acc.use_id GROUP BY us.use_id");
         return $users;
     }
+
+    public static function betweenDates($startDate, $endDate){
+        return DB::select("SELECT services.ser_id AS 'No. Servicio', services.ser_date AS 'Fecha',
+        services.ser_start AS 'Hora inicio', services.ser_end AS 'Hora fin',
+        service_types.ser_typ_name AS 'Tipo Servicio', profesionals.prof_name AS 'Profesional',
+        users.use_mail AS 'Correo', services.use_id AS 'Identificacion', services.ser_status AS 'Estado' FROM services INNER JOIN service_types ON services.ser_typ_id = service_types.ser_typ_id
+        INNER JOIN profesionals ON services.prof_id = profesionals.prof_id
+        INNER JOIN users ON services.use_id = users.use_id
+        WHERE services.ser_date BETWEEN '$startDate' AND '$endDate'
+        ORDER BY services.ser_date DESC");
+
+    }
 }

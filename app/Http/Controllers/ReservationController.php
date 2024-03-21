@@ -188,4 +188,22 @@ class ReservationController extends Controller
             ],400);
         }
     }
+
+    public function betweenDates($proj_id, $use_id, $startDate, $endDate){
+
+        $reservations = Reservation::betweenDates($startDate, $endDate);
+        if ($reservations == null)
+        {
+            return response()->json([
+             'status' => False,
+             'message' => 'No se encontraron reservaciones'
+            ], 400);
+        }else{
+        Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla reservations ",4,$proj_id, $use_id);
+        return response()->json([
+            'status'=> True,
+            'data'=> $reservations
+        ], 200);
+        }
+    }
 }

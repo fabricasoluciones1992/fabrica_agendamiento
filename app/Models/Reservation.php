@@ -211,14 +211,14 @@ class Reservation extends Model
         {
                 // Se comprueba que la reserva sea minimo de treinta minutos y máximo de dos horas.
                 if ($request->res_end >= $minHourFormat && $request->res_end <= $maxHourFormat && $request->res_start < $request->res_end){
-                    
+
                     $totalReservationsDay = DB::select("SELECT COUNT(res_id) AS total_res
                         FROM reservations
                         WHERE res_date = '$request->res_date' AND reservations.use_id = $request->use_id  AND reservations.res_status = 1");
 
                     $totalReservationsDayCount = $totalReservationsDay[0]->total_res;
                     if($totalReservationsDayCount < 3 || $request->acc_administrator == 1){
-                       
+
                         $reserUsers = DB::table('reservations AS res')
                         ->join('spaces AS sp', 'sp.spa_id', '=', 'res.spa_id')
                         ->join('users AS u', 'u.use_id', '=', 'res.use_id')
@@ -235,7 +235,7 @@ class Reservation extends Model
                         ->orderBy('res.res_date', 'DESC')->get();
 
                         if($reserUsers->isEmpty()){
-                            
+
                             if($request->res_date == $date && $request->res_start <= $actualHour){
                                 return response()->json([
                                     'status' => False,
@@ -365,16 +365,16 @@ class Reservation extends Model
     public static function ActiveReservUser($use_id, $request){
         $date= date('Y-m-d');
         // Ternario
-        $reservation = ($request->acc_administrator == 1) 
+        $reservation = ($request->acc_administrator == 1)
         ? DB::table('reservations AS res')
         ->join('spaces AS sp', 'res.spa_id', '=', 'sp.spa_id')
         ->join('users AS us', 'res.use_id', '=', 'us.use_id')
-        ->select('res.res_id AS No. Reserva', 'res.res_date AS Fecha', 'res.res_start AS Hora inicio', 
+        ->select('res.res_id AS No. Reserva', 'res.res_date AS Fecha', 'res.res_start AS Hora inicio',
         'res.res_end AS Hora fin', 'res.res_status AS Estado',
         'sp.spa_name AS Espacio', 'us.use_mail AS Correo')
         ->where("res_date", ">=" ,$date)
         ->where("res_status","=", 1)
-        ->OrderBy("res.use_id", 'DESC')->get() 
+        ->OrderBy("res.use_id", 'DESC')->get()
 
         : DB::table('reservations AS res')
         ->join('spaces AS sp', 'res.spa_id', '=', 'sp.spa_id')
@@ -421,6 +421,19 @@ class Reservation extends Model
                     'message' => 'Ya existe una reservación activa en este momento.'
                 ],400);
             }
+    }
+
+    public static function betweenDates( $startDate, $endDate){
+
+        return DB::table('reservations AS res')
+        ->join('spaces AS sp', 'res.spa_id', '=', 'sp.spa_id')
+        ->join('users AS us', 'res.use_id', '=', 'us.use_id')
+        ->select('res.res_id AS No. Reserva', 'res.res_date AS Fecha', 'res.res_start AS Hora inicio',
+        'res.res_end AS Hora fin', 'res.res_status AS Estado',
+        'sp.spa_name AS Espacio', 'us.use_mail AS Correo')
+        ->whereBetween('res.res_date', [$startDate, $endDate])
+        ->OrderBy("res.res_date", 'DESC')->get();
+
     }
 }
 
