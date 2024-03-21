@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -353,26 +352,40 @@ class Reservation extends Model
 
 
     public static function ReserFilters( $column, $data){
-        $reservation = DB::table('reservations')->select('reservations.res_id AS No. Reserva', 'reservations.res_date AS Fecha',
-        'reservations.res_start AS Hora inicio', 'reservations.res_end AS Hora fin', 'spaces.spa_name AS Espacio',
-        'users.use_mail AS Correo', 'reservations.res_status AS Estado')
-        ->join('spaces', 'reservations.spa_id', '=', 'spaces.spa_id')
-        ->join('users', 'reservations.use_id', '=', 'users.use_id')->where("reservations.".$column,'like', '%'.$data.'%')->OrderBy("reservations.".$column, 'DESC')->get();
+        $reservation = DB::table('reservations AS res')
+        ->join('spaces AS sp', 'res.spa_id', '=', 'sp.spa_id')
+        ->join('users AS us', 'res.use_id', '=', 'us.use_id')
+        ->select('res.res_id AS No. Reserva', 'res.res_date AS Fecha',
+        'res.res_start AS Hora inicio', 'res.res_end AS Hora fin', 'sp.spa_name AS Espacio',
+        'us.use_mail AS Correo', 'res.res_status AS Estado')
+        ->where("res.".$column,'like', '%'.$data.'%')->OrderBy("res.".$column, 'DESC')->get();
         return $reservation;
         }
 
     public static function ActiveReservUser($use_id, $request){
         $date= date('Y-m-d');
-        $reservation = ($request->acc_administrator == 1) ?  DB::table('reservations')->select('reservations.res_id AS No. Reserva', 'reservations.res_date AS Fecha',
-        'reservations.res_start AS Hora inicio', 'reservations.res_end AS Hora fin', 'spaces.spa_name AS Espacio',
-        'users.use_mail AS Correo', 'reservations.res_status AS Estado')
-        ->join('spaces', 'reservations.spa_id', '=', 'spaces.spa_id')
-        ->join('users', 'reservations.use_id', '=', 'users.use_id')->where("res_date", ">=" ,$date)->where("res_status","=", 1)->OrderBy("reservations.use_id", 'DESC')->get() : DB::table('reservations')->select('reservations.res_id AS No. Reserva', 'reservations.res_date AS Fecha',
-        'reservations.res_start AS Hora inicio', 'reservations.res_end AS Hora fin',
-        'spaces.spa_name AS Espacio',
-        'users.use_mail AS Correo', 'reservations.res_status AS Estado')
-        ->join('spaces', 'reservations.spa_id', '=', 'spaces.spa_id')
-        ->join('users', 'reservations.use_id', '=', 'users.use_id')->OrderBy("reservations.use_id", 'DESC')->where("reservations.use_id", '=', $use_id)->where("res_status", "=", 1)->get() ;
+        // Ternario
+        $reservation = ($request->acc_administrator == 1) 
+        ? DB::table('reservations AS res')
+        ->join('spaces AS sp', 'res.spa_id', '=', 'sp.spa_id')
+        ->join('users AS us', 'res.use_id', '=', 'us.use_id')
+        ->select('res.res_id AS No. Reserva', 'res.res_date AS Fecha', 'res.res_start AS Hora inicio', 
+        'res.res_end AS Hora fin', 'res.res_status AS Estado',
+        'sp.spa_name AS Espacio', 'us.use_mail AS Correo')
+        ->where("res_date", ">=" ,$date)
+        ->where("res_status","=", 1)
+        ->OrderBy("res.use_id", 'DESC')->get() 
+
+        : DB::table('reservations AS res')
+        ->join('spaces AS sp', 'res.spa_id', '=', 'sp.spa_id')
+        ->join('users AS us', 'res.use_id', '=', 'us.use_id')
+        ->select('res.res_id AS No. Reserva', 'res.res_date AS Fecha', 'res.res_start AS Hora inicio',
+        'res.res_end AS Hora fin', 'res.res_status AS Estado',
+        'sp.spa_name AS Espacio',
+        'us.use_mail AS Correo')
+        ->where("res.use_id", '=', $use_id)
+        ->where("res_status", "=", 1)
+        ->OrderBy("res.use_id", 'DESC')->get() ;
         return $reservation;
     }
     public static function Calendar(){

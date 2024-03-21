@@ -156,7 +156,7 @@ class ReservationController extends Controller
         if ($reservation == null){
             return response()->json([
                 'status' => False,
-                'message' => 'No se han hecho reservaciones'
+                'message' => 'No se han hecho reservaciones.'
             ],400);
         }else{
             // Control de acciones
