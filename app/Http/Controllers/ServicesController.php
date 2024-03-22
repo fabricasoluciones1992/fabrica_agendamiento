@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ServicesController extends Controller
 {
@@ -36,25 +37,56 @@ class ServicesController extends Controller
 
     public function store(Request $request,$proj_id, $use_id)
     {
+        $rules = [
+            'ser_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
+            'ser_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
+            'ser_end' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
+            'ser_typ_id' => 'required|integer',
+            'prof_id' => 'required',
+            'use_id' => 'required'
+
+        ];
+        $messages = [
+            'ser_date.required' => 'La fecha del servicio es requerida.',
+            'ser_date.regex' => 'El formato de la fecha del servicio no es valido.',
+            'ser_start.required' => 'La hora inicial del servicio es requerida.',
+            'ser_start.regex' => 'El formato de la hora inicial del servicio no es valido.',
+            'ser_end.required' => 'La hora final del servicio es requerida.',
+            'ser_end.regex' => 'El formato de la hora final del servicio no es valido.',
+            'ser_typ_id.required' => 'El tipo de servicio es requerido.',
+            'ser_typ_id.integer' => 'El tipo de servicio no es valido.',
+            'prof_id.required' => 'El profesional del servicio es requerido.',
+            'use_id.required' => 'El usuario que realiza la reserva es requerido.'
+        ];
+
+        $validator = Validator::make($request->input(), $rules, $messages);
+        if($validator->fails())
+        {
+            return response()->json([
+              'status' => False,
+              'message' => $validator->errors()->all()
+            ],400);
+        }else{
         return Service::Store($proj_id, $use_id, $request);
+        }
     }
 
 
     public function show($proj_id, $use_id, $id)
     {
-        $services = Service::Show($id);
+        $service = Service::FindOne($id);
 
-        if ($services == null)
+        if ($service == null)
         {
             return response()->json([
              'status' => False,
              'message' => 'No se encontraron servicios'
             ], 400);
         }else{
-        Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla services ",4,$proj_id, $use_id);
+        Controller::NewRegisterTrigger("Se realizó la busqueda de un dato en la tabla services ",4,$proj_id, $use_id);
         return response()->json([
             'status'=> True,
-            'data'=> $services
+            'data'=> $service
         ], 200);
         }
     }
@@ -63,8 +95,39 @@ class ServicesController extends Controller
 
     public function update($proj_id, $use_id, Request $request, $id)
     {
-        $reservations = Service::Amend($proj_id, $use_id, $request, $id);
-        return $reservations;
+        $rules = [
+            'ser_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
+            'ser_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
+            'ser_end' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
+            'ser_typ_id' => 'required|integer',
+            'prof_id' => 'required|integer',
+            'use_id' => 'required|integer'
+
+        ];
+
+        $messages = [
+            'ser_date.required' => 'La fecha de la reserva es requerida.',
+            'ser_date.regex' => 'El formato de la fecha de la reserva no es valido.',
+            'ser_start.required' => 'La hora inicial de la reserva es requerida.',
+            'ser_start.regex' => 'El formato de la hora inicial de la reserva no es valido.',
+            'ser_end.required' => 'La hora final de la reserva es requerida.',
+            'ser_end.regex' => 'El formato de la hora final de la reserva no es valido.',
+            'ser_typ_id.required' => 'El tipo de reserva es requerido.',
+            'ser_typ_id.integer' => 'El tipo de reserva no es valido.',
+            'prof_id.required' => 'El profesional a reservar es requerido.',
+            'use_id.required' => 'El usuario que realiza la reserva es requerido.'
+        ];
+
+        $validator = Validator::make($request->input(), $rules, $messages);
+        if($validator->fails()){
+            return response()->json([
+                'status' => False,
+                'message' => $validator->errors()->all()
+            ],400);
+        }else{
+            return Service::Amend($proj_id, $use_id, $request, $id);
+        }
+        
     }
 
 

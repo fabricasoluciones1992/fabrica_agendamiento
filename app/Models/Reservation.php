@@ -113,7 +113,6 @@ class Reservation extends Model
                                         ],400);
                                     }
                                }
-                            // return $validateDay;
                                 // Los datos ingresados en el request se almacenan en un nuevo modelo Reservation
                                 $reservations = new Reservation($request->input());
                                 $reservations->res_status = 1;
@@ -126,7 +125,6 @@ class Reservation extends Model
                             }
                         }
                     }else{
-                        // return $validateDay;
                         if(!Empty($validateDay)){
                             foreach ($reserUsers as $reserUsersKey){
                                 $validatedResStart = carbon::parse($reserUsersKey->res_start);
@@ -139,16 +137,15 @@ class Reservation extends Model
                                 }
                             }
                         }
-
-                        $reservations = new Reservation($request->input());
-                        $reservations->res_status = 1;
-                        Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla reservations ",1,$proj_id, $use_id);
-                        // Se guarda la novedad
-                        $reservations->save();
-                        return response()->json([
-                              'status' => True,
-                              'message' => 'La reserva en el espacio '.$space->spa_name.' se actualizó exitosamente el dia'.$reservations->res_date.' por el usuario: '.$user->use_mail.'.'
-                            ],200);
+                            $reservations = new Reservation($request->input());
+                            $reservations->res_status = 1;
+                            $reservations->save();
+                            // Se guarda la novedad
+                            Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla reservations ",1,$proj_id, $use_id);
+                            return response()->json([
+                                  'status' => True,
+                                  'message' => 'La reserva en el espacio '.$space->spa_name.' se actualizó exitosamente el dia'.$reservations->res_date.' por el usuario: '.$user->use_mail.'.'
+                                ],200);
                     }
                 }else{
                         return response()->json([
@@ -173,13 +170,12 @@ class Reservation extends Model
         }
     }
     public static function FindOne($id){
-        $reservation =  DB::select(
-            "SELECT reservations.res_id, reservations.res_date, reservations.res_start, reservations.res_end, spaces.spa_name, users.use_mail
-            FROM reservations
-            INNER JOIN spaces ON reservations.spa_id = spaces.spa_id
-            INNER JOIN users ON reservations.use_id = users.use_id
-            WHERE reservations.res_id = $id");
-            return $reservation;
+        $reservation = DB::table('reservations AS res')
+        ->join('spaces AS sp', 'sp.spa_id', '=', 'res.spa_id')
+        ->join('users AS u', 'u.use_id', '=', 'res.use_id')
+        ->select('res.res_id','res.res_date', 'res.res_start', 'res.res_end', 'res.res_status', 'sp.spa_name', 'u.use_mail', 'u.use_id')
+        ->where('reservations.res_id', '=', $id)->first();
+        return $reservation;
     }
     public static function Amend(Request $request, $proj_id, $use_id,  $id){
 
