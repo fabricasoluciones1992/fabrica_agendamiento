@@ -213,5 +213,21 @@ public function users(Request $request){
        ],400);
    }
 }
+    public function betweenDates($proj_id, $use_id, $startDate, $endDate){
+        $services = Service::betweenDates($startDate, $endDate);
+        if ($services == null)
+        {
+            return response()->json([
+             'status' => False,
+             'message' => 'No se encontraron servicios'
+            ], 400);
+        }else{
+        Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla services ",4,$proj_id, $use_id);
+        return response()->json([
+            'status'=> True,
+            'data'=> $services
+        ], 200);
+        }
+    }
 }
 
