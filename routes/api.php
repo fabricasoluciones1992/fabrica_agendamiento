@@ -28,8 +28,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
 // Route::middleware(['auth:sanctum'])->group(function() {
-// Route::middleware(['auth:sanctum'])->group(function() {
-    Route::Resource('reservations'.URL, ReservationController::class)->names('reservations')->parameter('','reservations');
+Route::Resource('reservations'.URL, ReservationController::class)->names('reservations')->parameter('','reservations');
 // Funciones adicionales ReservationController
 Route::get('historial'.URL.'{column}/{data}', [ReservationController::class, "reserFilters"])->name('historial.filters');
 Route::get('historialDate'.URL.'{startDate}/{endDate}', [ReservationController::class, "betweenDates"])->name('hi   storial.betweenDates');
