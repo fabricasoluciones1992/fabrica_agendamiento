@@ -1,6 +1,6 @@
 <?php
-
 namespace App\Models;
+
 
 use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -30,9 +30,9 @@ class Service extends Model
     public static function Select()
     {
         $services = DB::table('services AS ser')
-            ->join('profesionals AS pro', 'pro.spa_id', '=', 'ser.spa_id')
+            ->join('profesionals AS pro', 'pro.prof_id', '=', 'ser.prof_id')
             ->join('users AS u', 'u.use_id', '=', 'ser.use_id')
-            ->select('ser.ser_id', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'pro.spa_name', 'u.use_mail', 'u.use_id')
+            ->select('ser.ser_id', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'pro.prof_name', 'u.use_mail', 'u.use_id')
             ->orderBy('ser.ser_date', 'DESC')->limit(100)->get();
         return $services;
     }
@@ -99,7 +99,7 @@ class Service extends Model
                                     Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla services ", 3, $proj_id, $use_id);
                                     return response()->json([
                                         'status' => True,
-                                        'message' => 'La reserva en el espacio ' . $profesional->spa_name . ' se creo exitosamente el dia ' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.',
+                                        'message' => 'La reserva en el eprofcio ' . $profesional->prof_name . ' se creo exitosamente el dia ' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.',
                                     ], 200);
                                 } else {
 
@@ -112,7 +112,7 @@ class Service extends Model
                                             // Hay superposición, la nueva reserva no es posible
                                             return response()->json([
                                                 'status' => False,
-                                                'message' => 'Este espacio está reservado'
+                                                'message' => 'Este eprofcio está reservado'
                                             ], 400);
                                         }
                                     }
@@ -123,7 +123,7 @@ class Service extends Model
                                     Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla services ", 3, $proj_id, $use_id);
                                     return response()->json([
                                         'status' => True,
-                                        'message' => 'La reserva en el espacio  ' . $profesional->spa_name . ' se creó exitosamente el dia ' . $services->res_date . ' por el usuario: ' . $user->use_mail . '.',
+                                        'message' => 'La reserva en el eprofcio  ' . $profesional->prof_name . ' se creó exitosamente el dia ' . $services->res_date . ' por el usuario: ' . $user->use_mail . '.',
                                     ], 200);
                                 }
                             }
@@ -223,10 +223,10 @@ class Service extends Model
     public static function FindOne($id)
     {
         $service = DB::table('services AS ser')
-            ->join('profesionals AS pro', 'pro.spa_id', '=', 'ser.spa_id')
+            ->join('profesionals AS pro', 'pro.prof_id', '=', 'ser.prof_id')
             ->join('users AS u', 'u.use_id', '=', 'ser.use_id')
-            ->select('ser.ser_id', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'pro.spa_name', 'u.use_mail', 'u.use_id')
-            ->where('services.ser_id', '=', $id)->first();
+            ->select('ser.ser_id', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'pro.prof_name', 'u.use_mail', 'u.use_id')
+            ->where('ser.ser_id', '=', $id)->first();
         return $service;
     }
 
@@ -285,7 +285,7 @@ class Service extends Model
                             $services->res_date = $request->res_date;
                             $services->res_start = $request->res_start;
                             $services->res_end = $request->res_end;
-                            $services->spa_id = $request->spa_id;
+                            $services->prof_id = $request->prof_id;
                             $services->use_id = $request->use_id;
                             // Se guarda la actualización
                             $services->save();
@@ -293,7 +293,7 @@ class Service extends Model
                             Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla services ", 1, $proj_id, $use_id);
                             return response()->json([
                                 'status' => True,
-                                'message' => 'La reserva en el espacio  ' . $profesional->prof_name . ' se actualizó exitosamente el dia ' . $services->res_date . ' por el usuario: ' . $user->use_mail . '.'
+                                'message' => 'La reserva en el eprofcio  ' . $profesional->prof_name . ' se actualizó exitosamente el dia ' . $services->res_date . ' por el usuario: ' . $user->use_mail . '.'
                             ], 200);
                         } else {
                             foreach ($validateDay as $validateDayKey) {
@@ -305,7 +305,7 @@ class Service extends Model
                                     $services->ser_date = $request->ser_date;
                                     $services->ser_start = $request->ser_start;
                                     $services->ser_end = $request->ser_end;
-                                    $services->spa_id = $request->spa_id;
+                                    $services->prof_id = $request->prof_id;
                                     $services->use_id = $request->use_id;
                                     // Se guarda la actualización
                                     $services->save();
@@ -313,7 +313,7 @@ class Service extends Model
                                     Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla services ", 1, $proj_id, $use_id);
                                     return response()->json([
                                         'status' => True,
-                                        'message' => 'La reserva en el espacio ' . $profesional->prof_name . ' se actualizó exitosamente el dia ' . $services->res_date . ' por el usuario: ' . $user->use_mail . '.'
+                                        'message' => 'La reserva en el eprofcio ' . $profesional->prof_name . ' se actualizó exitosamente el dia ' . $services->res_date . ' por el usuario: ' . $user->use_mail . '.'
                                     ], 200);
                                 } elseif ($newSerStart->lt($validatedSerEnd) && $newSerEnd->gt($validatedSerStart) && $validateDayKey->ser_status == 1) {
                                     // Hay superposición, la nueva reserva no es posible
@@ -391,7 +391,7 @@ class Service extends Model
                                     // Hay superposición, la nueva reserva no es posible
                                     return response()->json([
                                         'status' => False,
-                                        'message' => 'Este espacio está reservado'
+                                        'message' => 'Este eprofcio está reservado'
                                     ], 400);
                                 }
                             }
@@ -428,7 +428,7 @@ class Service extends Model
         } else {
             $message = ($$profesional->prof_status == 0)
                 ? 'El profesional ' . $profesional->prof_name . ' no está disponible.'
-                : 'Hora invalida, el espacio debe ser reservado entre las 7:00AM y las 7:00PM del ' . $date . ', o una fecha posterior.';
+                : 'Hora invalida, el eprofcio debe ser reservado entre las 7:00AM y las 7:00PM del ' . $date . ', o una fecha posterior.';
             return response()->json([
                 'status' => False,
                 'message' => $message
