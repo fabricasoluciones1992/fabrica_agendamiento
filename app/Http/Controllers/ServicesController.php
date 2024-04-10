@@ -127,7 +127,7 @@ class ServicesController extends Controller
         }else{
             return Service::Amend($proj_id, $use_id, $request, $id);
         }
-        
+
     }
 
 
@@ -144,8 +144,8 @@ class ServicesController extends Controller
 }
 public function reserFilters($proj_id, $use_id, $column, $data){
    // return $column;
-   $reservation = Service::ReserFilters($column, $data);
-   if ($reservation == null){
+   $services = Service::ReserFilters($column, $data);
+   if ($services == null){
        return response()->json([
            'status' => False,
            'message' => 'No se han hecho reservaciones de servicios'
@@ -155,14 +155,14 @@ public function reserFilters($proj_id, $use_id, $column, $data){
        Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla services ",4,$proj_id, $use_id);
        return response()->json([
            'status' => True,
-           'data' => $reservation
+           'data' => $services
        ],200);
    }
 }
 
-public function activeReservUser($proj_id, $use_id, Request $request){
-   $reservation = Service::ActiveReservUser($use_id, $request);
-   if ($reservation == null){
+public function ActiveServiceUser($proj_id, $use_id, Request $request){
+   $service = Service::ActiveServiceUser($use_id, $request);
+   if ($service == '[]'){
        return response()->json([
            'status' => False,
            'message' => 'No se han hecho reservaciones de servicios'
@@ -172,13 +172,13 @@ public function activeReservUser($proj_id, $use_id, Request $request){
        Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla services ",4,$proj_id, $use_id);
        return response()->json([
            'status' => True,
-           'data' => $reservation
+           'data' => $service
        ],200);
    }
 }
 public function calendar($proj_id, $use_id){
-   $reservation = Service::Calendar();
-   if ($reservation == null){
+   $services = Service::Calendar();
+   if ($services == null){
        return response()->json([
            'status' => False,
            'message' => 'No se han hecho reservaciones de servicios'
@@ -188,7 +188,7 @@ public function calendar($proj_id, $use_id){
        Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla services ",4,$proj_id, $use_id);
        return response()->json([
            'status' => True,
-           'data' => $reservation
+           'data' => $services
        ],200);
    }
 }

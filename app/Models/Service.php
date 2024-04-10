@@ -453,9 +453,10 @@ class Service extends Model
         return $reservation;
     }
 
-    public static function ActiveReservUser($use_id, $request)
+    public static function ActiveServiceUser($use_id, $request)
     {
         $date = date('Y-m-d');
+
         $reservation = ($request->acc_administrator == 1) ? DB::table('services')->select(
             'services.ser_id AS No. Servicio',
             'services.ser_date AS Fecha',
@@ -465,7 +466,7 @@ class Service extends Model
             'profesionals.prof_name AS Profesional',
             'users.use_mail AS Correo',
             'services.ser_status AS Estado'
-        )->join('service_types', 'services.ser_typ_id', '=', 'service_types.ser_typ_id')
+            )->join('service_types', 'services.ser_typ_id', '=', 'service_types.ser_typ_id')
             ->join('profesionals', 'services.prof_id', '=', 'profesionals.prof_id')
             ->join('users', 'services.use_id', '=', 'users.use_id')->where("ser_date", ">=", $date)->where("ser_status", "=", 1)->OrderBy("services.use_id", 'DESC')->get() : DB::table('services')->select(
                 'services.ser_id AS No. Servicio',
@@ -476,9 +477,9 @@ class Service extends Model
                 'profesionals.prof_name AS Profesional',
                 'users.use_mail AS Correo',
                 'services.ser_status AS Estado'
-            )->join('service_types', 'services.ser_typ_id', '=', 'service_types.ser_typ_id')
+                 )->join('service_types', 'services.ser_typ_id', '=', 'service_types.ser_typ_id')
                 ->join('profesionals', 'services.prof_id', '=', 'profesionals.prof_id')
-                ->join('users', 'services.use_id', '=', 'users.use_id')->OrderBy("services.use_id", 'DESC')->where("services.use_id", '=', $use_id)->where("ser_status", "=", 1)->get();
+                ->join('users', 'services.use_id', '=', 'users.use_id')->where("ser_date", ">=", $date)->OrderBy("services.use_id", 'DESC')->where("services.use_id", '=', $use_id)->where("ser_status", "=", 1)->get();
         return $reservation;
     }
     public static function Calendar()

@@ -391,36 +391,37 @@ class Reservation extends Model
         // Ternario
         $reservation = ($request->acc_administrator == 1)
             ? DB::table('reservations AS res')
-                ->join('spaces AS sp', 'res.spa_id', '=', 'sp.spa_id')
-                ->join('users AS us', 'res.use_id', '=', 'us.use_id')
-                ->select(
-                    'res.res_id AS No. Reserva',
-                    'res.res_date AS Fecha',
-                    'res.res_start AS Hora inicio',
-                    'res.res_end AS Hora fin',
-                    'res.res_status AS Estado',
-                    'sp.spa_name AS Espacio',
-                    'us.use_mail AS Correo'
-                )
-                ->where("res_date", ">=", $date)
-                ->where("res_status", "=", 1)
-                ->OrderBy("res.use_id", 'DESC')->get()
+            ->join('spaces AS sp', 'res.spa_id', '=', 'sp.spa_id')
+            ->join('users AS us', 'res.use_id', '=', 'us.use_id')
+            ->select(
+                'res.res_id AS No. Reserva',
+                'res.res_date AS Fecha',
+                'res.res_start AS Hora inicio',
+                'res.res_end AS Hora fin',
+                'res.res_status AS Estado',
+                'sp.spa_name AS Espacio',
+                'us.use_mail AS Correo'
+            )
+            ->where("res_date", ">=", $date)
+            ->where("res_status", "=", 1)
+            ->OrderBy("res.use_id", 'DESC')->get()
 
             : DB::table('reservations AS res')
-                ->join('spaces AS sp', 'res.spa_id', '=', 'sp.spa_id')
-                ->join('users AS us', 'res.use_id', '=', 'us.use_id')
-                ->select(
-                    'res.res_id AS No. Reserva',
-                    'res.res_date AS Fecha',
-                    'res.res_start AS Hora inicio',
-                    'res.res_end AS Hora fin',
-                    'res.res_status AS Estado',
-                    'sp.spa_name AS Espacio',
-                    'us.use_mail AS Correo'
-                )
-                ->where("res.use_id", '=', $use_id)
-                ->where("res_status", "=", 1)
-                ->OrderBy("res.use_id", 'DESC')->get();
+            ->join('spaces AS sp', 'res.spa_id', '=', 'sp.spa_id')
+            ->join('users AS us', 'res.use_id', '=', 'us.use_id')
+            ->select(
+                'res.res_id AS No. Reserva',
+                'res.res_date AS Fecha',
+                'res.res_start AS Hora inicio',
+                'res.res_end AS Hora fin',
+                'res.res_status AS Estado',
+                'sp.spa_name AS Espacio',
+                'us.use_mail AS Correo'
+            )
+            ->where("res.use_id", '=', $use_id)
+            ->where("res_date", ">=", $date)
+            ->where("res_status", "=", 1)
+            ->OrderBy("res.use_id", 'DESC')->get();
         return $reservation;
     }
     public static function Calendar()
@@ -461,6 +462,5 @@ class Reservation extends Model
             )
             ->whereBetween('res.res_date', [$startDate, $endDate])
             ->OrderBy("res.res_date", 'DESC')->get();
-
     }
 }

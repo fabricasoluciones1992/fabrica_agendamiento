@@ -45,7 +45,7 @@ Route::Resource('service/types'.URL, ServiceTypesController::class)->names('serv
 
 Route::get('historialService'.URL.'{column}/{data}', [ServicesController::class, "reserFilters"])->name('historial.filters');
 Route::get('historialServiceDates'.URL.'{startDate}/{endDate}', [ServicesController::class, "betweenDates"])->name('historial.betweenDates');
-Route::get('active/service/user'.URL, [ServicesController::class, "activeReservUser"])->name('active.reserv.user');
+Route::get('active/service/user'.URL, [ServicesController::class, "ActiveServiceUser"])->name('active.service.user');
 Route::get('calendarService'.URL, [ServicesController::class, "calendar"])->name('calendar');
 Route::get('profes'.URL, [ProfesionalsController::class, "Profs"])->name('Profs');
 // });
