@@ -79,14 +79,15 @@ class Reservation extends Model
                         ->select('res.res_id', 'res.res_date', 'res.res_start', 'res.res_end', 'res.res_status', 'sp.spa_name', 'sp.spa_id', 'u.use_id')
                         ->where('res.res_date', '=', $request->res_date)
                         ->where('sp.spa_id', '=', $request->spa_id)->get();
-                    if ($reserUsers->isEmpty()) {
+                    if (!$reserUsers->isEmpty()) {
                         if ($request->res_date == $date && $request->res_start <= $actualHour) {
                             return response()->json([
                                 'status' => False,
                                 'message' => 'La hora inicial de la reserva debe ser igual o mayor a:' . $actualHour . '.'
                             ], 400);
                         } else {
-                            if ($validateDay->isEmpty()) {
+                            if (!$validateDay->isEmpty()) {
+
                                 // Los datos ingresados en el request se almacenan en un nuevo modelo Reservation
                                 $reservations = new Reservation($request->input());
                                 $reservations->res_status = 1;
@@ -97,17 +98,30 @@ class Reservation extends Model
                                     'message' => 'La reserva en el espacio ' . $space->spa_name . ' se creo exitosamente el dia ' . $reservations->res_date . ' por el usuario: ' . $user->use_mail . '.',
                                 ], 200);
                             } else {
+
                                 foreach ($validateDay as $validateDayKey) {
                                     // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon
                                     $validatedResStart = carbon::parse($validateDayKey->res_start);
                                     $validatedResEnd = carbon::parse($validateDayKey->res_end);
-                                    if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart) && $validateDayKey->res_status == 1) {
+                                    if ($newResStart->lt($validatedResEnd) || $newResEnd->gt($validatedResStart) || $validateDayKey->res_status == 1 || $validateDay->spa_id == $space->spa_id) {
                                         // Hay superposición, la nueva reserva no es posible
                                         return response()->json([
                                             'status' => False,
                                             'message' => 'Este espacio está reservado'
                                         ], 400);
                                     }
+                                }
+                                foreach($reserUsers as $userReser){
+                                    $validatedResStart = carbon::parse($userReser->res_start);
+                                    $validatedResEnd = carbon::parse($userReser->res_end);
+                                    if ($newResStart->lt($validatedResEnd) || $newResEnd->gt($validatedResStart) || $validateDayKey->res_status == 1 || $validateDay->spa_id == $space->spa_id) {
+                                        // Hay superposición, la nueva reserva no es posible
+                                        return response()->json([
+                                            'status' => False,
+                                            'message' => 'Este Usuario ya tiene una reserva a esta hora'
+                                        ], 400);
+                                    }
+
                                 }
                                 // Los datos ingresados en el request se almacenan en un nuevo modelo Reservation
                                 $reservations = new Reservation($request->input());
@@ -121,6 +135,7 @@ class Reservation extends Model
                             }
                         }
                     } else {
+
                         if (!empty($validateDay)) {
                             foreach ($reserUsers as $reserUsersKey) {
                                 $validatedResStart = carbon::parse($reserUsersKey->res_start);
