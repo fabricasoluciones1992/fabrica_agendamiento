@@ -426,7 +426,7 @@ class Service extends Model
                 ], 400);
             }
         } else {
-            $message = ($$profesional->prof_status == 0)
+            $message = ($profesional->prof_status == 0)
                 ? 'El profesional ' . $profesional->prof_name . ' no está disponible.'
                 : 'Hora invalida, el eprofcio debe ser reservado entre las 7:00AM y las 7:00PM del ' . $date . ', o una fecha posterior.';
             return response()->json([
