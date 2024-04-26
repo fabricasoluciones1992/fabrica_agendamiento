@@ -79,7 +79,8 @@ class Reservation extends Model
                         ->select('res.res_id', 'res.res_date', 'res.res_start', 'res.res_end', 'res.res_status', 'sp.spa_name', 'sp.spa_id', 'u.use_id')
                         ->where('res.res_date', '=', $request->res_date)
                         ->get();
-                    if (!$reserUsers->isEmpty()) {
+
+                    if ($reserUsers->isEmpty()) {
                         if ($request->res_date == $date && $request->res_start <= $actualHour) {
                             return response()->json([
                                 'status' => False,
@@ -100,12 +101,13 @@ class Reservation extends Model
                                     'message' => 'La reserva en el espacio ' . $space->spa_name . ' se creo exitosamente el dia ' . $reservations->res_date . ' por el usuario: ' . $user->use_mail . '.',
                                 ], 200);
                             } else {
-                                
+
                                 foreach ($validateDay as $validateDayKey) {
                                     // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon
                                     $validatedResStart = carbon::parse($validateDayKey->res_start);
                                     $validatedResEnd = carbon::parse($validateDayKey->res_end);
-                                    if ($newResStart->lt($validatedResEnd) || $newResEnd->gt($validatedResStart) || $validateDayKey->res_status == 1 || $validateDay->spa_id == $space->spa_id) {
+                                    // return $validateDay;
+                                    if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart) && $validateDayKey->res_status == 1 && $validateDayKey->spa_id == $space->spa_id) {
                                         // Hay superposición, la nueva reserva no es posible
                                         return response()->json([
                                             'status' => False,
@@ -117,7 +119,7 @@ class Reservation extends Model
 
                                     $validatedResStart = carbon::parse($userReser->res_start);
                                     $validatedResEnd = carbon::parse($userReser->res_end);
-                                    if ($newResStart->lt($validatedResEnd) || $newResStart == $validatedResStart || $newResEnd == $validatedResEnd|| $newResEnd->gt($validatedResStart) || $validateDayKey->res_status == 1 || $validateDay->spa_id == $space->spa_id) {
+                                    if ($newResStart->lt($validatedResEnd) && $newResStart == $validatedResStart && $newResEnd == $validatedResEnd&& $newResEnd->gt($validatedResStart) && $validateDayKey->res_status == 1 && $userReser->spa_id == $space->spa_id) {
                                         // Hay superposición, la nueva reserva no es posible
                                         return response()->json([
                                             'status' => False,
@@ -141,11 +143,12 @@ class Reservation extends Model
                         }
                     } else {
 
-                        if (!empty($validateDay)) {
+                        if ($validateDay->isEmpty()) {
                             foreach ($reserUsers as $reserUsersKey) {
                                 $validatedResStart = carbon::parse($reserUsersKey->res_start);
                                 $validatedResEnd = carbon::parse($reserUsersKey->res_end);
-                                if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart) && $request->spa_id == $reserUsersKey->spa_id && $reserUsersKey->res_status == 1) {
+                                if ($newResStart->lt($validatedResEnd) && $newResEnd->gt
+                                ($validatedResStart) && $request->spa_id == $reserUsersKey->spa_id && $reserUsersKey->res_status == 1) {
                                     return response()->json([
                                         'status' => False,
                                         'message' => 'Ya existe una reservación en este momento.'
@@ -158,6 +161,7 @@ class Reservation extends Model
                         $reservations->save();
                         // Se guarda la novedad
                         Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla reservations ", 1, $proj_id, $use_id);
+
                         return response()->json([
                             'status' => True,
                             'message' => 'La reserva en el espacio ' . $space->spa_name . ' se actualizó exitosamente el dia' . $reservations->res_date . ' por el usuario: ' . $user->use_mail . '.'
