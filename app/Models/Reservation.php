@@ -160,7 +160,7 @@ class Reservation extends Model
                         }
                     } else {
 
-                        if ($validateDay->isEmpty()) {
+                        if (!$validateDay->isEmpty()) {
                             foreach ($reserUsers as $reserUsersKey) {
                                 $validatedResStart = carbon::parse($reserUsersKey->res_start);
                                 $validatedResEnd = carbon::parse($reserUsersKey->res_end);
@@ -229,7 +229,36 @@ class Reservation extends Model
         $actualHour = Carbon::now('America/Bogota')->format('H:i');
         // Trae todos los datos de usuarios y salas según el id que trae el request
         $user = User::find($request->use_id);
+        if( $user == null){
+            return response()->json([
+                'status' => False,
+                'message' => "El usuario no existe"
+            ], 400);
+        }
         $space = Space::find($request->spa_id);
+        if( $space == null){
+            return response()->json([
+                'status' => False,
+                'message' => "El espacio no existe"
+            ], 400);
+        }elseif($space->spa_status == 0){
+            return response()->json([
+                'status' => False,
+                'message' => "El espacio no está disponible"
+            ], 400);
+        }
+        $reservation = Reservation::find($id);
+        if( $reservation == null){
+            return response()->json([
+                'status' => False,
+                'message' => "La reservación no existe"
+            ], 400);
+        }elseif($reservation->res_status == 0){
+            return response()->json([
+                'status' => False,
+                'message' => "La reservación no está disponible"
+            ], 400);
+        }
         // Convertimos los valores de hora que nos pasa el usuario a datos tipo Carbon
         $newResStart = carbon::parse($request->res_start);
         $newResEnd = carbon::parse($request->res_end);

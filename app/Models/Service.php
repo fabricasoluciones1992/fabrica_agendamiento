@@ -262,7 +262,36 @@ class Service extends Model
         $actualHour = Carbon::now('America/Bogota')->format('H:i');
         // Trae todos los datos de usuarios y salas según el id que trae el request
         $user = User::find($request->use_id);
+        if( $user == null){
+            return response()->json([
+                'status' => False,
+                'message' => "El usuario no existe"
+            ], 400);
+        }
         $profesional = Profesional::find($request->prof_id);
+        if( $profesional == null){
+            return response()->json([
+                'status' => False,
+                'message' => "El profesional no existe"
+            ], 400);
+        }elseif($profesional->prof_status == 0){
+            return response()->json([
+                'status' => False,
+                'message' => "El profesional no está disponible"
+            ], 400);
+        }
+        $service = Service::find($id);
+        if( $service == null){
+            return response()->json([
+                'status' => False,
+                'message' => "La reservación del servicio no existe"
+            ], 400);
+        }elseif($service->ser_status == 0){
+            return response()->json([
+                'status' => False,
+                'message' => "La reservación del servicio no está disponible"
+            ], 400);
+        }
         // Convertimos los valores de hora que nos pasa el usuario a datos tipo Carbon
 
         $newSerStart = carbon::parse($request->ser_start);
