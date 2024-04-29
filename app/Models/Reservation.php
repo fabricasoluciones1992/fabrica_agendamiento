@@ -50,13 +50,30 @@ class Reservation extends Model
         $actualHour = Carbon::now('America/Bogota')->format('H:i');
         // Trae todos los datos de usuarios y salas según el id que trae el request
         $user = User::find($request->use_id);
+        if( $user == null){
+            return response()->json([
+                'status' => False,
+                'message' => "El usuario no existe"
+            ], 400);
+        }
         $space = Space::find($request->spa_id);
+        if( $space == null){
+            return response()->json([
+                'status' => False,
+                'message' => "El espacio no existe"
+            ], 400);
+        }elseif($space->spa_status == 0){
+            return response()->json([
+                'status' => False,
+                'message' => "El espacio no está disponible"
+            ], 400);
+        }
         // Convertimos los valores de hora que nos pasa el usuario a datos tipo Carbon
         $newResStart = carbon::parse($request->res_start);
         $newResEnd = carbon::parse($request->res_end);
         // Se comprueba que solo puedan hacerse reservas del mismo día o días posteriores y la zona horaria de la reserva.
         // Se comprueba que la sala este habilitada
-        if ($request->res_date >= $date && $request->res_start >= "07:00" && $request->res_end <= "19:00" && $space->spa_status != 0) {
+        if ($request->res_date >= $date && $request->res_start >= "07:00" && $request->res_end <= "19:00") {
             // Se comprueba que la reserva sea minimo de treinta minutos y máximo de dos horas.
             if ($request->res_end >= $minHourFormat && $request->res_end <= $maxHourFormat && $request->res_start < $request->res_end) {
 
@@ -160,11 +177,11 @@ class Reservation extends Model
                         $reservations->res_status = 1;
                         $reservations->save();
                         // Se guarda la novedad
-                        Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla reservations ", 1, $proj_id, $use_id);
+                        Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla reservations ", 1, $proj_id, $use_id);
 
                         return response()->json([
                             'status' => True,
-                            'message' => 'La reserva en el espacio ' . $space->spa_name . ' se actualizó exitosamente el dia' . $reservations->res_date . ' por el usuario: ' . $user->use_mail . '.'
+                            'message' => 'La reserva en el espacio ' . $space->spa_name . ' se realizó exitosamente el dia' . $reservations->res_date . ' por el usuario: ' . $user->use_mail . '.'
                         ], 200);
                     }
                 } else {
