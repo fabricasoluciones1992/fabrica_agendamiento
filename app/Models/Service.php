@@ -446,26 +446,7 @@ class Service extends Model
                                 // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon
                                 $validatedSerStart = carbon::parse($validateDayKey->ser_start);
                                 $validatedSerEnd = carbon::parse($validateDayKey->ser_end);
-                                if ($validateDayKey->ser_id == $id && $validateDayKey->use_id == $request->use_id) {
-
-                                    $services = Service::find($id);
-                                    $services->ser_date = $request->ser_date;
-                                    $services->ser_start = $request->ser_start;
-                                    $services->ser_end = $request->ser_end;
-                                    $services->ser_typ_id = $request->ser_typ_id;
-                                    $services->prof_id = $request->prof_id;
-                                    $services->use_id = $request->use_id;
-                                    // Se guarda la novedad
-                                    $services->save();
-                                    // Reporte de novedad
-                                    Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla services ", 1, $proj_id, $use_id);
-
-                                    return response()->json([
-
-                                        'status' => True,
-                                        'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.'
-                                    ], 200);
-                                } elseif ($newSerStart->lt($validatedSerEnd) && $newSerEnd->gt($validatedSerStart) && $validateDayKey->ser_status == 1) {
+                                if ($newSerStart->lt($validatedSerEnd) && $newSerEnd->gt($validatedSerStart) && $validateDayKey->ser_status == 1) {
                                     // Hay superposición, la nueva reserva no es posible
                                     return response()->json([
                                         'status' => False,
