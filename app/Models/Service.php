@@ -381,7 +381,6 @@ class Service extends Model
                                 $validatedSerEnd = carbon::parse($validateDayKey->ser_end);
 
                                 if ($newSerStart->lt($validatedSerEnd) && $newSerEnd->gt($validatedSerStart) && $validateDayKey->prof_id == $request->prof_id) {
-
                                     // Hay superposición, la nueva reserva no es posible
                                     return response()->json([
                                         'status' => False,
@@ -400,25 +399,25 @@ class Service extends Model
                                         'message' => 'Ya existe una reservación en este momento.'
                                     ], 400);
                                 }
-                                if ($servicesUsersKey->ser_id == $id) {
-                                    $services = Service::find($id);
-                                    $services->ser_date = $request->ser_date;
-                                    $services->ser_start = $request->ser_start;
-                                    $services->ser_end = $request->ser_end;
-                                    $services->ser_typ_id = $request->ser_typ_id;
-                                    $services->prof_id = $request->prof_id;
-                                    $services->use_id = $request->use_id;
-                                    // Se guarda la novedad
-                                    $services->save();
-                                    // Reporte de novedad
-                                    Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla services ", 1, $proj_id, $use_id);
+                                if ($servicesUsersKey->ser_id != $id) {
+                                //     $services = Service::find($id);
+                                //     $services->ser_date = $request->ser_date;
+                                //     $services->ser_start = $request->ser_start;
+                                //     $services->ser_end = $request->ser_end;
+                                //     $services->ser_typ_id = $request->ser_typ_id;
+                                //     $services->prof_id = $request->prof_id;
+                                //     $services->use_id = $request->use_id;
+                                //     // Se guarda la novedad
+                                //     $services->save();
+                                //     // Reporte de novedad
+                                //     Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla services ", 1, $proj_id, $use_id);
 
-                                    return response()->json([
+                                //     return response()->json([
 
-                                        'status' => True,
-                                        'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.'
-                                    ], 200);
-                                }else{
+                                //         'status' => True,
+                                //         'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.'
+                                //     ], 200);
+                                // }else{
                                     return response()->json([
                                         'status' => False,
                                         'message' => 'Reserva invalida'
@@ -450,7 +449,7 @@ class Service extends Model
                                     // Hay superposición, la nueva reserva no es posible
                                     return response()->json([
                                         'status' => False,
-                                        'message' => 'Este profesional está reservado'
+                                        'message' => 'Ya existe una reserva en este momento'
                                     ], 400);
                                 }
                             }

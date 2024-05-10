@@ -38,8 +38,6 @@ class AuthController extends Controller
                     'status' => true,
                     'data' => [
                         "message" => $responseData['message'],
-                        "use_photo" => $responseData['use_photo'],
-                        "per_typ_name" => $responseData['per_typ_name'],
                         "token" => $token,
                         "use_id" => $user->use_id,
                         "acc_administrator" => $responseData['acc_administrator'],
