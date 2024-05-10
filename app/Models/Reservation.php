@@ -171,7 +171,7 @@ class Reservation extends Model
                                 }
                             }
                         }
-                        return "aaa";
+                  
                         $reservations = new Reservation($request->input());
                         $reservations->res_status = 1;
                         $reservations->save();
