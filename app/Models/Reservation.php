@@ -50,19 +50,19 @@ class Reservation extends Model
         $actualHour = Carbon::now('America/Bogota')->format('H:i');
         // Trae todos los datos de usuarios y salas según el id que trae el request
         $user = User::find($request->use_id);
-        if( $user == null){
+        if ($user == null) {
             return response()->json([
                 'status' => False,
                 'message' => "El usuario no existe"
             ], 400);
         }
         $space = Space::find($request->spa_id);
-        if( $space == null){
+        if ($space == null) {
             return response()->json([
                 'status' => False,
                 'message' => "El espacio no existe"
             ], 400);
-        }elseif($space->spa_status == 0){
+        } elseif ($space->spa_status == 0) {
             return response()->json([
                 'status' => False,
                 'message' => "El espacio no está disponible"
@@ -132,18 +132,17 @@ class Reservation extends Model
                                         ], 400);
                                     }
                                 }
-                                foreach($reserUsers as $userReser){
+                                foreach ($reserUsers as $userReser) {
 
                                     $validatedResStart = carbon::parse($userReser->res_start);
                                     $validatedResEnd = carbon::parse($userReser->res_end);
-                                    if ($newResStart->lt($validatedResEnd) && $newResStart == $validatedResStart && $newResEnd == $validatedResEnd&& $newResEnd->gt($validatedResStart) && $validateDayKey->res_status == 1 && $userReser->spa_id == $space->spa_id) {
+                                    if ($newResStart->lt($validatedResEnd) && $newResStart == $validatedResStart && $newResEnd == $validatedResEnd && $newResEnd->gt($validatedResStart) && $validateDayKey->res_status == 1 && $userReser->spa_id == $space->spa_id) {
                                         // Hay superposición, la nueva reserva no es posible
                                         return response()->json([
                                             'status' => False,
                                             'message' => 'Este Usuario ya tiene una reserva a esta hora'
                                         ], 400);
                                     }
-
                                 }
 
 
@@ -159,13 +158,12 @@ class Reservation extends Model
                             }
                         }
                     } else {
-
-                        if (!$validateDay->isEmpty()) {
+                        if ($validateDay->isNotEmpty()) {
                             foreach ($reserUsers as $reserUsersKey) {
                                 $validatedResStart = carbon::parse($reserUsersKey->res_start);
                                 $validatedResEnd = carbon::parse($reserUsersKey->res_end);
-                                if ($newResStart->lt($validatedResEnd) && $newResEnd->gt
-                                ($validatedResStart) && $request->spa_id == $reserUsersKey->spa_id && $reserUsersKey->res_status == 1) {
+                                if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart) && $request->use_id == $reserUsersKey->use_id && $reserUsersKey->res_status == 1
+                                ) {
                                     return response()->json([
                                         'status' => False,
                                         'message' => 'Ya existe una reservación en este momento.'
@@ -173,6 +171,7 @@ class Reservation extends Model
                                 }
                             }
                         }
+                        return "aaa";
                         $reservations = new Reservation($request->input());
                         $reservations->res_status = 1;
                         $reservations->save();
@@ -229,31 +228,31 @@ class Reservation extends Model
         $actualHour = Carbon::now('America/Bogota')->format('H:i');
         // Trae todos los datos de usuarios y salas según el id que trae el request
         $user = User::find($request->use_id);
-        if( $user == null){
+        if ($user == null) {
             return response()->json([
                 'status' => False,
                 'message' => "El usuario no existe"
             ], 400);
         }
         $space = Space::find($request->spa_id);
-        if( $space == null){
+        if ($space == null) {
             return response()->json([
                 'status' => False,
                 'message' => "El espacio no existe"
             ], 400);
-        }elseif($space->spa_status == 0){
+        } elseif ($space->spa_status == 0) {
             return response()->json([
                 'status' => False,
                 'message' => "El espacio no está disponible"
             ], 400);
         }
         $reservation = Reservation::find($id);
-        if( $reservation == null){
+        if ($reservation == null) {
             return response()->json([
                 'status' => False,
                 'message' => "La reservación no existe"
             ], 400);
-        }elseif($reservation->res_status == 0){
+        } elseif ($reservation->res_status == 0) {
             return response()->json([
                 'status' => False,
                 'message' => "La reservación no está disponible"
