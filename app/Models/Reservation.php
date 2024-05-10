@@ -98,6 +98,7 @@ class Reservation extends Model
                         ->get();
 
                     if ($reserUsers->isEmpty()) {
+
                         if ($request->res_date == $date && $request->res_start <= $actualHour) {
                             return response()->json([
                                 'status' => False,
@@ -158,6 +159,13 @@ class Reservation extends Model
                             }
                         }
                     } else {
+
+                        if ($request->res_date == $date && $request->res_start <= $actualHour) {
+                            return response()->json([
+                                'status' => False,
+                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a:' . $actualHour . '.'
+                            ], 400);
+                        }
                         if ($validateDay->isNotEmpty()) {
                             foreach ($reserUsers as $reserUsersKey) {
                                 $validatedResStart = carbon::parse($reserUsersKey->res_start);
@@ -171,7 +179,7 @@ class Reservation extends Model
                                 }
                             }
                         }
-                  
+
                         $reservations = new Reservation($request->input());
                         $reservations->res_status = 1;
                         $reservations->save();
@@ -343,6 +351,13 @@ class Reservation extends Model
                             }
                         }
                     } else {
+
+                        if ($request->res_date == $date && $request->res_start <= $actualHour) {
+                            return response()->json([
+                                'status' => False,
+                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a:' . $actualHour . '.'
+                            ], 400);
+                        }
                         if ($validateDay->isEmpty()) {
                             foreach ($reserUsers as $reserUsersKey) {
                                 $validatedResStart = carbon::parse($reserUsersKey->res_start);

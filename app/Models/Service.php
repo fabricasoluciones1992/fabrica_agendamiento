@@ -184,6 +184,12 @@ class Service extends Model
                                 ], 200);
                             }
                         } else {
+                            if ($request->ser_date == $date && $request->ser_start <= $actualHour) {
+                                return response()->json([
+                                    'status' => False,
+                                    'message' => 'La hora inicial de la reserva debe ser igual o mayor a:' . $actualHour . '.'
+                                ], 400);
+                            }
                             if (!empty($validateDay)) {
                                 foreach ($servicesUsers as $servicesUsersKey) {
                                     // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon
@@ -374,6 +380,12 @@ class Service extends Model
                             }
                         }
                     } else {
+                        if ($request->ser_date == $date && $request->ser_start <= $actualHour) {
+                            return response()->json([
+                                'status' => False,
+                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a:' . $actualHour . '.'
+                            ], 400);
+                        }
                         if (!$validateDay->isEmpty()) {
 
                             foreach($validateDay as $validateDayKey){
