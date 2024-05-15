@@ -404,10 +404,9 @@ class Service extends Model
                             }
 
                             foreach ($servicesUsers as $servicesUsersKey) {
-
                                 $validatedResStart = carbon::parse($servicesUsersKey->ser_start);
                                 $validatedResEnd = carbon::parse($servicesUsersKey->ser_end);
-                                if ($newSerStart->lt($validatedResEnd) && $newSerEnd->gt($validatedResStart) && $request->prof_id == $servicesUsersKey->prof_id && $servicesUsersKey->ser_status == 1 ) {
+                                if ($newSerStart->lt($validatedResEnd) && $newSerEnd->gt($validatedResStart) && $request->prof_id == $servicesUsersKey->prof_id && $servicesUsersKey->ser_status == 1 && $servicesUsersKey->ser_id != $id) {
                                     return response()->json([
                                         'status' => False,
                                         'message' => 'Ya existe una reservación en este momento.'
