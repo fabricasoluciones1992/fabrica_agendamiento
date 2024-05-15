@@ -308,6 +308,8 @@ class Service extends Model
             // Se comprueba que la reserva sea minimo de treinta minutos y máximo de dos horas.
             if ($request->ser_end >= $minHourFormat && $request->ser_end <= $maxHourFormat && $request->ser_start < $request->ser_end && $profesional->prof_status != 0) {
 
+                
+
                 $totalservicesDay = DB::select("SELECT COUNT(services.ser_id) AS total_ser
                             FROM services
                             WHERE services.ser_date = '$request->ser_date' AND services.use_id = $request->use_id  AND services.ser_status = 1");
