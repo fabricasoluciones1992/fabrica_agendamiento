@@ -390,7 +390,7 @@ class Reservation extends Model
                                 // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon
                                 $validatedResStart = carbon::parse($validateDayKey->res_start);
                                 $validatedResEnd = carbon::parse($validateDayKey->res_end);
-                                if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart) && $validateDayKey->res_status == 1) {
+                                if ($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart) && $validateDayKey->res_status == 1 && $validateDayKey->res_id != $id) {
                                     // Hay superposición, la nueva reserva no es posible
                                     return response()->json([
                                         'status' => False,

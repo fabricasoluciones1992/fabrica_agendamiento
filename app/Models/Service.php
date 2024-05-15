@@ -308,7 +308,7 @@ class Service extends Model
             // Se comprueba que la reserva sea minimo de treinta minutos y máximo de dos horas.
             if ($request->ser_end >= $minHourFormat && $request->ser_end <= $maxHourFormat && $request->ser_start < $request->ser_end && $profesional->prof_status != 0) {
 
-                
+
 
                 $totalservicesDay = DB::select("SELECT COUNT(services.ser_id) AS total_ser
                             FROM services
@@ -394,7 +394,7 @@ class Service extends Model
                                 $validatedSerStart = carbon::parse($validateDayKey->ser_start);
                                 $validatedSerEnd = carbon::parse($validateDayKey->ser_end);
 
-                                if ($newSerStart->lt($validatedSerEnd) && $newSerEnd->gt($validatedSerStart) && $validateDayKey->prof_id == $request->prof_id) {
+                                if ($newSerStart->lt($validatedSerEnd) && $newSerEnd->gt($validatedSerStart) && $validateDayKey->prof_id == $request->prof_id && $validateDayKey->ser_id != $id) {
                                     // Hay superposición, la nueva reserva no es posible
                                     return response()->json([
                                         'status' => False,
