@@ -380,6 +380,22 @@ class Service extends Model
                                     ], 400);
                                 }
                             }
+                            
+                            $services = Service::find($id);
+                            $services->ser_date = $request->ser_date;
+                            $services->ser_start = $request->ser_start;
+                            $services->ser_end = $request->ser_end;
+                            $services->prof_id = $request->prof_id;
+                            $services->use_id = $request->use_id;
+                            // Se guarda la actualización
+                            $services->save();
+                            // Reporte de novedad
+                            Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla services ", 1, $proj_id, $use_id);
+
+                            return response()->json([
+                                'status' => True,
+                                'message' => 'La reserva en el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia ' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.'
+                            ], 200);
                         }
                     } else {
                         if ($request->ser_date == $date && $request->ser_start <= $actualHour) {
