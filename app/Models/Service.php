@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 
@@ -20,6 +21,7 @@ class Service extends Model
         'ser_start',
         'ser_end',
         'ser_status',
+        'ser_quotas',
         'ser_typ_id',
         'prof_id',
         'use_id'
@@ -33,7 +35,7 @@ class Service extends Model
             ->join('service_types AS st', 'st.ser_typ_id', '=', 'ser.ser_typ_id')
             ->join('profesionals AS pro', 'pro.prof_id', '=', 'ser.prof_id')
             ->join('users AS u', 'u.use_id', '=', 'ser.use_id')
-            ->select('ser.ser_id', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'st.ser_typ_id', 'st.ser_typ_name', 'pro.prof_name', 'u.use_mail', 'u.use_id')
+            ->select('ser.ser_id', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser_quotas', 'st.ser_typ_id', 'st.ser_typ_name', 'pro.prof_name', 'u.use_mail', 'u.use_id')
             ->orderBy('ser.ser_date', 'DESC')->limit(100)->get();
         return $services;
     }
@@ -52,19 +54,19 @@ class Service extends Model
         $actualHour = Carbon::now('America/Bogota')->format('H:i');
         // Trae todos los datos de usuarios y salas según el id que trae el request
         $user = User::find($request->use_id);
-        if( $user == null){
+        if ($user == null) {
             return response()->json([
                 'status' => False,
                 'message' => "El usuario no existe"
             ], 400);
         }
         $profesional = Profesional::find($request->prof_id);
-        if( $profesional == null){
+        if ($profesional == null) {
             return response()->json([
                 'status' => False,
                 'message' => "El profesional no existe"
             ], 400);
-        }elseif($profesional->prof_status == 0){
+        } elseif ($profesional->prof_status == 0) {
             return response()->json([
                 'status' => False,
                 'message' => "El profesional no está disponible"
@@ -88,7 +90,7 @@ class Service extends Model
                                                 WHERE services.ser_date >= '$date'  AND services.use_id = $request->use_id AND services.ser_status = 1");
                     $servicesSinceDateCount = $servicesSinceDate[0]->total_ser;
 
-                    if ($servicesSinceDateCount < 3 || $request->acc_administrator == 1) {
+                    if ($request->acc_administrator == 1) {
                         $servicesUsers = DB::table('services AS ser')
                             ->join('profesionals AS pro', 'pro.prof_id', '=', 'ser.prof_id')
                             ->join('users AS u', 'u.use_id', '=', 'ser.use_id')
@@ -170,7 +172,6 @@ class Service extends Model
                                     'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se creo exitosamente el dia ' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.',
 
                                 ], 200);
-
                             } else {
                                 // Los datos ingresados en el request se almacenan en un nuevo modelo Reservation
                                 $services = new Service($request->input());
@@ -217,7 +218,7 @@ class Service extends Model
                     } else {
                         return response()->json([
                             'status' => False,
-                            'message' => 'Este usuario no puede hacer mas reservaciones.'
+                            'message' => 'Este usuario no puede hacer reservaciones.'
                         ], 400);
                     }
                 } else {
@@ -232,7 +233,6 @@ class Service extends Model
                     'message' => 'El profesional ' . $profesional->prof_name . ' no está disponible.'
                 ], 400);
             }
-
         } else {
             $message = ($serType->ser_typ_status == 0)
                 ? 'El tipo de servicio ' . $serType->ser_typ_name . ' está fuera de servicio.'
@@ -249,7 +249,7 @@ class Service extends Model
         $service = DB::table('services AS ser')
             ->join('profesionals AS pro', 'pro.prof_id', '=', 'ser.prof_id')
             ->join('users AS u', 'u.use_id', '=', 'ser.use_id')
-            ->select('ser.ser_id', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'pro.prof_name', 'u.use_mail', 'u.use_id')
+            ->select('ser.ser_id', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser.ser_quotas', 'pro.prof_name', 'u.use_mail', 'u.use_id')
             ->where('ser.ser_id', '=', $id)->first();
         return $service;
     }
@@ -268,31 +268,31 @@ class Service extends Model
         $actualHour = Carbon::now('America/Bogota')->format('H:i');
         // Trae todos los datos de usuarios y salas según el id que trae el request
         $user = User::find($request->use_id);
-        if( $user == null){
+        if ($user == null) {
             return response()->json([
                 'status' => False,
                 'message' => "El usuario no existe"
             ], 400);
         }
         $profesional = Profesional::find($request->prof_id);
-        if( $profesional == null){
+        if ($profesional == null) {
             return response()->json([
                 'status' => False,
                 'message' => "El profesional no existe"
             ], 400);
-        }elseif($profesional->prof_status == 0){
+        } elseif ($profesional->prof_status == 0) {
             return response()->json([
                 'status' => False,
                 'message' => "El profesional no está disponible"
             ], 400);
         }
         $service = Service::find($id);
-        if( $service == null){
+        if ($service == null) {
             return response()->json([
                 'status' => False,
                 'message' => "La reservación del servicio no existe"
             ], 400);
-        }elseif($service->ser_status == 0){
+        } elseif ($service->ser_status == 0) {
             return response()->json([
                 'status' => False,
                 'message' => "La reservación del servicio no está disponible"
@@ -341,6 +341,8 @@ class Service extends Model
                             $services->ser_date = $request->ser_date;
                             $services->ser_start = $request->ser_start;
                             $services->ser_end = $request->ser_end;
+                            $services->ser_quotas = $request->ser_quotas;
+                            $services->ser_typ_id = $request->ser_typ_id;
                             $services->prof_id = $request->prof_id;
                             $services->use_id = $request->use_id;
                             // Se guarda la actualización
@@ -361,6 +363,8 @@ class Service extends Model
                                     $services->ser_date = $request->ser_date;
                                     $services->ser_start = $request->ser_start;
                                     $services->ser_end = $request->ser_end;
+                                    $services->ser_quotas = $request->ser_quotas;
+                                    $services->ser_typ_id = $request->ser_typ_id;
                                     $services->prof_id = $request->prof_id;
                                     $services->use_id = $request->use_id;
                                     // Se guarda la actualización
@@ -406,7 +410,7 @@ class Service extends Model
                         }
                         if (!$validateDay->isEmpty()) {
 
-                            foreach($validateDay as $validateDayKey){
+                            foreach ($validateDay as $validateDayKey) {
                                 $validatedSerStart = carbon::parse($validateDayKey->ser_start);
                                 $validatedSerEnd = carbon::parse($validateDayKey->ser_end);
 
@@ -429,34 +433,34 @@ class Service extends Model
                                     ], 400);
                                 }
                                 if ($servicesUsersKey->ser_id != $id) {
-                                //     $services = Service::find($id);
-                                //     $services->ser_date = $request->ser_date;
-                                //     $services->ser_start = $request->ser_start;
-                                //     $services->ser_end = $request->ser_end;
-                                //     $services->ser_typ_id = $request->ser_typ_id;
-                                //     $services->prof_id = $request->prof_id;
-                                //     $services->use_id = $request->use_id;
-                                //     // Se guarda la novedad
-                                //     $services->save();
-                                //     // Reporte de novedad
-                                //     Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla services ", 1, $proj_id, $use_id);
+                                    //     $services = Service::find($id);
+                                    //     $services->ser_date = $request->ser_date;
+                                    //     $services->ser_start = $request->ser_start;
+                                    //     $services->ser_end = $request->ser_end;
+                                    //     $services->ser_typ_id = $request->ser_typ_id;
+                                    //     $services->prof_id = $request->prof_id;
+                                    //     $services->use_id = $request->use_id;
+                                    //     // Se guarda la novedad
+                                    //     $services->save();
+                                    //     // Reporte de novedad
+                                    //     Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla services ", 1, $proj_id, $use_id);
 
-                                //     return response()->json([
+                                    //     return response()->json([
 
-                                //         'status' => True,
-                                //         'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.'
-                                //     ], 200);
-                                // }else{
+                                    //         'status' => True,
+                                    //         'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.'
+                                    //     ], 200);
+                                    // }else{
                                     return response()->json([
                                         'status' => False,
                                         'message' => 'Reserva invalida'
                                     ], 400);
-
                                 }
                             }
                             $services = Service::find($id);
                             $services->ser_date = $request->ser_date;
                             $services->ser_start = $request->ser_start;
+                            $services->ser_quotas = $request->ser_quotas;
                             $services->ser_end = $request->ser_end;
                             $services->ser_typ_id = $request->ser_typ_id;
                             $services->prof_id = $request->prof_id;
@@ -486,6 +490,7 @@ class Service extends Model
                             $services->ser_date = $request->ser_date;
                             $services->ser_start = $request->ser_start;
                             $services->ser_end = $request->ser_end;
+                            $services->ser_quotas = $request->ser_quotas;
                             $services->ser_typ_id = $request->ser_typ_id;
                             $services->prof_id = $request->prof_id;
                             $services->use_id = $request->use_id;
@@ -498,7 +503,6 @@ class Service extends Model
                                 'message' => 'La reserva con el profesional' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.'
                             ], 200);
                         }
-
                     }
                 } else {
                     return response()->json([
@@ -530,6 +534,7 @@ class Service extends Model
             'services.ser_date AS Fecha',
             'services.ser_start AS Hora inicio',
             'services.ser_end AS Hora fin',
+            'services.ser_quotas AS Cupos',
             'service_types.ser_typ_name AS Tipo Servicio',
             'profesionals.prof_name AS Profesional',
             'users.use_mail AS Correo',
@@ -549,24 +554,28 @@ class Service extends Model
             'services.ser_date AS Fecha',
             'services.ser_start AS Hora inicio',
             'services.ser_end AS Hora fin',
+            'services.ser_quotas AS Cupos',
             'service_types.ser_typ_name AS Tipo Servicio',
             'profesionals.prof_name AS Profesional',
             'users.use_mail AS Correo',
             'services.ser_status AS Estado'
-            )->join('service_types', 'services.ser_typ_id', '=', 'service_types.ser_typ_id')
+        )->join('service_types', 'services.ser_typ_id', '=', 'service_types.ser_typ_id')
             ->join('profesionals', 'services.prof_id', '=', 'profesionals.prof_id')
-            ->join('users', 'services.use_id', '=', 'users.use_id')->where("ser_date", ">=", $date)->where("ser_status", "=", 1)->OrderBy("services.use_id", 'DESC')->get() : DB::table('services')->select(
+            ->join('users', 'services.use_id', '=', 'users.use_id')->where("ser_date", ">=", $date)->where("ser_status", "=", 1)->OrderBy("services.use_id", 'DESC')->get()
+
+            : DB::table('services')->select(
                 'services.ser_id AS No. Servicio',
                 'services.ser_date AS Fecha',
                 'services.ser_start AS Hora inicio',
                 'services.ser_end AS Hora fin',
+                'services.ser_quotas AS Cupos',
                 'service_types.ser_typ_name AS Tipo Servicio',
                 'profesionals.prof_name AS Profesional',
                 'users.use_mail AS Correo',
                 'services.ser_status AS Estado'
-                 )->join('service_types', 'services.ser_typ_id', '=', 'service_types.ser_typ_id')
-                ->join('profesionals', 'services.prof_id', '=', 'profesionals.prof_id')
-                ->join('users', 'services.use_id', '=', 'users.use_id')->where("ser_date", ">=", $date)->OrderBy("services.use_id", 'DESC')->where("services.use_id", '=', $use_id)->where("ser_status", "=", 1)->get();
+            )->join('service_types', 'services.ser_typ_id', '=', 'service_types.ser_typ_id')
+            ->join('profesionals', 'services.prof_id', '=', 'profesionals.prof_id')
+            ->join('users', 'services.use_id', '=', 'users.use_id')->where("ser_date", ">=", $date)->OrderBy("services.use_id", 'DESC')->where("services.use_id", '=', $use_id)->where("ser_status", "=", 1)->get();
         return $reservation;
     }
     public static function Calendar()
@@ -602,6 +611,25 @@ class Service extends Model
         INNER JOIN users ON services.use_id = users.use_id
         WHERE services.ser_date BETWEEN '$startDate' AND '$endDate'
         ORDER BY services.ser_date DESC");
+    }
 
+    public static function substractQuote($request)
+    {
+        $valQuotes = DB::table('services AS ser')
+            ->select('ser.ser_id', 'ser.ser_quotas')
+            ->where('ser.ser_id', $request->ser_id)
+            ->first();
+
+        $quotesCount = DB::table('biblioteca_inscriptions')
+            ->where('ser_id', $request->ser_id)
+            ->where('bio_ins_status', 1)
+            ->count();
+        // return $quotesCount;
+        // return $valQuotes->ser_quotas;
+        if ($valQuotes->ser_quotas > $quotesCount) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -4,6 +4,7 @@
 // use App\Http\Controllers\GendersController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BibliotecaInscriptionController;
 use App\Http\Controllers\ProfesionalsController;
 use App\Http\Controllers\SpaceController;
 use App\Http\Controllers\ReservationController;
@@ -48,4 +49,5 @@ Route::get('historialServiceDates'.URL.'{startDate}/{endDate}', [ServicesControl
 Route::get('active/service/user'.URL, [ServicesController::class, "ActiveServiceUser"])->name('active.service.user');
 Route::get('calendarService'.URL, [ServicesController::class, "calendar"])->name('calendar');
 Route::get('profes'.URL, [ProfesionalsController::class, "Profs"])->name('Profs');
+Route::Resource('inscriptions'.URL, BibliotecaInscriptionController::class)->names('Inscriptions')->parameter('','inscriptions');
 // });

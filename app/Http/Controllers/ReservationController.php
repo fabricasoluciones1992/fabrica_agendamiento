@@ -107,7 +107,7 @@ class ReservationController extends Controller
         }
     }
     public function destroy($proj_id, $use_id, $id){
-             $desactivate = Reservation::find($id);
+            $desactivate = Reservation::find($id);
             ($desactivate->res_status == 1)?$desactivate->res_status=0:$desactivate->res_status=1;
             $desactivate->save();
             $message = ($desactivate->res_status == 1)?'Activado':'Desactivado';
