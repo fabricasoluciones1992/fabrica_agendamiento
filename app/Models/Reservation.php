@@ -53,19 +53,19 @@ class Reservation extends Model
         if ($user == null) {
             return response()->json([
                 'status' => False,
-                'message' => "El usuario no existe"
+                'message' => "El usuario no existe."
             ], 400);
         }
         $space = Space::find($request->spa_id);
         if ($space == null) {
             return response()->json([
                 'status' => False,
-                'message' => "El espacio no existe"
+                'message' => "El espacio no existe."
             ], 400);
         } elseif ($space->spa_status == 0) {
             return response()->json([
                 'status' => False,
-                'message' => "El espacio no está disponible"
+                'message' => "El espacio no está disponible."
             ], 400);
         }
         // Convertimos los valores de hora que nos pasa el usuario a datos tipo Carbon
@@ -102,7 +102,7 @@ class Reservation extends Model
                         if ($request->res_date == $date && $request->res_start <= $actualHour) {
                             return response()->json([
                                 'status' => False,
-                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a:' . $actualHour . '.'
+                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a: ' . $actualHour . '.'
                             ], 400);
                         } else {
 
@@ -129,7 +129,7 @@ class Reservation extends Model
                                         // Hay superposición, la nueva reserva no es posible
                                         return response()->json([
                                             'status' => False,
-                                            'message' => 'Ya hay una reserva en este horario o espacio '
+                                            'message' => 'Ya hay una reserva en este horario o espacio. '
                                         ], 400);
                                     }
                                 }
@@ -141,7 +141,7 @@ class Reservation extends Model
                                         // Hay superposición, la nueva reserva no es posible
                                         return response()->json([
                                             'status' => False,
-                                            'message' => 'Este Usuario ya tiene una reserva a esta hora'
+                                            'message' => 'Este Usuario ya tiene una reserva a esta hora.'
                                         ], 400);
                                     }
                                 }
@@ -163,7 +163,7 @@ class Reservation extends Model
                         if ($request->res_date == $date && $request->res_start <= $actualHour) {
                             return response()->json([
                                 'status' => False,
-                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a:' . $actualHour . '.'
+                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a: ' . $actualHour . '.'
                             ], 400);
                         }
                         if ($validateDay->isNotEmpty()) {
@@ -239,31 +239,31 @@ class Reservation extends Model
         if ($user == null) {
             return response()->json([
                 'status' => False,
-                'message' => "El usuario no existe"
+                'message' => "El usuario no existe."
             ], 400);
         }
         $space = Space::find($request->spa_id);
         if ($space == null) {
             return response()->json([
                 'status' => False,
-                'message' => "El espacio no existe"
+                'message' => "El espacio no existe."
             ], 400);
         } elseif ($space->spa_status == 0) {
             return response()->json([
                 'status' => False,
-                'message' => "El espacio no está disponible"
+                'message' => "El espacio no está disponible."
             ], 400);
         }
         $reservation = Reservation::find($id);
         if ($reservation == null) {
             return response()->json([
                 'status' => False,
-                'message' => "La reservación no existe"
+                'message' => "La reservación no existe."
             ], 400);
         } elseif ($reservation->res_status == 0) {
             return response()->json([
                 'status' => False,
-                'message' => "La reservación no está disponible"
+                'message' => "La reservación no está disponible."
             ], 400);
         }
         // Convertimos los valores de hora que nos pasa el usuario a datos tipo Carbon

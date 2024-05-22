@@ -42,6 +42,7 @@ class ServicesController extends Controller
             'ser_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
             'ser_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
             'ser_end' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
+            'ser_quotas' => ['required', 'regex:/^[1-9][0-9]?$|^100$/'],
             'ser_typ_id' => 'required|integer',
             'prof_id' => 'required',
             'use_id' => 'required'
@@ -51,6 +52,8 @@ class ServicesController extends Controller
             'ser_name.regex' => 'El nombre del servicio es invalido.',
             'ser_date.required' => 'La fecha del servicio es requerida.',
             'ser_date.regex' => 'El formato de la fecha del servicio no es valido.',
+            'ser_quotas.regex' => 'El numero de cupos debe de ser mayor a 0 y menor 100.',
+            'ser_quotas.required' => 'El numero de cupos es requerido.',
             'ser_start.required' => 'La hora inicial del servicio es requerida.',
             'ser_start.regex' => 'El formato de la hora inicial del servicio no es valido.',
             'ser_end.required' => 'La hora final del servicio es requerida.',
@@ -102,6 +105,7 @@ class ServicesController extends Controller
             'ser_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
             'ser_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
             'ser_end' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
+            'ser_quotas' => ['required', 'regex:/^[1-9][0-9]?$|^100$/'],
             'ser_typ_id' => 'required|integer',
             'prof_id' => 'required|integer',
             'use_id' => 'required|integer'
@@ -111,6 +115,8 @@ class ServicesController extends Controller
         $messages = [
             'ser_name.regex' => 'El nombre del servicio es invalido.',
             'ser_date.required' => 'La fecha de la reserva es requerida.',
+            'ser_quotas.regex' => 'El numero de cupos debe de ser mayor a 0 y menor 100.',
+            'ser_quotas.required' => 'El numero de cupos es requerido.',
             'ser_date.regex' => 'El formato de la fecha de la reserva no es valido.',
             'ser_start.required' => 'La hora inicial de la reserva es requerida.',
             'ser_start.regex' => 'El formato de la hora inicial de la reserva no es valido.',
@@ -239,7 +245,7 @@ public function users(Request $request){
         if ($services == null)
         {
             return response()->json([
-             'status' => False, 
+             'status' => False,
              'message' => 'No se encontraron servicios'
             ], 400);
         }else{

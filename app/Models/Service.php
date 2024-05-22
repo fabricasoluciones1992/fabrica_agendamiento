@@ -58,19 +58,19 @@ class Service extends Model
         if ($user == null) {
             return response()->json([
                 'status' => False,
-                'message' => "El usuario no existe"
+                'message' => "El usuario no existe."
             ], 400);
         }
         $profesional = Profesional::find($request->prof_id);
         if ($profesional == null) {
             return response()->json([
                 'status' => False,
-                'message' => "El profesional no existe"
+                'message' => "El profesional no existe."
             ], 400);
         } elseif ($profesional->prof_status == 0) {
             return response()->json([
                 'status' => False,
-                'message' => "El profesional no está disponible"
+                'message' => "El profesional no está disponible."
             ], 400);
         }
         // Convertimos los valores de hora que nos pasa el usuario a datos tipo Carbon
@@ -109,7 +109,7 @@ class Service extends Model
                             if ($request->ser_date == $date && $request->ser_start <= $actualHour) {
                                 return response()->json([
                                     'status' => False,
-                                    'message' => 'La hora inicial de la reserva debe ser igual o mayor a:' . $actualHour . '.'
+                                    'message' => 'La hora inicial de la reserva debe ser igual o mayor a: ' . $actualHour . '.'
                                 ], 400);
                             } else {
                                 if ($validateDay->isEmpty()) {
@@ -120,7 +120,7 @@ class Service extends Model
                                     Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla services ", 3, $proj_id, $use_id);
                                     return response()->json([
                                         'status' => True,
-                                        'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se creo exitosamente el dia ' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.',
+                                        'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se creo exitosamente el dia ' . $services->ser_date . '.',
                                     ], 200);
                                 } else {
 
@@ -133,7 +133,7 @@ class Service extends Model
                                             // Hay superposición, la nueva reserva no es posible
                                             return response()->json([
                                                 'status' => False,
-                                                'message' => 'Este profesional está reservado'
+                                                'message' => 'Este profesional está reservado.'
                                             ], 400);
                                         }
                                     }
@@ -144,7 +144,7 @@ class Service extends Model
                                     Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla services ", 3, $proj_id, $use_id);
                                     return response()->json([
                                         'status' => True,
-                                        'message' => 'La reserva en el profesional  ' . $profesional->prof_name . ' se creó exitosamente el dia ' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.',
+                                        'message' => 'La reserva con el profesional  ' . $profesional->prof_name . ' se creó exitosamente el dia ' . $services->ser_date . '.' ,
                                     ], 200);
                                 }
                             }
@@ -159,7 +159,7 @@ class Service extends Model
                                         // Hay superposición, la nueva reserva no es posible
                                         return response()->json([
                                             'status' => False,
-                                            'message' => 'Este profesional está reservado'
+                                            'message' => 'Este profesional está reservado.'
                                         ], 400);
                                     }
                                 }
@@ -170,7 +170,7 @@ class Service extends Model
                                 Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla services ", 3, $proj_id, $use_id);
                                 return response()->json([
                                     'status' => True,
-                                    'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se creo exitosamente el dia ' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.',
+                                    'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se creo exitosamente el dia ' . $services->ser_date . '.',
 
                                 ], 200);
                             } else {
@@ -181,7 +181,7 @@ class Service extends Model
                                 Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla services ", 3, $proj_id, $use_id);
                                 return response()->json([
                                     'status' => True,
-                                    'message' => 'La reserva con el profesional  ' . $profesional->prof_name . ' se creó exitosamente el dia ' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.',
+                                    'message' => 'La reserva con el profesional  ' . $profesional->prof_name . ' se creó exitosamente el dia ' . $services->ser_date . '.',
 
                                 ], 200);
                             }
@@ -201,7 +201,7 @@ class Service extends Model
                                         // Hay superposición, la nueva reserva no es posible
                                         return response()->json([
                                             'status' => False,
-                                            'message' => 'Este usuario ya tiene una reservacion con el profesional: ' . $servicesUsersKey->prof_name . '.'
+                                            'message' => 'El profesional ' . $servicesUsersKey->prof_name . ' se encuentra ocupado en esta hora o fecha especifica.'
                                         ], 400);
                                     }
                                 }
@@ -213,7 +213,7 @@ class Service extends Model
                             Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla services ", 3, $proj_id, $use_id);
                             return response()->json([
                                 'status' => True,
-                                'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se creo exitosamente el dia ' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.',
+                                'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se creo exitosamente el dia ' . $services->ser_date .  '.',
                             ], 200);
                         }
 
@@ -267,31 +267,31 @@ class Service extends Model
         if ($user == null) {
             return response()->json([
                 'status' => False,
-                'message' => "El usuario no existe"
+                'message' => "El usuario no existe."
             ], 400);
         }
         $profesional = Profesional::find($request->prof_id);
         if ($profesional == null) {
             return response()->json([
                 'status' => False,
-                'message' => "El profesional no existe"
+                'message' => "El profesional no existe."
             ], 400);
         } elseif ($profesional->prof_status == 0) {
             return response()->json([
                 'status' => False,
-                'message' => "El profesional no está disponible"
+                'message' => "El profesional no está disponible."
             ], 400);
         }
         $service = Service::find($id);
         if ($service == null) {
             return response()->json([
                 'status' => False,
-                'message' => "La reservación del servicio no existe"
+                'message' => "La reservación del servicio no existe."
             ], 400);
         } elseif ($service->ser_status == 0) {
             return response()->json([
                 'status' => False,
-                'message' => "La reservación del servicio no está disponible"
+                'message' => "La reservación del servicio no está disponible."
             ], 400);
         }
         // Convertimos los valores de hora que nos pasa el usuario a datos tipo Carbon
@@ -329,7 +329,7 @@ class Service extends Model
                         if ($request->ser_date == $date && $request->ser_start <= $actualHour) {
                             return response()->json([
                                 'status' => False,
-                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a:' . $actualHour . '.'
+                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a: ' . $actualHour . '.'
                             ], 400);
                         }
                         if ($validateDay->isEmpty()) {
@@ -348,7 +348,7 @@ class Service extends Model
                             Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla services ", 1, $proj_id, $use_id);
                             return response()->json([
                                 'status' => True,
-                                'message' => 'La reserva en el profesional  ' . $profesional->prof_name . ' se actualizó exitosamente el dia ' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.'
+                                'message' => 'La reserva en el profesional  ' . $profesional->prof_name . ' se actualizó exitosamente el dia ' . $services->ser_date .  '.'
                             ], 200);
                         } else {
                             foreach ($validateDay as $validateDayKey) {
@@ -372,7 +372,7 @@ class Service extends Model
 
                                     return response()->json([
                                         'status' => True,
-                                        'message' => 'La reserva en el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia ' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.'
+                                        'message' => 'La reserva en el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia ' . $services->ser_date . '.'
                                     ], 200);
                                 } elseif ($newSerStart->lt($validatedSerEnd) && $newSerEnd->gt($validatedSerStart) && $validateDayKey->ser_status == 1) {
                                     // Hay superposición, la nueva reserva no es posible
@@ -397,7 +397,7 @@ class Service extends Model
 
                             return response()->json([
                                 'status' => True,
-                                'message' => 'La reserva en el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia ' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.'
+                                'message' => 'La reserva en el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia ' . $services->ser_date .  '.'
                             ], 200);
                         }
                     } else {
@@ -417,7 +417,7 @@ class Service extends Model
                                     // Hay superposición, la nueva reserva no es posible
                                     return response()->json([
                                         'status' => False,
-                                        'message' => 'Este profesional está reservado'
+                                        'message' => 'Este profesional está reservado.'
                                     ], 400);
                                 }
                             }
@@ -432,27 +432,27 @@ class Service extends Model
                                     ], 400);
                                 }
                                 if ($servicesUsersKey->ser_id != $id) {
-                                    //     $services = Service::find($id);
-                                    //     $services->ser_date = $request->ser_date;
-                                    //     $services->ser_start = $request->ser_start;
-                                    //     $services->ser_end = $request->ser_end;
-                                    //     $services->ser_typ_id = $request->ser_typ_id;
-                                    //     $services->prof_id = $request->prof_id;
-                                    //     $services->use_id = $request->use_id;
-                                    //     // Se guarda la novedad
-                                    //     $services->save();
-                                    //     // Reporte de novedad
-                                    //     Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla services ", 1, $proj_id, $use_id);
+                                        $services = Service::find($id);
+                                        $services->ser_date = $request->ser_date;
+                                        $services->ser_start = $request->ser_start;
+                                        $services->ser_end = $request->ser_end;
+                                        $services->ser_typ_id = $request->ser_typ_id;
+                                        $services->prof_id = $request->prof_id;
+                                        $services->use_id = $request->use_id;
+                                        // Se guarda la novedad
+                                        $services->save();
+                                        // Reporte de novedad
+                                        Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla services ", 1, $proj_id, $use_id);
 
-                                    //     return response()->json([
+                                        return response()->json([
 
-                                    //         'status' => True,
-                                    //         'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.'
-                                    //     ], 200);
-                                    // }else{
+                                            'status' => True,
+                                            'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.'
+                                        ], 200);
+                                    }else{
                                     return response()->json([
                                         'status' => False,
-                                        'message' => 'Reserva invalida'
+                                        'message' => 'Reserva invalida.'
                                     ], 400);
                                 }
                             }
@@ -471,7 +471,7 @@ class Service extends Model
                             return response()->json([
 
                                 'status' => True,
-                                'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.',
+                                'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date . '.',
                             ], 200);
                         } else {
                             foreach ($validateDay as $validateDayKey) {
@@ -482,7 +482,7 @@ class Service extends Model
                                     // Hay superposición, la nueva reserva no es posible
                                     return response()->json([
                                         'status' => False,
-                                        'message' => 'Ya existe una reserva en este momento'
+                                        'message' => 'Ya existe una reserva en este momento.'
                                     ], 400);
                                 }
                             }
@@ -501,7 +501,7 @@ class Service extends Model
                             Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla services ", 1, $proj_id, $use_id);
                             return response()->json([
                                 'status' => True,
-                                'message' => 'La reserva con el profesional' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.'
+                                'message' => 'La reserva con el profesional' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date .  '.'
                             ], 200);
                         }
                     }
