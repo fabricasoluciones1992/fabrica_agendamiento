@@ -431,7 +431,7 @@ class Service extends Model
                                         'message' => 'Ya existe una reservación en este momento.'
                                     ], 400);
                                 }
-                                if ($servicesUsersKey->ser_id != $id) {
+                                if ($servicesUsersKey->ser_id == $id && $servicesUsersKey->use_id == $request->use_id) {
                                         $services = Service::find($id);
                                         $services->ser_date = $request->ser_date;
                                         $services->ser_start = $request->ser_start;
@@ -449,30 +449,15 @@ class Service extends Model
                                             'status' => True,
                                             'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.'
                                         ], 200);
-                                    }else{
-                                    return response()->json([
-                                        'status' => False,
-                                        'message' => 'Reserva invalida.'
-                                    ], 400);
-                                }
+                                    }
+
                             }
-                            $services = Service::find($id);
-                            $services->ser_date = $request->ser_date;
-                            $services->ser_name = $request->ser_name;
-                            $services->ser_start = $request->ser_start;
-                            $services->ser_quotas = $request->ser_quotas;
-                            $services->ser_end = $request->ser_end;
-                            $services->ser_typ_id = $request->ser_typ_id;
-                            $services->prof_id = $request->prof_id;
-                            $services->use_id = $request->use_id;
-                            $services->save();
-                            Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla services ", 3, $proj_id, $use_id);
 
-                            return response()->json([
-
-                                'status' => True,
-                                'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date . '.',
-                            ], 200);
+                                return response()->json([
+                                    'status' => False,
+                                    'message' => 'Reserva invalida.'
+                                ], 400);
+                            
                         } else {
                             foreach ($validateDay as $validateDayKey) {
                                 // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon
