@@ -27,7 +27,15 @@ class BibliotecaInscription extends Model
 
     public $timestamps = false;
 
-
+    public static function select(){
+        return DB::table('biblioteca_inscriptions as bi')
+            ->join('services as se', 'bi.ser_id', '=','se.ser_id')
+            ->join('students as st', 'bi.stu_id', '=','st.stu_id')
+            ->join('persons as pe', 'st.per_id','=','pe.per_id')
+            ->select('bi.bio_ins_id', 'bi.bio_ins_date', 'bi.bio_ins_status', 'bi.stu_id', 'bi.ser_id','se.ser_date','se.ser_start','se.ser_end','se.ser_status','se.ser_quotas','pe.per_name','pe.per_lastname','pe.per_document')
+            ->orderBy('bi.bio_ins_date', 'asc')
+            ->get();
+    }
 
     public static function make(Request $request, $proj_id, $use_id)
     {
@@ -118,6 +126,18 @@ class BibliotecaInscription extends Model
         //         'message' => 'Fecha invalida.'
         //     ], 400);
         // }
+    }
+
+
+    public static function findOne($id){
+        return DB::table('biblioteca_inscriptions as bi')
+            ->join('services as se', 'bi.ser_id', '=','se.ser_id')
+            ->join('students as st', 'bi.stu_id', '=','st.stu_id')
+            ->join('persons as pe', 'st.per_id','=','pe.per_id')
+            ->select('bi.bio_ins_id', 'bi.bio_ins_date', 'bi.bio_ins_status', 'bi.stu_id', 'bi.ser_id','se.ser_date','se.ser_start','se.ser_end','se.ser_status','se.ser_quotas','pe.per_name','pe.per_lastname','pe.per_document')
+            ->where('bi.bio_ins_id', $id)
+            ->orderBy('bi.bio_ins_date', 'asc')
+            ->first();
     }
 
     public static function Amend(Request $request, $proj_id, $use_id, $id)
@@ -224,4 +244,5 @@ class BibliotecaInscription extends Model
         //     ], 400);
         // }
     }
+
 }

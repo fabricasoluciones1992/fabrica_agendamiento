@@ -11,7 +11,7 @@ class BibliotecaInscriptionController extends Controller
 
     public function index($proj_id, $use_id)
     {
-        $bilioteca = BibliotecaInscription::all();
+        $bilioteca = BibliotecaInscription::select();
         if($bilioteca == null){
             return response()->json([
             'status' => False,
@@ -26,10 +26,6 @@ class BibliotecaInscriptionController extends Controller
 
     }
 
-
-
-
-
     public function store(Request $request, $proj_id, $use_id)
     {
         return BibliotecaInscription::make($request, $proj_id, $use_id);
@@ -38,9 +34,20 @@ class BibliotecaInscriptionController extends Controller
     }
 
 
-    public function show(bibliotecaInscription $bibliotecaInscription)
+    public function show($proj_id, $use_id, $id)
     {
-
+        $bilioteca = BibliotecaInscription::findOne($id);
+        if($bilioteca == null){
+            return response()->json([
+            'status' => False,
+            'message' => 'La enscripción no existe.'
+            ],400);
+        }else{
+            Controller::NewRegisterTrigger("Se realizó una busqueda de datos en la tabla biblioteca_Inscriptions ",4,$proj_id,$use_id);
+            return response()->json([
+                'status'=>True,
+                'data'=>$bilioteca],200);
+        }
     }
 
 
