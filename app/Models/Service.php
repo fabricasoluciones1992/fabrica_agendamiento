@@ -586,7 +586,7 @@ class Service extends Model
     {
         $date = date('Y-m-d');
         $reservation = DB::select("SELECT services.ser_id AS 'No. Servicio', services.ser_name AS 'Nombre del servicio',services.ser_date AS 'Fecha',
-        services.ser_start AS 'Hora inicio', services.ser_end AS 'Hora fin',
+        services.ser_start AS 'Hora inicio', services.ser_end AS 'Hora fin', services.ser_quotas AS Cupos,
         service_types.ser_typ_name AS 'Tipo Servicio', profesionals.prof_name AS 'Profesional',
         users.use_mail AS 'Correo', services.use_id AS 'Identificacion', services.ser_status AS 'Estado' FROM services INNER JOIN service_types ON services.ser_typ_id = service_types.ser_typ_id
         INNER JOIN profesionals ON services.prof_id = profesionals.prof_id
@@ -608,7 +608,7 @@ class Service extends Model
     public static function betweenDates($startDate, $endDate)
     {
         return DB::select("SELECT services.ser_id AS 'No. Servicio', services.ser_name AS 'Nombre del servicio', services.ser_date AS 'Fecha',
-        services.ser_start AS 'Hora inicio', services.ser_end AS 'Hora fin',
+        services.ser_start AS 'Hora inicio', services.ser_end AS 'Hora fin', services.ser_quotas AS Cupos,
         service_types.ser_typ_name AS 'Tipo Servicio', profesionals.prof_name AS 'Profesional',
         users.use_mail AS 'Correo', services.use_id AS 'Identificacion', services.ser_status AS 'Estado' FROM services INNER JOIN service_types ON services.ser_typ_id = service_types.ser_typ_id
         INNER JOIN profesionals ON services.prof_id = profesionals.prof_id
@@ -635,5 +635,24 @@ class Service extends Model
         } else {
             return false;
         }
+    }
+
+    public static function incriptionsPerService($id){
+        $service = DB::table('services AS ser')
+            ->join('profesionals AS pro', 'pro.prof_id', '=', 'ser.prof_id')
+            ->join('users AS u', 'u.use_id', '=', 'ser.use_id')
+            ->select('ser.ser_id', 'ser.ser_name','ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser.ser_quotas', 'pro.prof_name', 'u.use_mail', 'u.use_id')
+            ->where('ser.ser_id', '=', $id)->first();
+
+            $users = DB::table('biblioteca_inscriptions as bi')
+            ->join('services as se', 'bi.ser_id', '=','se.ser_id')
+            ->join('students as st', 'bi.stu_id', '=','st.stu_id')
+            ->join('persons as pe', 'st.per_id','=','pe.per_id')
+            ->select('bi.bio_ins_id', 'bi.bio_ins_date', 'bi.bio_ins_status', 'bi.stu_id', 'bi.ser_id','pe.per_name','pe.per_lastname','pe.per_document')
+            ->where('bi.ser_id', $id)
+            ->orderBy('bi.bio_ins_date', 'asc')
+            ->get();
+            $service->users = ($users == null) ? 'No hay usuarios ingresados' : $users;
+            return $service;
     }
 }

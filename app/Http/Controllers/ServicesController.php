@@ -233,5 +233,22 @@ public function users(Request $request){
         ], 200);
         }
     }
+
+    public function usersIn($proj_id, $use_id, $id){
+        $services = Service::incriptionsPerService($id);
+        if ($services == null)
+        {
+            return response()->json([
+             'status' => False, 
+             'message' => 'No se encontraron servicios'
+            ], 400);
+        }else{
+        Controller::NewRegisterTrigger("Se realizó una busqueda en la tabla services ",4,$proj_id, $use_id);
+        return response()->json([
+            'status'=> True,
+            'data'=> $services
+        ], 200);
+        }
+    }
 }
 
