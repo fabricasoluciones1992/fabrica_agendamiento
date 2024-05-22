@@ -38,6 +38,7 @@ class ServicesController extends Controller
     public function store(Request $request,$proj_id, $use_id)
     {
         $rules = [
+            'ser_name' => 'regex:/^[A-ZÁÉÍÓÚÜÀÈÌÒÙÑ\s]+$/',
             'ser_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
             'ser_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
             'ser_end' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
@@ -47,6 +48,7 @@ class ServicesController extends Controller
 
         ];
         $messages = [
+            'ser_name.regex' => 'El nombre del servicio es invalido.',
             'ser_date.required' => 'La fecha del servicio es requerida.',
             'ser_date.regex' => 'El formato de la fecha del servicio no es valido.',
             'ser_start.required' => 'La hora inicial del servicio es requerida.',
@@ -96,6 +98,7 @@ class ServicesController extends Controller
     public function update($proj_id, $use_id, Request $request, $id)
     {
         $rules = [
+            'ser_name' => 'regex:/^[A-ZÁÉÍÓÚÜÀÈÌÒÙÑ\s]+$/',
             'ser_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
             'ser_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
             'ser_end' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
@@ -106,6 +109,7 @@ class ServicesController extends Controller
         ];
 
         $messages = [
+            'ser_name.regex' => 'El nombre del servicio es invalido.',
             'ser_date.required' => 'La fecha de la reserva es requerida.',
             'ser_date.regex' => 'El formato de la fecha de la reserva no es valido.',
             'ser_start.required' => 'La hora inicial de la reserva es requerida.',

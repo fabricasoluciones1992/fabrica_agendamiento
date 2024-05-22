@@ -18,6 +18,7 @@ class Service extends Model
 
     protected $fillable = [
         'ser_date',
+        'ser_name',
         'ser_start',
         'ser_end',
         'ser_status',
@@ -35,7 +36,7 @@ class Service extends Model
             ->join('service_types AS st', 'st.ser_typ_id', '=', 'ser.ser_typ_id')
             ->join('profesionals AS pro', 'pro.prof_id', '=', 'ser.prof_id')
             ->join('users AS u', 'u.use_id', '=', 'ser.use_id')
-            ->select('ser.ser_id', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser_quotas', 'st.ser_typ_id', 'st.ser_typ_name', 'pro.prof_name', 'u.use_mail', 'u.use_id')
+            ->select('ser.ser_id','ser.ser_name', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser_quotas', 'st.ser_typ_id', 'st.ser_typ_name', 'pro.prof_name', 'u.use_mail', 'u.use_id')
             ->orderBy('ser.ser_date', 'DESC')->limit(100)->get();
         return $services;
     }
@@ -249,7 +250,7 @@ class Service extends Model
         $service = DB::table('services AS ser')
             ->join('profesionals AS pro', 'pro.prof_id', '=', 'ser.prof_id')
             ->join('users AS u', 'u.use_id', '=', 'ser.use_id')
-            ->select('ser.ser_id', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser.ser_quotas', 'pro.prof_name', 'u.use_mail', 'u.use_id')
+            ->select('ser.ser_id', 'ser.ser_name','ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser.ser_quotas', 'pro.prof_name', 'u.use_mail', 'u.use_id')
             ->where('ser.ser_id', '=', $id)->first();
         return $service;
     }
@@ -338,6 +339,7 @@ class Service extends Model
                         }
                         if ($validateDay->isEmpty()) {
                             $services = Service::find($id);
+                            $services->ser_name = $request->ser_name;
                             $services->ser_date = $request->ser_date;
                             $services->ser_start = $request->ser_start;
                             $services->ser_end = $request->ser_end;
@@ -361,6 +363,7 @@ class Service extends Model
                                 if ($validateDayKey->ser_id == $id) {
                                     $services = Service::find($id);
                                     $services->ser_date = $request->ser_date;
+                                    $services->ser_name = $request->ser_name;
                                     $services->ser_start = $request->ser_start;
                                     $services->ser_end = $request->ser_end;
                                     $services->ser_quotas = $request->ser_quotas;
@@ -384,9 +387,10 @@ class Service extends Model
                                     ], 400);
                                 }
                             }
-                            
+
                             $services = Service::find($id);
                             $services->ser_date = $request->ser_date;
+                            $services->ser_name = $request->ser_name;
                             $services->ser_start = $request->ser_start;
                             $services->ser_end = $request->ser_end;
                             $services->prof_id = $request->prof_id;
@@ -459,6 +463,7 @@ class Service extends Model
                             }
                             $services = Service::find($id);
                             $services->ser_date = $request->ser_date;
+                            $services->ser_name = $request->ser_name;
                             $services->ser_start = $request->ser_start;
                             $services->ser_quotas = $request->ser_quotas;
                             $services->ser_end = $request->ser_end;
@@ -488,6 +493,7 @@ class Service extends Model
                             }
                             $services = Service::find($id);
                             $services->ser_date = $request->ser_date;
+                            $services->ser_name = $request->ser_name;
                             $services->ser_start = $request->ser_start;
                             $services->ser_end = $request->ser_end;
                             $services->ser_quotas = $request->ser_quotas;
@@ -531,6 +537,7 @@ class Service extends Model
     {
         $reservation = DB::table('services')->select(
             'services.ser_id AS No. Servicio',
+            'services.ser_name AS Nombre del servicio',
             'services.ser_date AS Fecha',
             'services.ser_start AS Hora inicio',
             'services.ser_end AS Hora fin',
@@ -551,6 +558,7 @@ class Service extends Model
 
         $reservation = ($request->acc_administrator == 1) ? DB::table('services')->select(
             'services.ser_id AS No. Servicio',
+            'services.ser_name AS Nombre del servicio',
             'services.ser_date AS Fecha',
             'services.ser_start AS Hora inicio',
             'services.ser_end AS Hora fin',
@@ -565,6 +573,7 @@ class Service extends Model
 
             : DB::table('services')->select(
                 'services.ser_id AS No. Servicio',
+                'services.ser_name AS Nombre del servicio',
                 'services.ser_date AS Fecha',
                 'services.ser_start AS Hora inicio',
                 'services.ser_end AS Hora fin',
@@ -581,7 +590,7 @@ class Service extends Model
     public static function Calendar()
     {
         $date = date('Y-m-d');
-        $reservation = DB::select("SELECT services.ser_id AS 'No. Servicio', services.ser_date AS 'Fecha',
+        $reservation = DB::select("SELECT services.ser_id AS 'No. Servicio', services.ser_name AS 'Nombre del servicio',services.ser_date AS 'Fecha',
         services.ser_start AS 'Hora inicio', services.ser_end AS 'Hora fin',
         service_types.ser_typ_name AS 'Tipo Servicio', profesionals.prof_name AS 'Profesional',
         users.use_mail AS 'Correo', services.use_id AS 'Identificacion', services.ser_status AS 'Estado' FROM services INNER JOIN service_types ON services.ser_typ_id = service_types.ser_typ_id
@@ -603,7 +612,7 @@ class Service extends Model
 
     public static function betweenDates($startDate, $endDate)
     {
-        return DB::select("SELECT services.ser_id AS 'No. Servicio', services.ser_date AS 'Fecha',
+        return DB::select("SELECT services.ser_id AS 'No. Servicio', services.ser_name AS 'Nombre del servicio', services.ser_date AS 'Fecha',
         services.ser_start AS 'Hora inicio', services.ser_end AS 'Hora fin',
         service_types.ser_typ_name AS 'Tipo Servicio', profesionals.prof_name AS 'Profesional',
         users.use_mail AS 'Correo', services.use_id AS 'Identificacion', services.ser_status AS 'Estado' FROM services INNER JOIN service_types ON services.ser_typ_id = service_types.ser_typ_id

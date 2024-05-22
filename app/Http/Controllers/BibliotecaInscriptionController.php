@@ -40,7 +40,7 @@ class BibliotecaInscriptionController extends Controller
         if($bilioteca == null){
             return response()->json([
             'status' => False,
-            'message' => 'La enscripción no existe.'
+            'message' => 'La inscripción no existe.'
             ],400);
         }else{
             Controller::NewRegisterTrigger("Se realizó una busqueda de datos en la tabla biblioteca_Inscriptions ",4,$proj_id,$use_id);
@@ -86,5 +86,20 @@ class BibliotecaInscriptionController extends Controller
 
 
 
+    }
+
+    public static function actives($proj_id,$use_id, $id){
+        $bilioteca = BibliotecaInscription::studentActive($id);
+        if($bilioteca == null){
+            return response()->json([
+            'status' => False,
+            'message' => 'La inscripción no existe.'
+            ],400);
+        }else{
+            Controller::NewRegisterTrigger("Se realizó una busqueda de datos en la tabla biblioteca_Inscriptions ",4,$proj_id,$use_id);
+            return response()->json([
+                'status'=>True,
+                'data'=>$bilioteca],200);
+        }
     }
 }

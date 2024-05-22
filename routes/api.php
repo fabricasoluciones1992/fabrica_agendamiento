@@ -50,4 +50,5 @@ Route::get('active/service/user'.URL, [ServicesController::class, "ActiveService
 Route::get('calendarService'.URL, [ServicesController::class, "calendar"])->name('calendar');
 Route::get('profes'.URL, [ProfesionalsController::class, "Profs"])->name('Profs');
 Route::Resource('inscriptions'.URL, BibliotecaInscriptionController::class)->names('Inscriptions')->parameter('','inscriptions');
+Route::get('inscriptions/actives'.URL .'{id}', [BibliotecaInscriptionController::class, 'actives'])->name('inscriptions.actives');
 // });
