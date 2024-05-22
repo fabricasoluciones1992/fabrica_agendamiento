@@ -91,7 +91,7 @@ class Service extends Model
                                                 WHERE services.ser_date >= '$date'  AND services.use_id = $request->use_id AND services.ser_status = 1");
                     $servicesSinceDateCount = $servicesSinceDate[0]->total_ser;
 
-                    if ($request->acc_administrator == 1) {
+
                         $servicesUsers = DB::table('services AS ser')
                             ->join('profesionals AS pro', 'pro.prof_id', '=', 'ser.prof_id')
                             ->join('users AS u', 'u.use_id', '=', 'ser.use_id')
@@ -216,12 +216,7 @@ class Service extends Model
                                 'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se creo exitosamente el dia ' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.',
                             ], 200);
                         }
-                    } else {
-                        return response()->json([
-                            'status' => False,
-                            'message' => 'Este usuario no puede hacer reservaciones.'
-                        ], 400);
-                    }
+
                 } else {
                     return response()->json([
                         'status' => False,
@@ -329,7 +324,7 @@ class Service extends Model
                     ->where('ser.ser_date', '=', $request->ser_date)
                     ->where('pro.prof_id', '=', $request->prof_id)->get();
 
-                if ($totalservicesDayCount < 3 || $request->acc_administrator == 1) {
+                if ($totalservicesDayCount < 3) {
                     if ($servicesUsers->isEmpty()) {
                         if ($request->ser_date == $date && $request->ser_start <= $actualHour) {
                             return response()->json([
