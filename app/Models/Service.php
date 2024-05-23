@@ -649,6 +649,7 @@ class Service extends Model
         $service = DB::table('services AS ser')
             ->join('profesionals AS pro', 'pro.prof_id', '=', 'ser.prof_id')
             ->join('users AS u', 'u.use_id', '=', 'ser.use_id')
+
             ->select('ser.ser_id', 'ser.ser_name','ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser.ser_quotas', 'pro.prof_name', 'u.use_mail', 'u.use_id')
             ->where('ser.ser_id', '=', $id)->first();
 
@@ -656,11 +657,13 @@ class Service extends Model
             ->join('services as se', 'bi.ser_id', '=','se.ser_id')
             ->join('students as st', 'bi.stu_id', '=','st.stu_id')
             ->join('persons as pe', 'st.per_id','=','pe.per_id')
-            ->select('bi.bio_ins_id', 'bi.bio_ins_date', 'bi.bio_ins_status', 'bi.stu_id', 'bi.ser_id','pe.per_name','pe.per_lastname','pe.per_document')
+            ->join('users as u', 'pe.use_id', '=','u.use_id')
+
+            ->select('bi.bio_ins_id', 'bi.bio_ins_date', 'u.use_mail', 'bi.bio_ins_status', 'bi.stu_id', 'bi.ser_id','pe.per_name','pe.per_lastname','pe.per_document')
             ->where('bi.ser_id', $id)
             ->orderBy('bi.bio_ins_date', 'asc')
             ->get();
-            $service->users = ($users == null) ? 'No hay usuarios ingresados' : $users;
+            $service->users = ($users == '[]') ? 'No hay usuarios ingresados' : $users;
             return $service;
     }
 }

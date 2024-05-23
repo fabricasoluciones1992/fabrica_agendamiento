@@ -90,7 +90,7 @@ class BibliotecaInscriptionController extends Controller
 
     public static function actives($proj_id,$use_id, $id){
         $bilioteca = BibliotecaInscription::studentActive($id);
-        if($bilioteca == null){
+        if($bilioteca == '[]'){
             return response()->json([
             'status' => False,
             'message' => 'La inscripción no existe.'
