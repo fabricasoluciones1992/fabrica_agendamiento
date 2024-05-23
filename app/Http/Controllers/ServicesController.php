@@ -101,7 +101,7 @@ class ServicesController extends Controller
     public function update($proj_id, $use_id, Request $request, $id)
     {
         $rules = [
-            'ser_name' => ['required','regex:/^[A-ZÁÉÍÓÚÜÀÈÌÒÙÑ\s]+$/'],
+            'ser_name' => ['required','regex:/^[ÁÉÍÓÚÜÑA-Z\s\W]+$/'],
             'ser_date' => ['required', 'regex:/^(\d{4})(\/|-)(0[1-9]|1[0-2])\2([0-2][0-9]|3[0-1])$/'],
             'ser_start' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],
             'ser_end' => ['required', 'regex:/^([0-1][0-9]|2[0-3])(:)([0-5][0-9])$/'],

@@ -194,7 +194,7 @@ class Reservation extends Model
                 } else {
                     return response()->json([
                         'status' => False,
-                        'message' => 'Este usuario no puede hacer mas reservaciones.'
+                        'message' => 'Solo puedes tener 3 reservaciones activas.'
                     ], 400);
                 }
             } else {
