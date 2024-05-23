@@ -509,18 +509,24 @@ class Reservation extends Model
 
     public static function users()
     {
-
         $users = DB::select(
-            "SELECT us.use_id, acc.proj_id, us.use_mail , acc.acc_id  FROM users us
+            "SELECT us.use_id,  MAX(us.use_mail) AS use_mail ,MAX(acc.acc_id) AS acc_id    FROM users us
+            LEFT JOIN access acc ON us.use_id = acc.use_id GROUP BY us.use_id"
+        );
+
+
+        $Allusers = DB::select(
+            "SELECT acc.use_id, acc.proj_id, us.use_mail , acc.acc_id  FROM users us
             LEFT JOIN access acc ON us.use_id = acc.use_id "
         );
         foreach($users as $user){
-            if($user->proj_id == 1){
-                $user->acc_admin= 1;
-
-            }else{
-                $user->acc_admin = 0;
+            $user->acc_admin = 0;
+            foreach($Allusers as $fullUser){
+                if($fullUser->use_id == $user->use_id && $fullUser->proj_id == 1){
+                    $user->acc_admin = 1;
+                }
             }
+
         }
         return $users;
     }
