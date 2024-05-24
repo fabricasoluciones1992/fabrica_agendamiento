@@ -25,7 +25,7 @@ class Service extends Model
         'ser_quotas',
         'ser_typ_id',
         'prof_id',
-        'use_id'
+
     ];
 
     public $timestamps = false;
@@ -35,8 +35,8 @@ class Service extends Model
         $services = DB::table('services AS ser')
             ->join('service_types AS st', 'st.ser_typ_id', '=', 'ser.ser_typ_id')
             ->join('profesionals AS pro', 'pro.prof_id', '=', 'ser.prof_id')
-            ->join('users AS u', 'u.use_id', '=', 'ser.use_id')
-            ->select('ser.ser_id','ser.ser_name', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser_quotas', 'st.ser_typ_id', 'st.ser_typ_name', 'pro.prof_name', 'u.use_mail', 'u.use_id')
+
+            ->select('ser.ser_id','ser.ser_name', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser_quotas', 'st.ser_typ_id', 'st.ser_typ_name', 'pro.prof_name', 'u.use_mail')
             ->orderBy('ser.ser_date', 'DESC')->limit(100)->get();
         return $services;
     }
@@ -54,13 +54,7 @@ class Service extends Model
         $date = date('Y-m-d');
         $actualHour = Carbon::now('America/Bogota')->format('H:i');
         // Trae todos los datos de usuarios y salas según el id que trae el request
-        $user = User::find($request->use_id);
-        if ($user == null) {
-            return response()->json([
-                'status' => False,
-                'message' => "El usuario no existe."
-            ], 400);
-        }
+
         $profesional = Profesional::find($request->prof_id);
         if ($profesional == null) {
             return response()->json([
@@ -88,21 +82,21 @@ class Service extends Model
 
                     $servicesSinceDate = DB::select("SELECT COUNT(services.ser_id) AS total_ser
                                                 FROM services
-                                                WHERE services.ser_date >= '$date'  AND services.use_id = $request->use_id AND services.ser_status = 1");
+                                                WHERE services.ser_date >= '$date'  AND services.ser_status = 1");
                     $servicesSinceDateCount = $servicesSinceDate[0]->total_ser;
 
 
                         $servicesUsers = DB::table('services AS ser')
                             ->join('profesionals AS pro', 'pro.prof_id', '=', 'ser.prof_id')
-                            ->join('users AS u', 'u.use_id', '=', 'ser.use_id')
-                            ->select('ser.ser_id', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'pro.prof_name', 'pro.prof_id', 'u.use_id')
+
+                            ->select('ser.ser_id', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'pro.prof_name', 'pro.prof_id')
                             ->where('ser.ser_date', '=', $request->ser_date)
-                            ->where('u.use_id', '=', $request->use_id)->get();
+                         ->get();
 
                         $validateDay = DB::table('services AS ser')
                             ->join('profesionals AS pro', 'pro.prof_id', '=', 'ser.prof_id')
-                            ->join('users AS u', 'u.use_id', '=', 'ser.use_id')
-                            ->select('ser.ser_id', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'pro.prof_name', 'pro.prof_id', 'u.use_id')
+
+                            ->select('ser.ser_id', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'pro.prof_name', 'pro.prof_id')
                             ->where('ser.ser_date', '=', $request->ser_date)
                             ->where('pro.prof_id', '=', $request->prof_id)->get();
                         if ($servicesUsers->isEmpty()) {
@@ -244,8 +238,8 @@ class Service extends Model
     {
         $service = DB::table('services AS ser')
             ->join('profesionals AS pro', 'pro.prof_id', '=', 'ser.prof_id')
-            ->join('users AS u', 'u.use_id', '=', 'ser.use_id')
-            ->select('ser.ser_id', 'ser.ser_name','ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser.ser_quotas', 'pro.prof_name', 'u.use_mail', 'u.use_id')
+
+            ->select('ser.ser_id', 'ser.ser_name','ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser.ser_quotas', 'pro.prof_name', 'u.use_mail')
             ->where('ser.ser_id', '=', $id)->first();
         return $service;
     }
@@ -263,13 +257,7 @@ class Service extends Model
         $date = date('Y-m-d');
         $actualHour = Carbon::now('America/Bogota')->format('H:i');
         // Trae todos los datos de usuarios y salas según el id que trae el request
-        $user = User::find($request->use_id);
-        if ($user == null) {
-            return response()->json([
-                'status' => False,
-                'message' => "El usuario no existe."
-            ], 400);
-        }
+
         $profesional = Profesional::find($request->prof_id);
         if ($profesional == null) {
             return response()->json([
@@ -308,19 +296,19 @@ class Service extends Model
 
                 $totalservicesDay = DB::select("SELECT COUNT(services.ser_id) AS total_ser
                             FROM services
-                            WHERE services.ser_date = '$request->ser_date' AND services.use_id = $request->use_id  AND services.ser_status = 1");
+                            WHERE services.ser_date = '$request->ser_date' AND services.ser_status = 1");
                 $totalservicesDayCount = $totalservicesDay[0]->total_ser;
                 $servicesUsers = DB::table('services AS ser')
                     ->join('profesionals AS pro', 'pro.prof_id', '=', 'ser.prof_id')
-                    ->join('users AS u', 'u.use_id', '=', 'ser.use_id')
-                    ->select('ser.ser_id', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'pro.prof_name', 'pro.prof_id', 'u.use_id')
+
+                    ->select('ser.ser_id', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'pro.prof_name', 'pro.prof_id')
                     ->where('ser.ser_date', '=', $request->ser_date)
-                    ->where('u.use_id', '=', $request->use_id)->get();
+                    ->get();
 
                 $validateDay = DB::table('services AS ser')
                     ->join('profesionals AS pro', 'pro.prof_id', '=', 'ser.prof_id')
-                    ->join('users AS u', 'u.use_id', '=', 'ser.use_id')
-                    ->select('ser.ser_id', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'pro.prof_name', 'pro.prof_id', 'u.use_id')
+
+                    ->select('ser.ser_id', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'pro.prof_name', 'pro.prof_id')
                     ->where('ser.ser_date', '=', $request->ser_date)
                     ->where('pro.prof_id', '=', $request->prof_id)->get();
 
@@ -341,7 +329,6 @@ class Service extends Model
                             $services->ser_quotas = $request->ser_quotas;
                             $services->ser_typ_id = $request->ser_typ_id;
                             $services->prof_id = $request->prof_id;
-                            $services->use_id = $request->use_id;
                             // Se guarda la actualización
                             $services->save();
                             // Reporte de novedad
@@ -364,7 +351,6 @@ class Service extends Model
                                     $services->ser_quotas = $request->ser_quotas;
                                     $services->ser_typ_id = $request->ser_typ_id;
                                     $services->prof_id = $request->prof_id;
-                                    $services->use_id = $request->use_id;
                                     // Se guarda la actualización
                                     $services->save();
                                     // Reporte de novedad
@@ -390,7 +376,6 @@ class Service extends Model
                             $services->ser_end = $request->ser_end;
                             $services->ser_quotas = $request->ser_quotas;
                             $services->prof_id = $request->prof_id;
-                            $services->use_id = $request->use_id;
                             // Se guarda la actualización
                             $services->save();
                             // Reporte de novedad
@@ -442,7 +427,6 @@ class Service extends Model
                                         $services->ser_quotas = $request->ser_quotas;
                                         $services->ser_typ_id = $request->ser_typ_id;
                                         $services->prof_id = $request->prof_id;
-                                        $services->use_id = $request->use_id;
                                         // Se guarda la novedad
                                         $services->save();
                                         // Reporte de novedad
@@ -451,7 +435,7 @@ class Service extends Model
                                         return response()->json([
 
                                             'status' => True,
-                                            'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.'
+                                            'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date  . '.'
                                         ], 200);
                                     }
 
@@ -469,7 +453,6 @@ class Service extends Model
                                         $services->ser_quotas = $request->ser_quotas;
                                         $services->ser_typ_id = $request->ser_typ_id;
                                         $services->prof_id = $request->prof_id;
-                                        $services->use_id = $request->use_id;
                                         // Se guarda la novedad
                                         $services->save();
                                         // Reporte de novedad
@@ -478,7 +461,7 @@ class Service extends Model
                                         return response()->json([
 
                                             'status' => True,
-                                            'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date . ' por el usuario: ' . $user->use_mail . '.'
+                                            'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date . '.'
                                         ], 200);
 
                         } else {
@@ -502,7 +485,6 @@ class Service extends Model
                             $services->ser_quotas = $request->ser_quotas;
                             $services->ser_typ_id = $request->ser_typ_id;
                             $services->prof_id = $request->prof_id;
-                            $services->use_id = $request->use_id;
                             // Se guarda la novedad
                             $services->save();
                             // Reporte de novedad
@@ -551,11 +533,11 @@ class Service extends Model
             'services.ser_status AS Estado'
         )->join('service_types', 'services.ser_typ_id', '=', 'service_types.ser_typ_id')
             ->join('profesionals', 'services.prof_id', '=', 'profesionals.prof_id')
-            ->join('users', 'services.use_id', '=', 'users.use_id')->where("services." . $column, 'like', '%' . $data . '%')->OrderBy("services." . $column, 'DESC')->get();
+           ->where("services." . $column, 'like', '%' . $data . '%')->OrderBy("services." . $column, 'DESC')->get();
         return $reservation;
     }
 
-    public static function ActiveServiceUser($use_id, $request)
+    public static function ActiveServiceUser( $request)
     {
         $date = date('Y-m-d');
 
@@ -572,7 +554,7 @@ class Service extends Model
             'services.ser_status AS Estado'
         )->join('service_types', 'services.ser_typ_id', '=', 'service_types.ser_typ_id')
             ->join('profesionals', 'services.prof_id', '=', 'profesionals.prof_id')
-            ->join('users', 'services.use_id', '=', 'users.use_id')->where("ser_date", ">=", $date)->where("ser_status", "=", 1)->OrderBy("services.use_id", 'DESC')->get()
+            ->where("ser_date", ">=", $date)->where("ser_status", "=", 1)->get()
 
             : DB::table('services')->select(
                 'services.ser_id AS No. Servicio',
@@ -587,7 +569,7 @@ class Service extends Model
                 'services.ser_status AS Estado'
             )->join('service_types', 'services.ser_typ_id', '=', 'service_types.ser_typ_id')
             ->join('profesionals', 'services.prof_id', '=', 'profesionals.prof_id')
-            ->join('users', 'services.use_id', '=', 'users.use_id')->where("ser_date", ">=", $date)->OrderBy("services.use_id", 'DESC')->where("services.use_id", '=', $use_id)->where("ser_status", "=", 1)->get();
+          ->where("ser_date", ">=", $date)->where("ser_status", "=", 1)->get();
         return $reservation;
     }
     public static function Calendar()
@@ -596,31 +578,21 @@ class Service extends Model
         $reservation = DB::select("SELECT services.ser_id AS 'No. Servicio', services.ser_name AS 'Nombre del servicio',services.ser_date AS 'Fecha',
         services.ser_start AS 'Hora inicio', services.ser_end AS 'Hora fin', services.ser_quotas AS Cupos,
         service_types.ser_typ_name AS 'Tipo Servicio', profesionals.prof_name AS 'Profesional',
-        users.use_mail AS 'Correo', services.use_id AS 'Identificacion', services.ser_status AS 'Estado' FROM services INNER JOIN service_types ON services.ser_typ_id = service_types.ser_typ_id
+        users.use_mail AS 'Correo', services.ser_status AS 'Estado' FROM services INNER JOIN service_types ON services.ser_typ_id = service_types.ser_typ_id
         INNER JOIN profesionals ON services.prof_id = profesionals.prof_id
-        INNER JOIN users ON services.use_id = users.use_id
+
         WHERE services.ser_date >= '$date' AND services.ser_status = 1");
         return $reservation;
     }
 
-    public static function users()
-    {
-
-        $users = DB::select(
-            "SELECT us.use_id, MAX(us.use_mail) AS use_mail, MAX(acc.acc_id) AS acc_id FROM users us
-            LEFT JOIN access acc ON us.use_id = acc.use_id GROUP BY us.use_id"
-        );
-        return $users;
-    }
 
     public static function betweenDates($startDate, $endDate)
     {
         return DB::select("SELECT services.ser_id AS 'No. Servicio', services.ser_name AS 'Nombre del servicio', services.ser_date AS 'Fecha',
         services.ser_start AS 'Hora inicio', services.ser_end AS 'Hora fin', services.ser_quotas AS Cupos,
         service_types.ser_typ_name AS 'Tipo Servicio', profesionals.prof_name AS 'Profesional',
-        users.use_mail AS 'Correo', services.use_id AS 'Identificacion', services.ser_status AS 'Estado' FROM services INNER JOIN service_types ON services.ser_typ_id = service_types.ser_typ_id
+        users.use_mail AS 'Correo', services.ser_status AS 'Estado' FROM services INNER JOIN service_types ON services.ser_typ_id = service_types.ser_typ_id
         INNER JOIN profesionals ON services.prof_id = profesionals.prof_id
-        INNER JOIN users ON services.use_id = users.use_id
         WHERE services.ser_date BETWEEN '$startDate' AND '$endDate'
         ORDER BY services.ser_date DESC");
     }
