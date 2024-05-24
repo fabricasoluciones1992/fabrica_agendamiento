@@ -36,7 +36,7 @@ class Service extends Model
             ->join('service_types AS st', 'st.ser_typ_id', '=', 'ser.ser_typ_id')
             ->join('profesionals AS pro', 'pro.prof_id', '=', 'ser.prof_id')
 
-            ->select('ser.ser_id','ser.ser_name', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser_quotas', 'st.ser_typ_id', 'st.ser_typ_name', 'pro.prof_name', 'u.use_mail')
+            ->select('ser.ser_id','ser.ser_name', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser_quotas', 'st.ser_typ_id', 'st.ser_typ_name', 'pro.prof_name')
             ->orderBy('ser.ser_date', 'DESC')->limit(100)->get();
         return $services;
     }
@@ -239,7 +239,7 @@ class Service extends Model
         $service = DB::table('services AS ser')
             ->join('profesionals AS pro', 'pro.prof_id', '=', 'ser.prof_id')
 
-            ->select('ser.ser_id', 'ser.ser_name','ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser.ser_quotas', 'pro.prof_name', 'u.use_mail')
+            ->select('ser.ser_id', 'ser.ser_name','ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser.ser_quotas', 'pro.prof_name')
             ->where('ser.ser_id', '=', $id)->first();
         return $service;
     }
@@ -529,7 +529,7 @@ class Service extends Model
             'services.ser_quotas AS Cupos',
             'service_types.ser_typ_name AS Tipo Servicio',
             'profesionals.prof_name AS Profesional',
-            'users.use_mail AS Correo',
+
             'services.ser_status AS Estado'
         )->join('service_types', 'services.ser_typ_id', '=', 'service_types.ser_typ_id')
             ->join('profesionals', 'services.prof_id', '=', 'profesionals.prof_id')
@@ -550,7 +550,7 @@ class Service extends Model
             'services.ser_quotas AS Cupos',
             'service_types.ser_typ_name AS Tipo Servicio',
             'profesionals.prof_name AS Profesional',
-            'users.use_mail AS Correo',
+
             'services.ser_status AS Estado'
         )->join('service_types', 'services.ser_typ_id', '=', 'service_types.ser_typ_id')
             ->join('profesionals', 'services.prof_id', '=', 'profesionals.prof_id')
@@ -565,7 +565,7 @@ class Service extends Model
                 'services.ser_quotas AS Cupos',
                 'service_types.ser_typ_name AS Tipo Servicio',
                 'profesionals.prof_name AS Profesional',
-                'users.use_mail AS Correo',
+
                 'services.ser_status AS Estado'
             )->join('service_types', 'services.ser_typ_id', '=', 'service_types.ser_typ_id')
             ->join('profesionals', 'services.prof_id', '=', 'profesionals.prof_id')
@@ -578,7 +578,7 @@ class Service extends Model
         $reservation = DB::select("SELECT services.ser_id AS 'No. Servicio', services.ser_name AS 'Nombre del servicio',services.ser_date AS 'Fecha',
         services.ser_start AS 'Hora inicio', services.ser_end AS 'Hora fin', services.ser_quotas AS Cupos,
         service_types.ser_typ_name AS 'Tipo Servicio', profesionals.prof_name AS 'Profesional',
-        users.use_mail AS 'Correo', services.ser_status AS 'Estado' FROM services INNER JOIN service_types ON services.ser_typ_id = service_types.ser_typ_id
+        services.ser_status AS 'Estado' FROM services INNER JOIN service_types ON services.ser_typ_id = service_types.ser_typ_id
         INNER JOIN profesionals ON services.prof_id = profesionals.prof_id
 
         WHERE services.ser_date >= '$date' AND services.ser_status = 1");
@@ -591,7 +591,7 @@ class Service extends Model
         return DB::select("SELECT services.ser_id AS 'No. Servicio', services.ser_name AS 'Nombre del servicio', services.ser_date AS 'Fecha',
         services.ser_start AS 'Hora inicio', services.ser_end AS 'Hora fin', services.ser_quotas AS Cupos,
         service_types.ser_typ_name AS 'Tipo Servicio', profesionals.prof_name AS 'Profesional',
-        users.use_mail AS 'Correo', services.ser_status AS 'Estado' FROM services INNER JOIN service_types ON services.ser_typ_id = service_types.ser_typ_id
+         services.ser_status AS 'Estado' FROM services INNER JOIN service_types ON services.ser_typ_id = service_types.ser_typ_id
         INNER JOIN profesionals ON services.prof_id = profesionals.prof_id
         WHERE services.ser_date BETWEEN '$startDate' AND '$endDate'
         ORDER BY services.ser_date DESC");
