@@ -608,10 +608,12 @@ class Service extends Model
             $users = DB::table('biblioteca_inscriptions as bi')
             ->join('services as se', 'bi.ser_id', '=','se.ser_id')
             ->join('users as u', 'bi.use_id', '=','u.use_id')
-            ->select('bi.bio_ins_id', 'bi.bio_ins_date', 'u.use_mail', 'bi.bio_ins_status', 'se.ser_date','bi.ser_id')
+            ->join('persons as pe', 'pe.use_id', '=','u.use_id')    
+            ->select('bi.bio_ins_id', 'bi.bio_ins_date', 'u.use_mail', 'bi.bio_ins_status', 'se.ser_date','bi.ser_id','pe.per_name','pe.per_lastname','pe.per_document')
             ->where('bi.ser_id', $id)
             ->orderBy('bi.bio_ins_date', 'asc')
             ->get();
+            return $users;
             $service->users = ($users == '[]') ? 'No hay usuarios ingresados' : $users;
             return $service;
     }
