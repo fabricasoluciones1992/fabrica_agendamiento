@@ -537,11 +537,10 @@ class Service extends Model
         return $reservation;
     }
 
-    public static function ActiveServiceUser( $request)
+    public static function ActiveServiceUser()
     {
         $date = date('Y-m-d');
-
-        $reservation = ($request->acc_administrator == 1) ? DB::table('services')->select(
+            $reservation = DB::table('services')->select(
             'services.ser_id AS No. Servicio',
             'services.ser_name AS Nombre del servicio',
             'services.ser_date AS Fecha',
@@ -554,23 +553,10 @@ class Service extends Model
             'services.ser_status AS Estado'
         )->join('service_types', 'services.ser_typ_id', '=', 'service_types.ser_typ_id')
             ->join('profesionals', 'services.prof_id', '=', 'profesionals.prof_id')
-            ->where("ser_date", ">=", $date)->where("ser_status", "=", 1)->get()
+            ->where("ser_date", ">=", $date)->where("ser_status", "=", 1)->get();
 
-            : DB::table('services')->select(
-                'services.ser_id AS No. Servicio',
-                'services.ser_name AS Nombre del servicio',
-                'services.ser_date AS Fecha',
-                'services.ser_start AS Hora inicio',
-                'services.ser_end AS Hora fin',
-                'services.ser_quotas AS Cupos',
-                'service_types.ser_typ_name AS Tipo Servicio',
-                'profesionals.prof_name AS Profesional',
 
-                'services.ser_status AS Estado'
-            )->join('service_types', 'services.ser_typ_id', '=', 'service_types.ser_typ_id')
-            ->join('profesionals', 'services.prof_id', '=', 'profesionals.prof_id')
-          ->where("ser_date", ">=", $date)->where("ser_status", "=", 1)->get();
-        return $reservation;
+         return $reservation;
     }
     public static function Calendar()
     {

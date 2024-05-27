@@ -125,7 +125,7 @@ class ServicesController extends Controller
             'ser_typ_id.integer' => 'El tipo de reserva no es valido.',
             'prof_id.required' => 'El profesional a reservar es requerido.',
 
-            
+
         ];
 
         $validator = Validator::make($request->input(), $rules, $messages);
@@ -170,8 +170,8 @@ public function reserFilters($proj_id, $use_id, $column, $data){
    }
 }
 
-public function ActiveServiceUser($proj_id, $use_id, Request $request){
-   $service = Service::ActiveServiceUser($use_id, $request);
+public function ActiveServiceUser( $proj_id, $use_id){
+   $service = Service::ActiveServiceUser();
    if ($service == '[]'){
        return response()->json([
            'status' => False,
