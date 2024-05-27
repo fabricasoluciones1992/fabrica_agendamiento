@@ -21,7 +21,7 @@ class BibliotecaInscription extends Model
     protected $fillable = [
         'bio_ins_date',
         'bio_ins_status',
-        'stu_id',
+        'use_id',
         'ser_id'
     ];
 
@@ -30,9 +30,8 @@ class BibliotecaInscription extends Model
     public static function select(){
         return DB::table('biblioteca_inscriptions as bi')
             ->join('services as se', 'bi.ser_id', '=','se.ser_id')
-            ->join('students as st', 'bi.stu_id', '=','st.stu_id')
-            ->join('persons as pe', 'st.per_id','=','pe.per_id')
-            ->select('bi.bio_ins_id', 'bi.bio_ins_date', 'se.ser_name', 'bi.bio_ins_status', 'bi.stu_id', 'bi.ser_id','se.ser_date','se.ser_start','se.ser_end','se.ser_status','se.ser_quotas','pe.per_name','pe.per_lastname','pe.per_document')
+            ->join('users as u', 'bi.use_id', '=','u.use_id')
+            ->select('bi.bio_ins_id', 'bi.bio_ins_date', 'se.ser_name', 'bi.bio_ins_status', 'bi.use_id', 'bi.ser_id','se.ser_date','se.ser_start','se.ser_end','se.ser_status','se.ser_quotas', 'u.use_mail')
             ->orderBy('bi.bio_ins_date', 'asc')
             ->get();
     }
@@ -43,7 +42,7 @@ class BibliotecaInscription extends Model
         $services = DB::table('biblioteca_inscriptions as bi')
             ->join('services as se', 'se.ser_id', '=', 'bi.ser_id')
             ->select('se.ser_id', 'se.ser_date', 'se.ser_start', 'se.ser_end', 'se.ser_status')
-            ->where('bi.stu_id', '=', $request->stu_id)
+            ->where('bi.use_id', '=', $request->use_id)
             ->where('se.ser_status', '=', 1)
             ->get();
         $service =  Service::find($request->ser_id);
@@ -51,7 +50,7 @@ class BibliotecaInscription extends Model
         $newSerEnd = Carbon::parse($service->ser_end);
         // Se establecen los parametros para ingresar datos.
         $rules = [
-            'stu_id' => ['required'],
+            'use_id' => ['required'],
             'ser_id' => ['required']
 
         ];
@@ -84,9 +83,9 @@ class BibliotecaInscription extends Model
         } else {
             // Si los datos son correctos se procede a guardar los datos en la base de datos.
 
-            $student =  DB::table('students AS st')->where('st.stu_id', '=', $request->stu_id)->first();
+            $student =  DB::table('users as u')->where('u.use_id', '=', $request->use_id)->first();
             if ($service == null || $student == null) {
-                $message = ($service == null) ? 'El servicio no existe.' : ' El estudiante no existe.';
+                $message = ($service == null) ? 'El servicio no existe.' : ' El usuario no existe.';
                 return response()->json([
                     'status' => False,
                     'message' => $message
@@ -132,9 +131,8 @@ class BibliotecaInscription extends Model
     public static function findOne($id){
         return DB::table('biblioteca_inscriptions as bi')
             ->join('services as se', 'bi.ser_id', '=','se.ser_id')
-            ->join('students as st', 'bi.stu_id', '=','st.stu_id')
-            ->join('persons as pe', 'st.per_id','=','pe.per_id')
-            ->select('bi.bio_ins_id', 'se.ser_name', 'bi.bio_ins_date', 'bi.bio_ins_status', 'bi.stu_id', 'bi.ser_id','se.ser_date','se.ser_start','se.ser_end','se.ser_status','se.ser_quotas','pe.per_name','pe.per_lastname','pe.per_document')
+            ->join('users as u', 'bi.use_id', '=','u.use_id')
+            ->select('bi.bio_ins_id', 'bi.bio_ins_date', 'se.ser_name', 'bi.bio_ins_status', 'bi.use_id', 'bi.ser_id','se.ser_date','se.ser_start','se.ser_end','se.ser_status','se.ser_quotas', 'u.use_mail')
             ->where('bi.bio_ins_id', $id)
             ->orderBy('bi.bio_ins_date', 'asc')
             ->first();
@@ -146,7 +144,7 @@ class BibliotecaInscription extends Model
         $services = DB::table('biblioteca_inscriptions as bi')
             ->join('services as se', 'se.ser_id', '=', 'bi.ser_id')
             ->select('bi.bio_ins_id','se.ser_id', 'se.ser_date', 'se.ser_start', 'se.ser_end', 'se.ser_status')
-            ->where('bi.stu_id', '=', $request->stu_id)
+            ->where('bi.use_id', '=', $request->use_id)
             ->where('se.ser_status', '=', 1)
             ->get();
         $service =  Service::find($request->ser_id);
@@ -154,7 +152,7 @@ class BibliotecaInscription extends Model
         $newSerEnd = Carbon::parse($service->ser_end);
         // Se establecen los parametros para ingresar datos.
         $rules = [
-            'stu_id' => ['required'],
+            'use_id' => ['required'],
             'ser_id' => ['required']
 
         ];
@@ -185,9 +183,9 @@ class BibliotecaInscription extends Model
 
             $biblioteca =  BibliotecaInscription::find($id);
             $service =  Service::find($request->ser_id);
-            $student =  DB::table('students AS st')->where('st.stu_id', '=', $request->stu_id)->first();
+            $student =  DB::table('users AS u')->where('u.use_id', '=', $request->use_id)->first();
             if ($biblioteca == null || $service == null || $student == null) {
-                $message = ($biblioteca == null) ? 'La inscripción no existe.' : ($service == null ? 'El servicio no existe.' : ' El estudiante no existe.');
+                $message = ($biblioteca == null) ? 'La inscripción no existe.' : ($service == null ? 'El servicio no existe.' : ' El usuario no existe.');
                 return response()->json([
                     'status' => False,
                     'message' => $message
@@ -217,7 +215,7 @@ class BibliotecaInscription extends Model
 
                         // Se actualizará la fecha en el día que se genere el cambio.
                         $biblioteca->bio_ins_date = $date;
-                        $biblioteca->stu_id = $request->stu_id;
+                        $biblioteca->use_id = $request->use_id;
                         $biblioteca->ser_id = $request->ser_id;
                         $biblioteca->save();
                         // Se guarda la novedad en la base de datos.
@@ -248,8 +246,8 @@ class BibliotecaInscription extends Model
     public static function studentActive($id){
         return DB::table('biblioteca_inscriptions as bi')
             ->join('services as se', 'bi.ser_id', '=','se.ser_id')
-            ->select('bi.bio_ins_id','se.ser_name', 'bi.bio_ins_date', 'bi.bio_ins_status', 'bi.stu_id', 'bi.ser_id','se.ser_date','se.ser_start','se.ser_end','se.ser_status','se.ser_quotas')
-            ->where('bi.stu_id', $id)
+            ->select('bi.bio_ins_id','se.ser_name', 'bi.bio_ins_date', 'bi.bio_ins_status', 'bi.use_id', 'bi.ser_id','se.ser_date','se.ser_start','se.ser_end','se.ser_status','se.ser_quotas')
+            ->where('bi.use_id', $id)
             ->where('bi.bio_ins_status', 1)
             ->orderBy('bi.bio_ins_date', 'asc')
             ->get();
