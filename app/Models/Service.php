@@ -191,7 +191,7 @@ class Service extends Model
                                     // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon
                                     $validatedResStart = Carbon::parse($servicesUsersKey->ser_start);
                                     $validatedResEnd = carbon::parse($servicesUsersKey->ser_end);
-                                    if ($newSerStart->lt($validatedResEnd) && $newSerEnd->gt($validatedResStart) && $servicesUsersKey->ser_status == 1) {
+                                    if ($newSerStart->lt($validatedResEnd) && $newSerEnd->gt($validatedResStart) && $servicesUsersKey->ser_status == 1 && $servicesUsersKey->prof_id == $request->prof_id) {
                                         // Hay superposición, la nueva reserva no es posible
                                         return response()->json([
                                             'status' => False,
