@@ -45,7 +45,7 @@ class ServicesController extends Controller
             'ser_quotas' => ['required', 'regex:/^[1-9][0-9]?$|^100$/'],
             'ser_typ_id' => 'required|integer',
             'prof_id' => 'required',
-            'use_id' => 'required'
+       
 
         ];
         $messages = [
@@ -108,7 +108,6 @@ class ServicesController extends Controller
             'ser_quotas' => ['required', 'regex:/^[1-9][0-9]?$|^100$/'],
             'ser_typ_id' => 'required|integer',
             'prof_id' => 'required|integer',
-            'use_id' => 'required|integer'
 
         ];
 
@@ -125,7 +124,7 @@ class ServicesController extends Controller
             'ser_typ_id.required' => 'El tipo de reserva es requerido.',
             'ser_typ_id.integer' => 'El tipo de reserva no es valido.',
             'prof_id.required' => 'El profesional a reservar es requerido.',
-            
+
         ];
 
         $validator = Validator::make($request->input(), $rules, $messages);
