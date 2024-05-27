@@ -61,7 +61,7 @@ class ServicesController extends Controller
             'ser_typ_id.required' => 'El tipo de servicio es requerido.',
             'ser_typ_id.integer' => 'El tipo de servicio no es valido.',
             'prof_id.required' => 'El profesional del servicio es requerido.',
-            'use_id.required' => 'El usuario que realiza la reserva es requerido.'
+
         ];
 
         $validator = Validator::make($request->input(), $rules, $messages);
@@ -125,7 +125,7 @@ class ServicesController extends Controller
             'ser_typ_id.required' => 'El tipo de reserva es requerido.',
             'ser_typ_id.integer' => 'El tipo de reserva no es valido.',
             'prof_id.required' => 'El profesional a reservar es requerido.',
-            'use_id.required' => 'El usuario que realiza la reserva es requerido.'
+            
         ];
 
         $validator = Validator::make($request->input(), $rules, $messages);
