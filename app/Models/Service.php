@@ -312,7 +312,7 @@ class Service extends Model
                     ->where('ser.ser_date', '=', $request->ser_date)
                     ->where('pro.prof_id', '=', $request->prof_id)->get();
 
-                if ($totalservicesDayCount < 3) {
+
                     if ($servicesUsers->isEmpty()) {
                         if ($request->ser_date == $date && $request->ser_start <= $actualHour) {
                             return response()->json([
@@ -495,12 +495,7 @@ class Service extends Model
                             ], 200);
                         }
                     }
-                } else {
-                    return response()->json([
-                        'status' => False,
-                        'message' => 'Este usuario no puede hacer mas reservaciones.'
-                    ], 400);
-                }
+
             } else {
                 return response()->json([
                     'status' => False,
