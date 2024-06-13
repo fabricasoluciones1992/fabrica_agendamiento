@@ -102,7 +102,7 @@ class Reservation extends Model
                         if ($request->res_date == $date && $request->res_start <= $actualHour) {
                             return response()->json([
                                 'status' => False,
-                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a: ' . $actualHour . '.'
+                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a ' . $actualHour . '.'
                             ], 400);
                         } else {
 
@@ -163,7 +163,7 @@ class Reservation extends Model
                         if ($request->res_date == $date && $request->res_start <= $actualHour) {
                             return response()->json([
                                 'status' => False,
-                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a: ' . $actualHour . '.'
+                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a ' . $actualHour . '.'
                             ], 400);
                         }
                         if ($validateDay->isNotEmpty()) {
@@ -200,7 +200,7 @@ class Reservation extends Model
             } else {
                 return response()->json([
                     'status' => False,
-                    'message' => 'Hora invalida, ' . $request->res_end . ' debe ser mayor a ' . $request->res_start . ' y el rango de la reserva debe ser mínimo de 30 minutos y máximo 2 horas.'
+                    'message' => 'Hora invalida, la hora final debe ser mayor a la inicial y el rango de la reserva debe ser mínimo de 30 minutos y máximo 2 horas.'
                 ], 400);
             }
         } else {
@@ -302,7 +302,7 @@ class Reservation extends Model
                         if ($request->res_date == $date && $request->res_start <= $actualHour) {
                             return response()->json([
                                 'status' => False,
-                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a:' . $actualHour . '.'
+                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a ' . $actualHour . '.'
                             ], 400);
                         }
                         if ($validateDay->isEmpty()) {
@@ -355,7 +355,7 @@ class Reservation extends Model
                         if ($request->res_date == $date && $request->res_start <= $actualHour) {
                             return response()->json([
                                 'status' => False,
-                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a:' . $actualHour . '.'
+                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a ' . $actualHour . '.'
                             ], 400);
                         }
                         if ($validateDay->isEmpty()) {
@@ -423,7 +423,7 @@ class Reservation extends Model
             } else {
                 return response()->json([
                     'status' => False,
-                    'message' => 'Hora invalida, ' . $request->res_end . ' debe ser mayor a ' . $request->res_start . ' y el rango de la reserva debe ser mínimo de 30 minutos y máximo 2 horas.'
+                    'message' => 'Hora invalida, la hora final debe ser mayor a la inicial y el rango de la reserva debe ser mínimo de 30 minutos y máximo 2 horas.'
                 ], 400);
             }
         } else {

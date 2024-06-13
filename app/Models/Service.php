@@ -103,7 +103,7 @@ class Service extends Model
                             if ($request->ser_date == $date && $request->ser_start <= $actualHour) {
                                 return response()->json([
                                     'status' => False,
-                                    'message' => 'La hora inicial de la reserva debe ser igual o mayor a: ' . $actualHour . '.'
+                                    'message' => 'La hora inicial de la reserva debe ser igual o mayor a ' . $actualHour . '.'
                                 ], 400);
                             } else {
                                 if ($validateDay->isEmpty()) {
@@ -183,7 +183,7 @@ class Service extends Model
                             if ($request->ser_date == $date && $request->ser_start <= $actualHour) {
                                 return response()->json([
                                     'status' => False,
-                                    'message' => 'La hora inicial de la reserva debe ser igual o mayor a:' . $actualHour . '.'
+                                    'message' => 'La hora inicial de la reserva debe ser igual o mayor a ' . $actualHour . '.'
                                 ], 400);
                             }
                             if (!empty($validateDay)) {
@@ -214,7 +214,7 @@ class Service extends Model
                 } else {
                     return response()->json([
                         'status' => False,
-                        'message' => 'Hora invalida, ' . $request->ser_end . ' debe ser mayor a ' . $request->ser_start . ' y el rango de la reserva debe ser mínimo de 30 minutos y máximo 2 horas.'
+                        'message' => 'Hora invalida, la hora final debe ser mayor a la inicial y el rango de la reserva debe ser mínimo de 30 minutos y máximo 2 horas.'
                     ], 400);
                 }
             } else {
@@ -317,7 +317,7 @@ class Service extends Model
                         if ($request->ser_date == $date && $request->ser_start <= $actualHour) {
                             return response()->json([
                                 'status' => False,
-                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a: ' . $actualHour . '.'
+                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a ' . $actualHour . '.'
                             ], 400);
                         }
                         if ($validateDay->isEmpty()) {
@@ -390,7 +390,7 @@ class Service extends Model
                         if ($request->ser_date == $date && $request->ser_start <= $actualHour) {
                             return response()->json([
                                 'status' => False,
-                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a:' . $actualHour . '.'
+                                'message' => 'La hora inicial de la reserva debe ser igual o mayor a ' . $actualHour . '.'
                             ], 400);
                         }
                         if (!$validateDay->isEmpty()) {
@@ -499,7 +499,7 @@ class Service extends Model
             } else {
                 return response()->json([
                     'status' => False,
-                    'message' => 'Hora invalida, ' . $request->ser_end . ' debe ser mayor a ' . $request->ser_start . ' y el rango de la reserva debe ser mínimo de 30 minutos y máximo 2 horas.'
+                    'message' => 'Hora invalida, la hora final debe ser mayor a la inicial y el rango de la reserva debe ser mínimo de 30 minutos y máximo 2 horas.'
                 ], 400);
             }
         } else {
@@ -608,7 +608,7 @@ class Service extends Model
             $users = DB::table('biblioteca_inscriptions as bi')
             ->join('services as se', 'bi.ser_id', '=','se.ser_id')
             ->join('users as u', 'bi.use_id', '=','u.use_id')
-            ->join('persons as pe', 'pe.use_id', '=','u.use_id')    
+            ->join('persons as pe', 'pe.use_id', '=','u.use_id')
             ->select('bi.bio_ins_id', 'bi.bio_ins_date', 'u.use_mail', 'bi.bio_ins_status', 'se.ser_date','bi.ser_id','pe.per_name','pe.per_lastname','pe.per_document')
             ->where('bi.ser_id', $id)
             ->orderBy('bi.bio_ins_date', 'asc')
