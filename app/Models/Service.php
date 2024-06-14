@@ -555,7 +555,7 @@ class Service extends Model
     {
         $date = date('Y-m-d');
         $reservation = DB::select("SELECT services.ser_id AS 'No. Servicio', services.ser_name AS 'Nombre del servicio',services.ser_date AS 'Fecha',
-        services.ser_start AS 'Hora inicio', services.ser_end AS 'Hora fin', services.ser_quotas AS Cupos,
+        services.ser_start AS 'Hora inicio', services.ser_end AS 'Hora fin', services.ser_quotas AS 'Cupos Totales',
         service_types.ser_typ_name AS 'Tipo Servicio', profesionals.prof_name AS 'Profesional',
         services.ser_status AS 'Estado' FROM services INNER JOIN service_types ON services.ser_typ_id = service_types.ser_typ_id
         INNER JOIN profesionals ON services.prof_id = profesionals.prof_id
@@ -563,7 +563,13 @@ class Service extends Model
 
         foreach ($reservation as $serviceKey) {
 
-            $serviceKey->registers = DB::table('services')->where('ser_name', $serviceKey->{'Nombre del servicio'})->count();
+            $serviceKey->{'No. inscripciones'} = DB::table('services')
+            ->where('ser_name', $serviceKey->{'Nombre del servicio'})
+            ->where('ser_status', 1)
+            ->where('ser_date',$serviceKey->{'Fecha'})
+            ->where('ser_start',$serviceKey->{'Hora inicio'})
+            ->where('ser_end',$serviceKey->{'Hora fin'})
+            ->count();
         }
         return $reservation;
     }
