@@ -80,7 +80,7 @@ class Service extends Model
             // Se comprueba que el profesional este habilitado
             if ($profesional->prof_status != 0) {
                 // Se comprueba que la reserva sea minimo de treinta minutos y máximo de dos horas.
-                if ($request->ser_end >= $minHourFormat && $request->ser_end <= $maxHourFormat && $request->ser_start < $request->ser_end) {
+                if ($request->ser_end >= $minHourFormat && $request->ser_start < $request->ser_end) {
 
                     $servicesSinceDate = DB::select("SELECT COUNT(services.ser_id) AS total_ser
                                                 FROM services
@@ -215,7 +215,7 @@ class Service extends Model
                 } else {
                     return response()->json([
                         'status' => False,
-                        'message' => 'Hora invalida, la hora final debe ser mayor a la inicial y el rango de la reserva debe ser mínimo de 30 minutos y máximo 2 horas.'
+                        'message' => 'Hora invalida, la hora final debe ser mayor a la inicial y la reserva debe ser mínimo de 30 minutos.'
                     ], 400);
                 }
             } else {
@@ -497,7 +497,7 @@ class Service extends Model
             } else {
                 return response()->json([
                     'status' => False,
-                    'message' => 'Hora invalida, la hora final debe ser mayor a la inicial y el rango de la reserva debe ser mínimo de 30 minutos y máximo 2 horas.'
+                    'message' => 'Hora invalida, la hora final debe ser mayor a la inicial y la reserva debe ser mínimo de 30 minutos.'
                 ], 400);
             }
         } else {

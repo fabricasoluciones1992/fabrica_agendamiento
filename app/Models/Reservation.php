@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Psy\CodeCleaner\ReturnTypePass;
 
 class Reservation extends Model
 {
@@ -296,7 +297,6 @@ class Reservation extends Model
                         ->where('res.res_date', '=', $request->res_date)
                         ->where('sp.spa_id', '=', $request->spa_id)
                         ->orderBy('res.res_date', 'DESC')->get();
-
                     if ($reserUsers->isEmpty()) {
 
                         if ($request->res_date == $date && $request->res_start <= $actualHour) {
@@ -385,6 +385,21 @@ class Reservation extends Model
                                     ], 400);
                                 }
                             }
+                            // Si el foreach no para en ningún if al salir se actualizará la reserva.
+                            $reservations = Reservation::find($id);
+                            $reservations->res_date = $request->res_date;
+                            $reservations->res_start = $request->res_start;
+                            $reservations->res_end = $request->res_end;
+                            $reservations->spa_id = $request->spa_id;
+                            $reservations->use_id = $request->use_id;
+                            // Se guarda la novedad
+                            $reservations->save();
+                            // Reporte de novedad
+                            Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla reservations ", 1, $proj_id, $use_id);
+                            return response()->json([
+                                'status' => True,
+                                'message' => 'La reserva en el espacio ' . $space->spa_name . ' se actualizó exitosamente el dia' . $reservations->res_date . ' por el usuario: ' . $user->use_mail . '.'
+                            ], 200);
                         } else {
                             foreach ($validateDay as $validateDayKey) {
                                 // Pasamos los datos de la hora de reserva que llegan de la base de datos a tipo carbon
@@ -413,6 +428,7 @@ class Reservation extends Model
                                 'message' => 'La reserva en el espacio ' . $space->spa_name . ' se actualizó exitosamente el dia' . $reservations->res_date . ' por el usuario: ' . $user->use_mail . '.'
                             ], 200);
                         }
+                        return 'aaaa';
                     }
                 } else {
                     return response()->json([
