@@ -39,6 +39,17 @@ class Service extends Model
             ->select('ser.ser_id', 'ser.ser_name', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser_quotas', 'st.ser_typ_id', 'st.ser_typ_name', 'pro.prof_name')
             ->orderBy('ser.ser_date', 'DESC')->limit(100)->get();
 
+            foreach ($services as $serviceKey) {
+
+                $serviceKey->{'No. inscripciones'} = DB::table('biblioteca_inscriptions')
+                    ->join('services', 'services.ser_id', '=', 'biblioteca_inscriptions.ser_id')
+                    ->where('ser_name', $serviceKey->ser_name)
+                    ->where('bio_ins_status', 1)
+                    ->where('ser_date', $serviceKey->ser_date)
+                    ->where('ser_start', $serviceKey->ser_start)
+                    ->where('ser_end', $serviceKey->ser_end)
+                    ->count();
+            }
 
         return $services;
     }
@@ -242,6 +253,15 @@ class Service extends Model
 
             ->select('ser.ser_id', 'ser.ser_name', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser.ser_quotas', 'pro.prof_name')
             ->where('ser.ser_id', '=', $id)->first();
+
+            $service->{'No. inscripciones'} = DB::table('biblioteca_inscriptions')
+                    ->join('services', 'services.ser_id', '=', 'biblioteca_inscriptions.ser_id')
+                    ->where('ser_name', $service->ser_name)
+                    ->where('bio_ins_status', 1)
+                    ->where('ser_date', $service->ser_date)
+                    ->where('ser_start', $service->ser_start)
+                    ->where('ser_end', $service->ser_end)
+                    ->count();
         return $service;
     }
 
