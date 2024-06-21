@@ -209,7 +209,7 @@ class Service extends Model
                         Controller::NewRegisterTrigger("Se realizó una inserción de datos en la tabla services ", 3, $proj_id, $use_id);
                         return response()->json([
                             'status' => True,
-                            'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se creo exitosamente el dia ' . $services->ser_date .  '.',
+                            'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se creo exitosamente el dia ' . $services->ser_date . '.',
                         ], 200);
                     }
                 } else {
@@ -336,7 +336,7 @@ class Service extends Model
                         Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla services ", 1, $proj_id, $use_id);
                         return response()->json([
                             'status' => True,
-                            'message' => 'La reserva con el profesional  ' . $profesional->prof_name . ' se actualizó exitosamente el dia ' . $services->ser_date .  '.'
+                            'message' => 'La reserva con el profesional  ' . $profesional->prof_name . ' se actualizó exitosamente el dia ' . $services->ser_date . '.'
                         ], 200);
                     } else {
                         foreach ($validateDay as $validateDayKey) {
@@ -384,7 +384,7 @@ class Service extends Model
 
                         return response()->json([
                             'status' => True,
-                            'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia ' . $services->ser_date .  '.'
+                            'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia ' . $services->ser_date . '.'
                         ], 200);
                     }
                 } else {
@@ -436,7 +436,7 @@ class Service extends Model
                                 return response()->json([
 
                                     'status' => True,
-                                    'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date  . '.'
+                                    'message' => 'La reserva con el profesional ' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date . '.'
                                 ], 200);
                             }
                         }
@@ -490,7 +490,7 @@ class Service extends Model
                         Controller::NewRegisterTrigger("Se realizó una actualización de datos en la tabla services ", 1, $proj_id, $use_id);
                         return response()->json([
                             'status' => True,
-                            'message' => 'La reserva con el profesional' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date .  '.'
+                            'message' => 'La reserva con el profesional' . $profesional->prof_name . ' se actualizó exitosamente el dia' . $services->ser_date . '.'
                         ], 200);
                     }
                 }
@@ -561,15 +561,18 @@ class Service extends Model
         INNER JOIN profesionals ON services.prof_id = profesionals.prof_id
         WHERE services.ser_date >= '$date' AND services.ser_status = 1");
 
-        foreach ($reservation as $serviceKey) {
 
-            $serviceKey->{'No. inscripciones'} = DB::table('services')
-            ->where('ser_name', $serviceKey->{'Nombre del servicio'})
-            ->where('ser_status', 1)
-            ->where('ser_date',$serviceKey->{'Fecha'})
-            ->where('ser_start',$serviceKey->{'Hora inicio'})
-            ->where('ser_end',$serviceKey->{'Hora fin'})
-            ->count();
+    foreach ($reservation as $serviceKey) {
+
+            $serviceKey->{'No. inscripciones'} = DB::table('biblioteca_inscriptions')
+                ->join('services', 'services.ser_id', '=', 'biblioteca_inscriptions.ser_id')
+                ->where('ser_name', $serviceKey->{'Nombre del servicio'})
+                ->where('ser_status', 1)
+                ->where('bio_ins_status', 1)
+                ->where('ser_date', $serviceKey->{'Fecha'})
+                ->where('ser_start', $serviceKey->{'Hora inicio'})
+                ->where('ser_end', $serviceKey->{'Hora fin'})
+                ->count();
         }
         return $reservation;
     }
