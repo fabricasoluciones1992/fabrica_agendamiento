@@ -242,7 +242,7 @@ public function users(Request $request){
 
     public function usersIn($proj_id, $use_id, $id){
         $services = Service::incriptionsPerService($id);
-        return $services;
+        // return $services;
         if ($services == null)
         {
             return response()->json([

@@ -562,7 +562,7 @@ class Service extends Model
         WHERE services.ser_date >= '$date' AND services.ser_status = 1");
 
 
-    foreach ($reservation as $serviceKey) {
+        foreach ($reservation as $serviceKey) {
 
             $serviceKey->{'No. inscripciones'} = DB::table('biblioteca_inscriptions')
                 ->join('services', 'services.ser_id', '=', 'biblioteca_inscriptions.ser_id')
@@ -616,17 +616,20 @@ class Service extends Model
             ->select('ser.ser_id', 'ser.ser_name', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser.ser_quotas', 'pro.prof_name')
             ->where('ser.ser_id', '=', $id)
             ->first();
-
-        $users = DB::table('biblioteca_inscriptions as bi')
-            ->join('services as se', 'bi.ser_id', '=', 'se.ser_id')
-            ->join('users as u', 'bi.use_id', '=', 'u.use_id')
-            ->join('persons as pe', 'pe.use_id', '=', 'u.use_id')
-            ->select('bi.bio_ins_id', 'bi.bio_ins_date', 'u.use_mail', 'bi.bio_ins_status', 'se.ser_date', 'bi.ser_id', 'pe.per_name', 'pe.per_lastname', 'pe.per_document')
-            ->where('bi.ser_id', $id)
-            ->orderBy('bi.bio_ins_date', 'asc')
-            ->get();
-        return $users;
-        $service->users = ($users == '[]') ? 'No hay usuarios ingresados' : $users;
-        return $service;
+        if ($service == null){
+            return $service;
+        }else{
+            $users = DB::table('biblioteca_inscriptions as bi')
+                ->join('services as se', 'bi.ser_id', '=', 'se.ser_id')
+                ->join('users as u', 'bi.use_id', '=', 'u.use_id')
+                ->join('persons as pe', 'pe.use_id', '=', 'u.use_id')
+                ->select('bi.bio_ins_id', 'bi.bio_ins_date', 'u.use_mail', 'bi.bio_ins_status', 'se.ser_date', 'bi.ser_id', 'pe.per_name', 'pe.per_lastname', 'pe.per_document')
+                ->where('bi.ser_id', $id)
+                // ->where('bi.bio_ins_status', 1)
+                ->orderBy('bi.bio_ins_date', 'asc')
+                ->get();
+            $service->users = ($users == '[]') ? 'No hay usuarios ingresados' : $users;
+            return $service;
+        }
     }
 }
