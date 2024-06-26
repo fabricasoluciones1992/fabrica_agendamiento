@@ -8,15 +8,18 @@ use Illuminate\Http\Request;
 
 class BibliotecaInscriptionController extends Controller
 {
-
+// Función para traer todas las inscripciones que existen en la base de datos
     public function index($proj_id, $use_id)
     {
+        // Dirige a la función del modelo con el nombre 'select'.
         $bilioteca = BibliotecaInscription::select();
+        // Si no hay ninguna inscripción en la base de datos, se retorna un mensaje de error.
         if($bilioteca == null){
             return response()->json([
             'status' => False,
             'message' => 'No hay inscripciones disponibles.'
             ],400);
+            // Al encontrar inscripciones el sistema devuelve los datos en forma de respuesta api.
         }else{
             Controller::NewRegisterTrigger("Se realizó una busqueda de datos en la tabla biblioteca_Inscriptions ",4,$proj_id,$use_id);
             return response()->json([
@@ -29,8 +32,6 @@ class BibliotecaInscriptionController extends Controller
     public function store(Request $request, $proj_id, $use_id)
     {
         return BibliotecaInscription::make($request, $proj_id, $use_id);
-
-
     }
 
 
