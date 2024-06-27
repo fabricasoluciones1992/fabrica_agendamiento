@@ -39,17 +39,17 @@ class Service extends Model
             ->select('ser.ser_id', 'ser.ser_name', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser_quotas', 'st.ser_typ_id', 'st.ser_typ_name', 'pro.prof_name')
             ->orderBy('ser.ser_date', 'DESC')->limit(100)->get();
 
-            foreach ($services as $serviceKey) {
+        foreach ($services as $serviceKey) {
 
-                $serviceKey->{'No. inscripciones'} = DB::table('biblioteca_inscriptions')
-                    ->join('services', 'services.ser_id', '=', 'biblioteca_inscriptions.ser_id')
-                    ->where('ser_name', $serviceKey->ser_name)
-                    ->where('bio_ins_status', 1)
-                    ->where('ser_date', $serviceKey->ser_date)
-                    ->where('ser_start', $serviceKey->ser_start)
-                    ->where('ser_end', $serviceKey->ser_end)
-                    ->count();
-            }
+            $serviceKey->{'No. inscripciones'} = DB::table('biblioteca_inscriptions')
+                ->join('services', 'services.ser_id', '=', 'biblioteca_inscriptions.ser_id')
+                ->where('ser_name', $serviceKey->ser_name)
+                ->where('bio_ins_status', 1)
+                ->where('ser_date', $serviceKey->ser_date)
+                ->where('ser_start', $serviceKey->ser_start)
+                ->where('ser_end', $serviceKey->ser_end)
+                ->count();
+        }
 
         return $services;
     }
@@ -254,14 +254,14 @@ class Service extends Model
             ->select('ser.ser_id', 'ser.ser_name', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser.ser_quotas', 'pro.prof_name')
             ->where('ser.ser_id', '=', $id)->first();
 
-            $service->{'No. inscripciones'} = DB::table('biblioteca_inscriptions')
-                    ->join('services', 'services.ser_id', '=', 'biblioteca_inscriptions.ser_id')
-                    ->where('ser_name', $service->ser_name)
-                    ->where('bio_ins_status', 1)
-                    ->where('ser_date', $service->ser_date)
-                    ->where('ser_start', $service->ser_start)
-                    ->where('ser_end', $service->ser_end)
-                    ->count();
+        $service->{'No. inscripciones'} = DB::table('biblioteca_inscriptions')
+            ->join('services', 'services.ser_id', '=', 'biblioteca_inscriptions.ser_id')
+            ->where('ser_name', $service->ser_name)
+            ->where('bio_ins_status', 1)
+            ->where('ser_date', $service->ser_date)
+            ->where('ser_start', $service->ser_start)
+            ->where('ser_end', $service->ser_end)
+            ->count();
         return $service;
     }
 
@@ -639,16 +639,16 @@ class Service extends Model
         // if ($service == null){
         //     return $service;
         // }else{
-            $users = DB::table('biblioteca_inscriptions as bi')
-                ->join('services as se', 'bi.ser_id', '=', 'se.ser_id')
-                ->join('users as u', 'bi.use_id', '=', 'u.use_id')
-                ->join('persons as pe', 'pe.use_id', '=', 'u.use_id')
-                ->select('bi.bio_ins_id', 'bi.bio_ins_date', 'u.use_mail', 'bi.bio_ins_status', 'se.ser_date', 'bi.ser_id', 'pe.per_name', 'pe.per_lastname', 'pe.per_document')
-                ->where('bi.ser_id', $id)
-                ->where('bi.bio_ins_status', 1)
-                ->orderBy('bi.bio_ins_date', 'asc')
-                ->get();
-            return $users;
+        $users = DB::table('biblioteca_inscriptions as bi')
+            ->join('services as se', 'bi.ser_id', '=', 'se.ser_id')
+            ->join('users as u', 'bi.use_id', '=', 'u.use_id')
+            ->join('persons as pe', 'pe.use_id', '=', 'u.use_id')
+            ->select('bi.bio_ins_id', 'bi.bio_ins_date', 'u.use_mail', 'bi.bio_ins_status', 'se.ser_date', 'bi.ser_id', 'pe.per_name', 'pe.per_lastname', 'pe.per_document')
+            ->where('bi.ser_id', $id)
+            ->where('bi.bio_ins_status', 1)
+            ->orderBy('bi.bio_ins_date', 'asc')
+            ->get();
+        return $users;
         // }
     }
 }
