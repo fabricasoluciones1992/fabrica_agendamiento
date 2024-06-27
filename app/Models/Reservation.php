@@ -33,7 +33,7 @@ class Reservation extends Model
             ->join('spaces AS sp', 'sp.spa_id', '=', 'res.spa_id')
             ->join('users AS u', 'u.use_id', '=', 'res.use_id')
             ->select('res.res_id', 'res.res_date', 'res.res_start', 'res.res_end', 'res.res_status', 'sp.spa_name', 'u.use_mail', 'u.use_id')
-            ->orderBy('res.res_date', 'DESC')->limit(100)->get();
+            ->orderBy('res.res_id', 'DESC')->get();
         return $reservations;
     }
 

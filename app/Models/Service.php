@@ -37,7 +37,7 @@ class Service extends Model
             ->join('profesionals AS pro', 'pro.prof_id', '=', 'ser.prof_id')
 
             ->select('ser.ser_id', 'ser.ser_name', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser_quotas', 'st.ser_typ_id', 'st.ser_typ_name', 'pro.prof_name')
-            ->orderBy('ser.ser_date', 'DESC')->limit(100)->get();
+            ->orderBy('ser.ser_id', 'DESC')->get();
 
         foreach ($services as $serviceKey) {
 
@@ -250,10 +250,12 @@ class Service extends Model
     {
         $service = DB::table('services AS ser')
             ->join('profesionals AS pro', 'pro.prof_id', '=', 'ser.prof_id')
-
             ->select('ser.ser_id', 'ser.ser_name', 'ser.ser_date', 'ser.ser_start', 'ser.ser_end', 'ser.ser_status', 'ser.ser_quotas', 'pro.prof_name')
-            ->where('ser.ser_id', '=', $id)->first();
-
+            ->where('ser.ser_id', '=', $id)
+            ->first();
+            if($service == null){
+                return $service;
+            }
         $service->{'No. inscripciones'} = DB::table('biblioteca_inscriptions')
             ->join('services', 'services.ser_id', '=', 'biblioteca_inscriptions.ser_id')
             ->where('ser_name', $service->ser_name)
@@ -278,7 +280,22 @@ class Service extends Model
         $date = date('Y-m-d');
         $actualHour = Carbon::now('America/Bogota')->format('H:i');
         // Trae todos los datos de usuarios y salas según el id que trae el request
+        $services = Service::find($id);
+        $services->{'No. inscripciones'} = DB::table('biblioteca_inscriptions')
+            ->join('services', 'services.ser_id', '=', 'biblioteca_inscriptions.ser_id')
+            ->where('ser_name', $services->ser_name)
+            ->where('bio_ins_status', 1)
+            ->where('ser_date', $services->ser_date)
+            ->where('ser_start', $services->ser_start)
+            ->where('ser_end', $services->ser_end)
+            ->count();
 
+        if ($services->{'No. inscripciones'} > $request->ser_quotas) {
+            return response()->json([
+                'status' => False,
+                'message' => "El número de cupos es menor al numero de estudiantes actualmente registrados."
+            ], 400);
+        }
         $profesional = Profesional::find($request->prof_id);
         if ($profesional == null) {
             return response()->json([
