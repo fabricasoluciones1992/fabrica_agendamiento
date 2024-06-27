@@ -383,8 +383,14 @@ class Reservation extends Model
                                         'status' => False,
                                         'message' => 'Ya existe una reservación en este momento.'
                                     ], 400);
+                                }elseif($newResStart->lt($validatedResEnd) && $newResEnd->gt($validatedResStart) && $request->spa_id != $reserUsersKey->spa_id && $reserUsersKey->res_status == 1 && $request->acc_administrator == 0){
+                                    return response()->json([
+                                        'status' => False,
+                                        'message' => 'Ya tiene una reserva en este momento'
+                                    ], 400);
                                 }
                             }
+                        
                             // Si el foreach no para en ningún if al salir se actualizará la reserva.
                             $reservations = Reservation::find($id);
                             $reservations->res_date = $request->res_date;
