@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Space;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
@@ -128,6 +127,7 @@ class SpaceController extends Controller
     }
 
 
+    // Función para cambiar el estado de un espacio por ID
     public function destroy( $proj_id, $use_id, $id, Request $request)
     {
         if($request->acc_administrator == 1){
