@@ -36,7 +36,7 @@ class ServiceTypesController extends Controller
         // Verifica si el usuario tiene permisos de administrador
         if ($request->acc_administrator == 1) {
             $rules = [
-                'ser_typ_name' => ['required', 'unique:service_types', 'regex:/^([0-9A-ZÁÉÍÓÚÜÑ\s#¿?¡!@$ %^&*:-])+$/']
+                'ser_typ_name' => ['required', 'unique:service_types', 'regex:/^([0-9A-ZÁÉÍÓÚÜÑ\s#¿?¡,!@$%^&*:-])+$/']
             ];
             $validator = Validator::make($request->input(), $rules);
             if ($validator->fails()) { // Maneja los errores de validación
