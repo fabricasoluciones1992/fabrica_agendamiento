@@ -17,16 +17,16 @@ class AuthController extends Controller
             "use_mail" => $request->use_mail,
             "use_password" => $request->use_password
         ]);
-        $user=DB::table('users')->where("use_mail",'=',$request->use_mail)->first();
-        if($user == null){
-            return response()->json([
-                'status' => false,
-                'message' => "El usuario no existe."
-            ],400);
-        }
-        $user = User::find($user->use_id);
+        // $user=DB::table('users')->where("use_mail",'=',$request->use_mail)->first();
+        // // if($user == null){
+        // //     return response()->json([
+        // //         'status' => false,
+        // //         'message' => "El usuario no existe."
+        // //     ],400);
+        // // }
+        // $user = User::find($user->use_id);
 
-        Auth::login($user);
+        // Auth::login($user);
 
         // Check if the HTTP request was successful
         if ($response->successful()) {
@@ -35,6 +35,10 @@ class AuthController extends Controller
             $token = isset($responseData['token']) ? $responseData['token'] : null;
             // Check if a token was retrieved before storing it
             if ($token !== null) {
+            
+                $user=DB::table('users')->where("use_mail",'=',$request->use_mail)->first();
+                $user = User::find($user->use_id);
+                Auth::login($user);
                 // Start the session and store the token
                 // session_start();
                 // $_SESSION['api_token'] = $token;
@@ -44,7 +48,7 @@ class AuthController extends Controller
                 return response()->json([
                     'status' => true,
                     'data' => [
-                        "message" => $responseData['message'],
+                        // "message" => $responseData['message'],
                         "token" => $token,
                         "use_id" => $user->use_id,
                         "acc_administrator" => $responseData['acc_administrator'],
@@ -55,13 +59,13 @@ class AuthController extends Controller
                 return response()->json([
                     'status' => false,
                     'message' => $response->json()
-                ],400);
+                ],401);
             }
         } else {
             // Handle the case where the HTTP request was not successful
             return response()->json([
                 'status' => false,
-                'message' => $response->json()
+                'message' => $response->json()['message']
             ],400);
         }
     }
