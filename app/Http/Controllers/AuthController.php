@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 class AuthController extends Controller
 {
     public function login(Request $request){
-        $response = Http::post('http://127.0.0.1:8088/api/login/1', [
+        $response = Http::post('http://10.10.1.123/fabrica_general/public/index.php/api/login/1', [
             "use_mail" => $request->use_mail,
             "use_password" => $request->use_password
         ]);
@@ -35,7 +35,7 @@ class AuthController extends Controller
             $token = isset($responseData['token']) ? $responseData['token'] : null;
             // Check if a token was retrieved before storing it
             if ($token !== null) {
-            
+
                 $user=DB::table('users')->where("use_mail",'=',$request->use_mail)->first();
                 $user = User::find($user->use_id);
                 Auth::login($user);
